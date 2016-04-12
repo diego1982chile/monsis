@@ -97,5 +97,51 @@ class CategoriaMantencion
     {
         return $this->descripcion;
     }
+    
+    /**
+     * Get componente
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Componente
+     */
+    public function getComponente()
+    {
+        return $this->componente;
+    }
+    
+    /**
+    * Set componente
+    *
+    * @param \Fonasa\MonitorBundle\Entity\Componente
+    * @return CategoriaMantencion
+    */
+    public function setComponente($componente)
+    {
+        $this->componente = $componente;
+        
+        return $this;
+    }      
+    
+    /**
+     * Get idComponente
+     *
+     * @return int
+     */
+    public function getIdComponente()
+    {
+        return $this->idComponente;
+    }
+    
+    /**
+    * Set idComponente
+    *
+    * @param int $idComponente
+    * @return CategoriaMantencion
+    */
+    public function setIdComponente($idComponente)
+    {
+        $this->idComponente = $idComponente;
+        
+        return $this;
+    }     
 }
 

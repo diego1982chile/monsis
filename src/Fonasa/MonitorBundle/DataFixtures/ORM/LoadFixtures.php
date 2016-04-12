@@ -6,17 +6,16 @@ namespace AppBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Fonasa\MonitorBundle\Entity\Area;
-use Fonasa\MonitorBundle\Entity\Estado;
-use Fonasa\MonitorBundle\Entity\Origen;
-use Fonasa\MonitorBundle\Entity\Prioridad;
+use Fonasa\MonitorBundle\Entity\EstadoIncidencia;
+use Fonasa\MonitorBundle\Entity\EstadoMantencion;
+use Fonasa\MonitorBundle\Entity\OrigenIncidencia;
+use Fonasa\MonitorBundle\Entity\SeveridadMantencion;
 use Fonasa\MonitorBundle\Entity\Componente;
 use Fonasa\MonitorBundle\Entity\Tarea;
+use Fonasa\MonitorBundle\Entity\TipoMantencion;
 use Fonasa\MonitorBundle\Entity\TareaUsuario;
-use Fonasa\MonitorBundle\Entity\Tipo;
-use Fonasa\MonitorBundle\Entity\TipoServicio;
-use Fonasa\MonitorBundle\Entity\TipoAlcance;
-use Fonasa\MonitorBundle\Entity\Alcance;
-use Fonasa\MonitorBundle\Entity\Impacto;
+use Fonasa\MonitorBundle\Entity\CategoriaIncidencia;
+use Fonasa\MonitorBundle\Entity\CategoriaMantencion;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -55,147 +54,110 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($area4);
         $manager->flush(); 
                 
-        $connection->exec("ALTER TABLE estado AUTO_INCREMENT = 1;");
+        $connection->exec("ALTER TABLE estado_incidencia AUTO_INCREMENT = 1;");
         
-        $estado1 = new Estado();                
-        $estado1->setNombre("En Cola");
-        $estado1->setDescripcion("en cola");                
+        $estadoIncidencia1 = new EstadoIncidencia();                
+        $estadoIncidencia1->setNombre("En Cola");
+        $estadoIncidencia1->setDescripcion("en cola");                
         
-        $manager->persist($estado1);
+        $manager->persist($estadoIncidencia1);
         $manager->flush();   
         
-        $estado2 = new Estado();                
-        $estado2->setNombre("Análisis");
-        $estado2->setDescripcion("en resolución");                
+        $estadoIncidencia2 = new EstadoIncidencia();                
+        $estadoIncidencia2->setNombre("En Gestión FONASA");
+        $estadoIncidencia2->setDescripcion("En Gestión FONASA");                
         
-        $manager->persist($estado2);
+        $manager->persist($estadoIncidencia2);
         $manager->flush();           
         
-        $estado3 = new Estado();              
-        $estado3->setNombre("Desa");
-        $estado3->setDescripcion("en desarrollo");                
+        $estadoIncidencia3 = new EstadoIncidencia();              
+        $estadoIncidencia3->setNombre("Pendiente MT");
+        $estadoIncidencia3->setDescripcion("Pendiente MT");                
         
-        $manager->persist($estado3);
+        $manager->persist($estadoIncidencia3);
         $manager->flush();               
                 
-        $estado4 = new Estado();              
-        $estado4->setNombre("Test");
-        $estado4->setDescripcion("en testing");                
+        $estadoIncidencia4 = new EstadoIncidencia();              
+        $estadoIncidencia4->setNombre("Resuelta MT");
+        $estadoIncidencia4->setDescripcion("Resuelta MT");                
         
-        $manager->persist($estado4);
+        $manager->persist($estadoIncidencia4);
         $manager->flush();                 
                 
-        $estado5 = new Estado();              
-        $estado5->setNombre("Explotación");
-        $estado5->setDescripcion("en certificación");                
+        $estadoMantencion1 = new EstadoMantencion();              
+        $estadoMantencion1->setNombre("En cola");
+        $estadoMantencion1->setDescripcion("En cola");                
         
-        $manager->persist($estado5);
+        $manager->persist($estadoMantencion1);
         $manager->flush();                       
                 
-        $estado6 = new Estado();              
-        $estado6->setNombre("PaP");
-        $estado6->setDescripcion("pendiente PaP");                
+        $estadoMantencion2 = new EstadoMantencion();              
+        $estadoMantencion2->setNombre("Desa");
+        $estadoMantencion2->setDescripcion("En Desarrollo");                
         
-        $manager->persist($estado6);
-        $manager->flush();           
-                
-        $estado7 = new Estado();              
-        $estado7->setNombre("Cerrada");
-        $estado7->setDescripcion("Cerrada");                
+        $manager->persist($estadoMantencion2);
+        $manager->flush();                       
         
-        $manager->persist($estado7);
-        $manager->flush();     
+        $estadoMantencion3 = new EstadoMantencion();              
+        $estadoMantencion3->setNombre("Test");
+        $estadoMantencion3->setDescripcion("En Testing");                
         
-        $estado8 = new Estado();              
-        $estado8->setNombre("en gestión FONASA");
-        $estado8->setDescripcion("En Gestión FONASA");                
+        $manager->persist($estadoMantencion3);
+        $manager->flush();                                               
         
-        $manager->persist($estado8);
-        $manager->flush();     
+        $estadoMantencion5 = new EstadoMantencion();              
+        $estadoMantencion5->setNombre("PaP");
+        $estadoMantencion5->setDescripcion("Pendiente PaP");                
         
-        $estado9 = new Estado();              
-        $estado9->setNombre("pendiente MT");
-        $estado9->setDescripcion("Pendiente MT");                
+        $manager->persist($estadoMantencion5);
+        $manager->flush();  
         
-        $manager->persist($estado9);
-        $manager->flush();             
+        $estadoMantencion6 = new EstadoMantencion();              
+        $estadoMantencion6->setNombre("Cerrada");
+        $estadoMantencion6->setDescripcion("Cerrada");                
         
-        $estado10 = new Estado();              
-        $estado10->setNombre("resuelta MT");
-        $estado10->setDescripcion("Resuelta MT");                
+        $manager->persist($estadoMantencion6);
+        $manager->flush();          
         
-        $manager->persist($estado10);
-        $manager->flush();    
+        $connection->exec("ALTER TABLE origen_incidencia AUTO_INCREMENT = 1;");
         
-        $connection->exec("ALTER TABLE origen AUTO_INCREMENT = 1;");
-        
-        $origen1 = new Origen();                
-        $origen1->setNombre("Req. FONASA");
-        $origen1->setDescripcion("Requerimiento FONASA");                
+        $origen1 = new OrigenIncidencia();                
+        $origen1->setNombre("MAF");
+        $origen1->setDescripcion("Mesa Ayuda FONASA");                
         
         $manager->persist($origen1);
         $manager->flush();         
         
-        $origen2 = new Origen();                
-        $origen2->setNombre("Req. MINSAL");
-        $origen2->setDescripcion("Requerimiento FONASA");                
+        $origen2 = new OrigenIncidencia();                
+        $origen2->setNombre("MAM");
+        $origen2->setDescripcion("MAM");                
         
         $manager->persist($origen2);
         $manager->flush();         
-                
-        $origen3 = new Origen();              
-        $origen3->setNombre("Mesa ayuda");
-        $origen3->setDescripcion("Mesa de ayuda");                
+                        
+        $connection->exec("ALTER TABLE severidad_mantencion AUTO_INCREMENT = 1;");        
         
-        $manager->persist($origen3);
-        $manager->flush();       
+        $severidad1 = new SeveridadMantencion();
+        $severidad1->setNombre("Alta");
+        $severidad1->setDescripcion("Severidad alta");                
         
-        $connection->exec("ALTER TABLE prioridad AUTO_INCREMENT = 1;");        
-        
-        $prioridad1 = new Prioridad();
-        $prioridad1->setNombre("Alta");
-        $prioridad1->setDescripcion("Prioridad alta");                
-        
-        $manager->persist($prioridad1);
+        $manager->persist($severidad1);
         $manager->flush();            
         
-        $prioridad2 = new Prioridad();
-        $prioridad2->setNombre("Media");
-        $prioridad2->setDescripcion("Prioridad media");                
+        $severidad2 = new SeveridadMantencion();
+        $severidad2->setNombre("Media");
+        $severidad2->setDescripcion("Severidad media");                
         
-        $manager->persist($prioridad2);
-        $manager->flush();                  
+        $manager->persist($severidad2);
+        $manager->flush();            
+        
+        $severidad3 = new SeveridadMantencion();
+        $severidad3->setNombre("Baja");
+        $severidad3->setDescripcion("Severidad baja");                
+        
+        $manager->persist($severidad3);
+        $manager->flush();                    
                 
-        $prioridad3 = new Prioridad();
-        $prioridad3->setNombre("Baja");
-        $prioridad3->setDescripcion("Prioridad baja");                
-        
-        $manager->persist($prioridad3);
-        $manager->flush();                  
-        
-        $connection->exec("ALTER TABLE impacto AUTO_INCREMENT = 1;");                        
-        
-        $impacto1 = new Impacto();
-        $impacto1->setNombre("Alto");
-        $impacto1->setDescripcion("Alto");                
-        
-        $manager->persist($impacto1);
-        $manager->flush();     
-        
-        $impacto2 = new Impacto();
-        $impacto2->setNombre("Medio");
-        $impacto2->setDescripcion("Medio");                
-        
-        $manager->persist($impacto2);
-        $manager->flush();        
-        
-        $impacto3 = new Impacto();
-        $impacto3->setNombre("Leve");
-        $impacto3->setDescripcion("Leve");                
-        
-        $manager->persist($impacto3);
-        $manager->flush();                
-        
         $connection->exec("ALTER TABLE componente AUTO_INCREMENT = 1;");                                        
         
         $componente1 = new Componente();
@@ -226,91 +188,29 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($componente4);
         $manager->flush();                        
         
-        $connection->exec("ALTER TABLE tipo AUTO_INCREMENT = 1;");                                                        
+        $connection->exec("ALTER TABLE tipo_mantencion AUTO_INCREMENT = 1;");                                                                        
         
-        $tipo1 = new Tipo();
-        $tipo1->setNombre("Incidencia");
-        $tipo1->setDescripcion("Incidencia");                
-        
-        $manager->persist($tipo1);
-        $manager->flush();  
-        
-        $tipo2 = new Tipo();
+        $tipo2 = new TipoMantencion();
         $tipo2->setNombre("Mantención Correctiva");
         $tipo2->setDescripcion("Mantención correctiva");                
         
         $manager->persist($tipo2);
         $manager->flush();          
                 
-        $tipo3 = new Tipo();
+        $tipo3 = new TipoMantencion();
         $tipo3->setNombre("Mantención Evolutiva");
         $tipo3->setDescripcion("Mantención evolutiva");                
         
         $manager->persist($tipo3);
         $manager->flush();                  
                 
-        $tipo4 = new Tipo();     
+        $tipo4 = new TipoMantencion();     
         $tipo4->setNombre("Mantención Adaptativa");
         $tipo4->setDescripcion("Mantención Adaptativa");                
         
         $manager->persist($tipo4);
         $manager->flush();                   
-        
-        $connection->exec("ALTER TABLE tipo_servicio AUTO_INCREMENT = 1;");                                                        
-                        
-        $tipoServicio1 = new TipoServicio();
-        $tipoServicio1->setOrigen($origen1);
-        $tipoServicio1->setIdOrigen($origen1->getId());        
-        $tipoServicio1->setTipo($tipo2);
-        $tipoServicio1->setIdTipo($tipo2->getId());        
                 
-        $manager->persist($tipoServicio1);
-        $manager->flush();                       
-        
-        $tipoServicio2 = new TipoServicio();
-        $tipoServicio2->setOrigen($origen1);
-        $tipoServicio2->setTipo($tipo3);
-        $tipoServicio2->setIdTipo($tipo3->getId());                                     
-        
-        $manager->persist($tipoServicio2);
-        $manager->flush();                
-        
-        $tipoServicio3 = new TipoServicio();
-        $tipoServicio3->setOrigen($origen2);
-        $tipoServicio3->setIdOrigen($origen2->getId());        
-        $tipoServicio3->setTipo($tipo2);
-        $tipoServicio3->setIdTipo($tipo2->getId());                                              
-        
-        $manager->persist($tipoServicio3);
-        $manager->flush();      
-        
-        $tipoServicio4 = new TipoServicio();
-        $tipoServicio4->setOrigen($origen2);
-        $tipoServicio4->setIdOrigen($origen2->getId());        
-        $tipoServicio4->setTipo($tipo3);
-        $tipoServicio4->setIdTipo($tipo3->getId());                                             
-        
-        $manager->persist($tipoServicio4);
-        $manager->flush();            
-        
-        $tipoServicio5 = new TipoServicio();
-        $tipoServicio5->setOrigen($origen3);
-        $tipoServicio5->setIdOrigen($origen3->getId());        
-        $tipoServicio5->setTipo($tipo1);
-        $tipoServicio5->setIdTipo($tipo1->getId());                                             
-        
-        $manager->persist($tipoServicio5);
-        $manager->flush();                    
-        
-        $tipoServicio6 = new TipoServicio();
-        $tipoServicio6->setOrigen($origen3);
-        $tipoServicio6->setIdOrigen($origen3->getId());        
-        $tipoServicio6->setTipo($tipo2);
-        $tipoServicio6->setIdTipo($tipo2->getId());                                             
-        
-        $manager->persist($tipoServicio6);
-        $manager->flush();                            
-
         $connection->exec("ALTER TABLE tarea AUTO_INCREMENT = 1;");                                                                        
         
         $tarea1 = new Tarea();
@@ -473,443 +373,272 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tareaUsuario10->setIdTarea($tarea10->getId());                             
         
         $manager->persist($tareaUsuario10);
-        $manager->flush();                 
+        $manager->flush();    
         
-        $connection->exec("ALTER TABLE tipo_alcance AUTO_INCREMENT = 1;");                
+        $connection->exec("ALTER TABLE categoria_incidencia AUTO_INCREMENT = 1;");                
         
-        $tipoAlcance1 = new TipoAlcance();
-        $tipoAlcance1->setNombre("ACR Consulta");
-        $tipoAlcance1->setDescripcion("ACR Consulta");                
+        $tipoAlcance1 = new CategoriaIncidencia();
+        $tipoAlcance1->setNombre("Corrección de datos Paciente");
+        $tipoAlcance1->setDescripcion("Corrección de datos Paciente");                
+        $tipoAlcance1->setComponente($componente1);
+        $tipoAlcance1->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance1);
         $manager->flush();                         
         
-        $tipoAlcance2 = new TipoAlcance();   
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Extracción");
+        $tipoAlcance2->setDescripcion("Extracción");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();                          
+        
+        $connection->exec("ALTER TABLE categoria_mantencion AUTO_INCREMENT = 1;");                
+        
+        $tipoAlcance1 = new CategoriaMantencion();
+        $tipoAlcance1->setNombre("ACR Consulta");
+        $tipoAlcance1->setDescripcion("ACR Consulta");                
+        $tipoAlcance1->setComponente($componente1);
+        $tipoAlcance1->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance1);
+        $manager->flush();                         
+        
+        $tipoAlcance2 = new CategoriaMantencion();   
         $tipoAlcance2->setNombre("Adm. Establecimiento");
         $tipoAlcance2->setDescripcion("Adm. Establecimiento");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance2);
         $manager->flush();                           
                 
-        $tipoAlcance3 = new TipoAlcance();
+        $tipoAlcance3 = new CategoriaMantencion();
         $tipoAlcance3->setNombre("Adm. Colas");
-        $tipoAlcance3->setDescripcion("Adm. Colas");                
+        $tipoAlcance3->setDescripcion("Adm. Colas");          
+        $tipoAlcance3->setComponente($componente1);
+        $tipoAlcance3->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance3);
         $manager->flush();                 
                 
-        $tipoAlcance4 = new TipoAlcance();
+        $tipoAlcance4 = new CategoriaMantencion();
         $tipoAlcance4->setNombre("Arancel");
         $tipoAlcance4->setDescripcion("Arancel");                
+        $tipoAlcance4->setComponente($componente1);
+        $tipoAlcance4->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance4);
         $manager->flush();              
                 
-        $tipoAlcance5 = new TipoAlcance();
+        $tipoAlcance5 = new CategoriaMantencion();
         $tipoAlcance5->setNombre("Beneficiario");
-        $tipoAlcance5->setDescripcion("Beneficiario");                
+        $tipoAlcance5->setDescripcion("Beneficiario");        
+        $tipoAlcance5->setComponente($componente1);
+        $tipoAlcance5->setIdComponente($componente1->getId());        
         
         $manager->persist($tipoAlcance5);
         $manager->flush();                   
                 
-        $tipoAlcance6 = new TipoAlcance();
+        $tipoAlcance6 = new CategoriaMantencion();
         $tipoAlcance6->setNombre("Búsqueda paciente");
         $tipoAlcance6->setDescripcion("Búsqueda paciente");                
+        $tipoAlcance6->setComponente($componente1);
+        $tipoAlcance6->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance6);
         $manager->flush();        
                 
-        $tipoAlcance7 = new TipoAlcance();
+        $tipoAlcance7 = new CategoriaMantencion();
         $tipoAlcance7->setNombre("CAT");
         $tipoAlcance7->setDescripcion("CAT");                
+        $tipoAlcance7->setComponente($componente1);
+        $tipoAlcance7->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance7);
         $manager->flush();              
                 
-        $tipoAlcance8 = new TipoAlcance();
+        $tipoAlcance8 = new CategoriaMantencion();
         $tipoAlcance8->setNombre("CUP");
         $tipoAlcance8->setDescripcion("CUP");                
+        $tipoAlcance8->setComponente($componente1);
+        $tipoAlcance8->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance8);
         $manager->flush();          
         
-        $tipoAlcance9 = new TipoAlcance();
+        $tipoAlcance9 = new CategoriaMantencion();
         $tipoAlcance9->setNombre("Datamart");
-        $tipoAlcance9->setDescripcion("Datamart");                
+        $tipoAlcance9->setDescripcion("Datamart");            
+        $tipoAlcance9->setComponente($componente1);
+        $tipoAlcance9->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance9);
         $manager->flush();               
                 
-        $tipoAlcance10 = new TipoAlcance();
+        $tipoAlcance10 = new CategoriaMantencion();
         $tipoAlcance10->setNombre("DDE");
         $tipoAlcance10->setDescripcion("DDE");                
+        $tipoAlcance10->setComponente($componente1);
+        $tipoAlcance10->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance10);
         $manager->flush();          
         
-        $tipoAlcance11 = new TipoAlcance();
+        $tipoAlcance11 = new CategoriaMantencion();
         $tipoAlcance11->setNombre("Desbloqueo prev. fallecido");
         $tipoAlcance11->setDescripcion("Desbloqueo prev. fallecido");                
+        $tipoAlcance11->setComponente($componente1);
+        $tipoAlcance11->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance11);
         $manager->flush();                  
                 
-        $tipoAlcance12 = new TipoAlcance();
+        $tipoAlcance12 = new CategoriaMantencion();
         $tipoAlcance12->setNombre("ENDECA");
-        $tipoAlcance12->setDescripcion("ENDECA");                
+        $tipoAlcance12->setDescripcion("ENDECA");             
+        $tipoAlcance12->setComponente($componente1);
+        $tipoAlcance12->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance12);
         $manager->flush();                  
                 
-        $tipoAlcance13 = new TipoAlcance();
+        $tipoAlcance13 = new CategoriaMantencion();
         $tipoAlcance13->setNombre("Extracción");
-        $tipoAlcance13->setDescripcion("Extracción");                
+        $tipoAlcance13->setDescripcion("Extracción");         
+        $tipoAlcance13->setComponente($componente1);
+        $tipoAlcance13->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance13);
         $manager->flush();                     
                 
-        $tipoAlcance14 = new TipoAlcance();
+        $tipoAlcance14 = new CategoriaMantencion();
         $tipoAlcance14->setNombre("EXTRAEGGPF");
-        $tipoAlcance14->setDescripcion("EXTRAEGGPF");                
+        $tipoAlcance14->setDescripcion("EXTRAEGGPF");         
+        $tipoAlcance14->setComponente($componente1);
+        $tipoAlcance14->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance14);
         $manager->flush();                         
                 
-        $tipoAlcance15 = new TipoAlcance();
+        $tipoAlcance15 = new CategoriaMantencion();
         $tipoAlcance15->setNombre("Facturación");
-        $tipoAlcance15->setDescripcion("Facturación");                
+        $tipoAlcance15->setDescripcion("Facturación");        
+        $tipoAlcance15->setComponente($componente1);
+        $tipoAlcance15->setIdComponente($componente1->getId());        
         
         $manager->persist($tipoAlcance15);
         $manager->flush();                  
                 
-        $tipoAlcance16 = new TipoAlcance();
+        $tipoAlcance16 = new CategoriaMantencion();
         $tipoAlcance16->setNombre("Parametrización eventos GO");
         $tipoAlcance16->setDescripcion("Parametrización eventos GO");                
+        $tipoAlcance16->setComponente($componente1);
+        $tipoAlcance16->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance16);
         $manager->flush();                  
                 
-        $tipoAlcance17 = new TipoAlcance();
+        $tipoAlcance17 = new CategoriaMantencion();
         $tipoAlcance17->setNombre("IFL");
         $tipoAlcance17->setDescripcion("IFL");                
+        $tipoAlcance17->setComponente($componente1);
+        $tipoAlcance17->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance17);
         $manager->flush();                 
                 
-        $tipoAlcance18 = new TipoAlcance();
+        $tipoAlcance18 = new CategoriaMantencion();
         $tipoAlcance18->setNombre("Manuales");
-        $tipoAlcance18->setDescripcion("Manuales");                
+        $tipoAlcance18->setDescripcion("Manuales");           
+        $tipoAlcance18->setComponente($componente1);
+        $tipoAlcance18->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance18);
         $manager->flush();                         
                 
-        $tipoAlcance19 = new TipoAlcance();
+        $tipoAlcance19 = new CategoriaMantencion();
         $tipoAlcance19->setNombre("Monitoreo y consultas");
         $tipoAlcance19->setDescripcion("Monitoreo y consultas");                
+        $tipoAlcance19->setComponente($componente1);
+        $tipoAlcance19->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance19);
         $manager->flush();                       
                 
-        $tipoAlcance20 = new TipoAlcance();
+        $tipoAlcance20 = new CategoriaMantencion();
         $tipoAlcance20->setNombre("Reporte OFF-Line");
-        $tipoAlcance20->setDescripcion("Reporte OFF-Line");                
+        $tipoAlcance20->setDescripcion("Reporte OFF-Line");   
+        $tipoAlcance20->setComponente($componente1);
+        $tipoAlcance20->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance20);
         $manager->flush();                               
                 
-        $tipoAlcance21 = new TipoAlcance();
+        $tipoAlcance21 = new CategoriaMantencion();
         $tipoAlcance21->setNombre("RNP");
         $tipoAlcance21->setDescripcion("RNP");                
+        $tipoAlcance21->setComponente($componente1);
+        $tipoAlcance21->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance21);
         $manager->flush();                               
                 
-        $tipoAlcance22 = new TipoAlcance();    
+        $tipoAlcance22 = new CategoriaMantencion();    
         $tipoAlcance22->setNombre("POII-POIM");
-        $tipoAlcance22->setDescripcion("POII-POIM");                
+        $tipoAlcance22->setDescripcion("POII-POIM");          
+        $tipoAlcance22->setComponente($componente1);
+        $tipoAlcance22->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance22);
         $manager->flush();          
                 
-        $tipoAlcance23 = new TipoAlcance();
+        $tipoAlcance23 = new CategoriaMantencion();
         $tipoAlcance23->setNombre("Recálculo GO");
-        $tipoAlcance23->setDescripcion("Recálculo GO");                
+        $tipoAlcance23->setDescripcion("Recálculo GO");       
+        $tipoAlcance23->setComponente($componente1);
+        $tipoAlcance23->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance23);
         $manager->flush();                  
                 
-        $tipoAlcance24 = new TipoAlcance();
+        $tipoAlcance24 = new CategoriaMantencion();
         $tipoAlcance24->setNombre("Revalorizar");
-        $tipoAlcance24->setDescripcion("Revalorizar");                
+        $tipoAlcance24->setDescripcion("Revalorizar");        
+        $tipoAlcance24->setComponente($componente1);
+        $tipoAlcance24->setIdComponente($componente1->getId());        
         
         $manager->persist($tipoAlcance24);
         $manager->flush();                          
                 
-        $tipoAlcance25 = new TipoAlcance();
+        $tipoAlcance25 = new CategoriaMantencion();
         $tipoAlcance25->setNombre("Proceso CAC");
         $tipoAlcance25->setDescripcion("Proceso CAC");                
+        $tipoAlcance25->setComponente($componente1);
+        $tipoAlcance25->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance25);
         $manager->flush();                          
                 
-        $tipoAlcance26 = new TipoAlcance();
+        $tipoAlcance26 = new CategoriaMantencion();
         $tipoAlcance26->setNombre("VIH");
         $tipoAlcance26->setDescripcion("VIH");                
+        $tipoAlcance26->setComponente($componente1);
+        $tipoAlcance26->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance26);
         $manager->flush();                          
                 
-        $tipoAlcance27 = new TipoAlcance();
+        $tipoAlcance27 = new CategoriaMantencion();
         $tipoAlcance27->setNombre("WS Certificador Prev.");
         $tipoAlcance27->setDescripcion("WS Certificador Prev.");                
+        $tipoAlcance27->setComponente($componente1);
+        $tipoAlcance27->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance27);
-        $manager->flush();                  
-        
-        $connection->exec("ALTER TABLE alcance AUTO_INCREMENT = 1;");                                
-                        
-        $alcance1 = new Alcance();
-        $alcance1->setComponente($componente1);
-        $alcance1->setIdComponente($componente1->getId());
-        $alcance1->setTipoAlcance($tipoAlcance1);        
-        $alcance1->setIdTipoAlcance($tipoAlcance1->getId());
-        
-        $manager->persist($alcance1);
-        $manager->flush();                          
-        
-        $alcance2 = new Alcance();
-        $alcance2->setComponente($componente1);
-        $alcance2->setIdComponente($componente1->getId());
-        $alcance2->setTipoAlcance($tipoAlcance2);        
-        $alcance2->setIdTipoAlcance($tipoAlcance2->getId());                
-        
-        $manager->persist($alcance2);
-        $manager->flush();                      
-                
-        $alcance3 = new Alcance();
-        $alcance3->setComponente($componente1);
-        $alcance3->setIdComponente($componente1->getId());
-        $alcance3->setTipoAlcance($tipoAlcance3);        
-        $alcance3->setIdTipoAlcance($tipoAlcance3->getId());        
-        
-        $manager->persist($alcance3);
-        $manager->flush();         
-        
-        $alcance4 = new Alcance();
-        $alcance4->setComponente($componente1);
-        $alcance4->setIdComponente($componente1->getId());
-        $alcance4->setTipoAlcance($tipoAlcance4);        
-        $alcance4->setIdTipoAlcance($tipoAlcance4->getId());                
-        
-        $manager->persist($alcance4);
-        $manager->flush();         
-        
-        $alcance5 = new Alcance();
-        $alcance5->setComponente($componente1);
-        $alcance5->setIdComponente($componente1->getId());
-        $alcance5->setTipoAlcance($tipoAlcance5);        
-        $alcance5->setIdTipoAlcance($tipoAlcance5->getId());                        
-        
-        $manager->persist($alcance5);
-        $manager->flush();         
-        
-        $alcance6 = new Alcance();
-        $alcance6->setComponente($componente1);
-        $alcance6->setIdComponente($componente1->getId());
-        $alcance6->setTipoAlcance($tipoAlcance6);        
-        $alcance6->setIdTipoAlcance($tipoAlcance6->getId());                        
-        
-        $manager->persist($alcance6);
-        $manager->flush();         
-        
-        $alcance7 = new Alcance();
-        $alcance7->setComponente($componente1);
-        $alcance7->setIdComponente($componente1->getId());
-        $alcance7->setTipoAlcance($tipoAlcance7);        
-        $alcance7->setIdTipoAlcance($tipoAlcance7->getId());                        
-        
-        $manager->persist($alcance7);
-        $manager->flush();         
-        
-        $alcance8 = new Alcance();
-        $alcance8->setComponente($componente1);
-        $alcance8->setIdComponente($componente1->getId());
-        $alcance8->setTipoAlcance($tipoAlcance8);        
-        $alcance8->setIdTipoAlcance($tipoAlcance8->getId());                        
-        
-        $manager->persist($alcance8);
-        $manager->flush();         
-        
-        $alcance9 = new Alcance();
-        $alcance9->setComponente($componente1);
-        $alcance9->setIdComponente($componente1->getId());
-        $alcance9->setTipoAlcance($tipoAlcance9);        
-        $alcance9->setIdTipoAlcance($tipoAlcance9->getId());                        
-        
-        $manager->persist($alcance9);
-        $manager->flush();         
-        
-        $alcance10 = new Alcance();
-        $alcance10->setComponente($componente1);
-        $alcance10->setIdComponente($componente1->getId());
-        $alcance10->setTipoAlcance($tipoAlcance10);        
-        $alcance10->setIdTipoAlcance($tipoAlcance10->getId());        
-                
-        $manager->persist($alcance10);
-        $manager->flush();          
-        
-        $alcance11 = new Alcance();
-        $alcance11->setComponente($componente1);
-        $alcance11->setIdComponente($componente1->getId());
-        $alcance11->setTipoAlcance($tipoAlcance11);        
-        $alcance11->setIdTipoAlcance($tipoAlcance11->getId());                        
-        
-        $manager->persist($alcance11);
-        $manager->flush();          
-        
-        $alcance12 = new Alcance();
-        $alcance12->setComponente($componente1);
-        $alcance12->setIdComponente($componente1->getId());
-        $alcance12->setTipoAlcance($tipoAlcance12);        
-        $alcance12->setIdTipoAlcance($tipoAlcance12->getId());                                
-        
-        $manager->persist($alcance12);
-        $manager->flush();         
-        
-        $alcance13 = new Alcance();
-        $alcance13->setComponente($componente1);
-        $alcance13->setIdComponente($componente1->getId());
-        $alcance13->setTipoAlcance($tipoAlcance13);        
-        $alcance13->setIdTipoAlcance($tipoAlcance13->getId());                        
-        
-        $manager->persist($alcance13);
-        $manager->flush();      
-        
-        $alcance14 = new Alcance();
-        $alcance14->setComponente($componente1);
-        $alcance14->setIdComponente($componente1->getId());
-        $alcance14->setTipoAlcance($tipoAlcance14);        
-        $alcance14->setIdTipoAlcance($tipoAlcance14->getId());                       
-        
-        $manager->persist($alcance14);
-        $manager->flush();          
-        
-        $alcance15 = new Alcance();
-        $alcance15->setComponente($componente1);
-        $alcance15->setIdComponente($componente1->getId());
-        $alcance15->setTipoAlcance($tipoAlcance15);        
-        $alcance15->setIdTipoAlcance($tipoAlcance15->getId());                                
-        
-        $manager->persist($alcance15);
-        $manager->flush();          
-        
-        $alcance16 = new Alcance();
-        $alcance16->setComponente($componente1);
-        $alcance16->setIdComponente($componente1->getId());
-        $alcance16->setTipoAlcance($tipoAlcance16);        
-        $alcance16->setIdTipoAlcance($tipoAlcance16->getId());                                
-        
-        $manager->persist($alcance16);
-        $manager->flush();          
-        
-        $alcance17 = new Alcance();
-        $alcance17->setComponente($componente1);
-        $alcance17->setIdComponente($componente1->getId());
-        $alcance17->setTipoAlcance($tipoAlcance17);        
-        $alcance17->setIdTipoAlcance($tipoAlcance17->getId());                                
-        
-        $manager->persist($alcance17);
-        $manager->flush();          
-        
-        $alcance18 = new Alcance();
-        $alcance18->setComponente($componente1);
-        $alcance18->setIdComponente($componente1->getId());
-        $alcance18->setTipoAlcance($tipoAlcance18);        
-        $alcance18->setIdTipoAlcance($tipoAlcance18->getId());                                
-        
-        $manager->persist($alcance18);
-        $manager->flush();          
-        
-        $alcance19 = new Alcance();
-        $alcance19->setComponente($componente1);
-        $alcance19->setIdComponente($componente1->getId());
-        $alcance19->setTipoAlcance($tipoAlcance19);        
-        $alcance19->setIdTipoAlcance($tipoAlcance19->getId());                                
-        
-        $manager->persist($alcance19);
-        $manager->flush();                 
-        
-        $alcance20 = new Alcance();
-        $alcance20->setComponente($componente1);
-        $alcance20->setIdComponente($componente1->getId());
-        $alcance20->setTipoAlcance($tipoAlcance20);        
-        $alcance20->setIdTipoAlcance($tipoAlcance20->getId());                               
-        
-        $manager->persist($alcance20);
-        $manager->flush();          
-        
-        $alcance21 = new Alcance();
-        $alcance21->setComponente($componente1);
-        $alcance21->setIdComponente($componente1->getId());
-        $alcance21->setTipoAlcance($tipoAlcance21);        
-        $alcance21->setIdTipoAlcance($tipoAlcance21->getId());                                               
-        
-        $manager->persist($alcance21);
-        $manager->flush();          
-        
-        $alcance22 = new Alcance();
-        $alcance22->setComponente($componente1);
-        $alcance22->setIdComponente($componente1->getId());
-        $alcance22->setTipoAlcance($tipoAlcance22);        
-        $alcance22->setIdTipoAlcance($tipoAlcance22->getId());                                                       
-        
-        $manager->persist($alcance22);
-        $manager->flush();          
-        
-        $alcance23 = new Alcance();
-        $alcance23->setComponente($componente1);
-        $alcance23->setIdComponente($componente1->getId());
-        $alcance23->setTipoAlcance($tipoAlcance23);        
-        $alcance23->setIdTipoAlcance($tipoAlcance23->getId());                                                       
-        
-        $manager->persist($alcance23);
-        $manager->flush();          
-        
-        $alcance24 = new Alcance();
-        $alcance24->setComponente($componente1);
-        $alcance24->setIdComponente($componente1->getId());
-        $alcance24->setTipoAlcance($tipoAlcance24);        
-        $alcance24->setIdTipoAlcance($tipoAlcance24->getId());                                                       
-        
-        $manager->persist($alcance24);
-        $manager->flush();          
-        
-        $alcance25 = new Alcance();
-        $alcance25->setComponente($componente1);
-        $alcance25->setIdComponente($componente1->getId());
-        $alcance25->setTipoAlcance($tipoAlcance25);        
-        $alcance25->setIdTipoAlcance($tipoAlcance25->getId());                                                       
-        
-        $manager->persist($alcance25);
-        $manager->flush();          
-        
-        $alcance26 = new Alcance();
-        $alcance26->setComponente($componente1);
-        $alcance26->setIdComponente($componente1->getId());
-        $alcance26->setTipoAlcance($tipoAlcance26);        
-        $alcance26->setIdTipoAlcance($tipoAlcance26->getId());                                                               
-        
-        $manager->persist($alcance26);
-        $manager->flush();          
-        
-        $alcance27 = new Alcance();
-        $alcance27->setComponente($componente1);
-        $alcance27->setIdComponente($componente1->getId());
-        $alcance27->setTipoAlcance($tipoAlcance27);        
-        $alcance27->setIdTipoAlcance($tipoAlcance27->getId());                                               
-        
-        $manager->persist($alcance27);
-        $manager->flush();     
+        $manager->flush();                                                                                                 
         
     }
 }

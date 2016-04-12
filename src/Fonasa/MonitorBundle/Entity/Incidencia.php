@@ -70,7 +70,7 @@ class Incidencia
      */
     private $fechaUltHh;
         
-/**
+    /**
      * @var \Componente
      *
      * @ORM\ManyToOne(targetEntity="Componente", inversedBy="incidencias")

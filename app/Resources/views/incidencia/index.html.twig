@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Incidencia list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Codigoorigen</th>
+                <th>Codigointerno</th>
+                <th>Descripcion</th>
+                <th>Fechareporte</th>
+                <th>Fechaingreso</th>
+                <th>Fechasalida</th>
+                <th>Fechaulthh</th>
+                <th>Idcomponente</th>
+                <th>Idorigenincidencia</th>
+                <th>Idestadoincidencia</th>
+                <th>Idcategoriaincidencia</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for incidencium in incidencias %}
+            <tr>
+                <td><a href="{{ path('incidencia_show', { 'id': incidencium.id }) }}">{{ incidencium.id }}</a></td>
+                <td>{{ incidencium.codigoOrigen }}</td>
+                <td>{{ incidencium.codigoInterno }}</td>
+                <td>{{ incidencium.descripcion }}</td>
+                <td>{% if incidencium.fechaReporte %}{{ incidencium.fechaReporte|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if incidencium.fechaIngreso %}{{ incidencium.fechaIngreso|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if incidencium.fechaSalida %}{{ incidencium.fechaSalida|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if incidencium.fechaUltHh %}{{ incidencium.fechaUltHh|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ incidencium.idComponente }}</td>
+                <td>{{ incidencium.idOrigenIncidencia }}</td>
+                <td>{{ incidencium.idEstadoIncidencia }}</td>
+                <td>{{ incidencium.idCategoriaIncidencia }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('incidencia_show', { 'id': incidencium.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('incidencia_edit', { 'id': incidencium.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('incidencia_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

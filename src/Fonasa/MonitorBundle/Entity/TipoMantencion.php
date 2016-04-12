@@ -31,9 +31,9 @@ class TipoMantencion
     /**
      * @var string
      *
-     * @ORM\Column(name="decripcion", type="string", length=511, nullable=true)
+     * @ORM\Column(name="descripcion", type="string", length=511, nullable=true)
      */
-    private $decripcion;
+    private $descripcion;
 
 
     /**
@@ -77,9 +77,9 @@ class TipoMantencion
      *
      * @return TipoMantencion
      */
-    public function setDecripcion($decripcion)
+    public function setDescripcion($descripcion)
     {
-        $this->decripcion = $decripcion;
+        $this->descripcion = $descripcion;
 
         return $this;
     }
