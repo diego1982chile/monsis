@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}  
+{% block stylesheets %}
+{% endblock %}
+{% block body %}
+        {% for flash_message in app.session.flashbag.get('notice') %}            
+    <div class="alert alert-info alert-dismissible" role="alert">                
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 style="margin:0px">
+            <img data-target="#panel" src="{{ asset('bundles/monsis/images/circle_1.png') }}" data-toggle="collapse" style="height:24px;width:24px" />
+            &nbspOperación realizada con éxito
+        </h3>
+        <div>
+            <ul>
+                {% set foo = flash_message|split('|') %}
+                {% for var in foo %}                            
+                <li style="margin:10px">                    
+                    {{ var }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>                    
+    {% endfor %}
+    <h1>Incidencia</h1>
+    <div style="width:100%">
+    <table class="table table-striped display">
+        <tbody>
+            <tr>
+                <th width="10%">N°Ticket</th>
+                <td width="20%">{{ incidencia.numeroTicket }}</td>
+                <th width="10%">Origen</th>
+                <td width="20%">{{ incidencia.origenIncidencia.nombre }}</td>
+                <th width="10%">Componente</th>
+                <td width="20%">{{ incidencia.componente.nombre }}</td>
+            </tr>
+            <tr>                
+                <th width="10%">Categoría</th>
+                <td width="20%" colspan="3">{{ incidencia.categoriaIncidencia.nombre }}</td>                
+                <th width="10%">Estado</th>
+                <td width="20%">{{ incidencia.estadoIncidencia.nombre }}</td>                                
+            </tr>
+            <tr>
+                <th width="10%">Fecha Reporte</th>
+                <td width="20%">{% if incidencia.fechaReporte %}{{ incidencia.fechaReporte|date('Y-m-d H:i') }}{% endif %}</td>                
+                <th width="10%">Fecha Ingreso</th>
+                <td width="20%">{% if incidencia.fechaIngreso %}{{ incidencia.fechaIngreso|date('Y-m-d H:i') }}{% endif %}</td>                
+                <th width="10%">Fecha Salida</th>
+                <td width="20%">{% if incidencia.fechaSalida %}{{ incidencia.fechaSalida|date('Y-m-d H:i') }}{% endif %}</td>                                
+            </tr>            
+            <tr>                                
+                <th width="10%" colspan="3">Descripción</th>
+                <td colspan="6">{{ incidencia.descripcion }}</td>                
+            </tr>                                    
+        </tbody>
+    </table>
+    </div>
+    <ul>
+        <li>
+            <a href="{{ path('incidencia_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Eliminar" class="btn btn-warning">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

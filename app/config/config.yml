@@ -38,7 +38,7 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"            
     globals:
-        filters:    "@fonasa_monitor.helper.filters"
+        filters:    "@monsis.helper.filters"
 
 # Doctrine Configuration
 doctrine:

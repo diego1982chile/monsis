@@ -31,7 +31,7 @@ class GlobalFiltersExtension extends \Twig_Extension {
     public function getGlobals()
     {
         return array(
-            "GlobalFilters" => $this->container->get("fonasa_monitor.helper.filters")->getDefaultFiltersForm()
+            "GlobalFilters" => $this->container->get("monsis.helper.filters")->getDefaultFiltersForm()
         );
     }
 

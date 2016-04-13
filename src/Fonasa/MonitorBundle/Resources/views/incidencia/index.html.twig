@@ -1,0 +1,142 @@
+{% extends 'base.html.twig' %}
+{% form_theme GlobalFilters 'bootstrap_3_layout.html.twig' %}
+{% block stylesheets %}    
+{% endblock %}
+{% block title %}MonSis{% endblock %}
+{% block filtro %}        
+    <ul class="nav navbar-nav"> 
+        <li class="divider-vertical"></li>
+        <li class="active"> 
+            <form id="filtros" action="" method="post" class="navbar-form navbar-left">                 
+                {{ form_start(GlobalFilters) }}        
+                {{ form_errors(GlobalFilters) }}                
+                {{ form_widget(GlobalFilters.Anio) }}                
+                {{ form_widget(GlobalFilters.Mes) }}                                                 
+                <div id="form_Estado" class="btn-group" data-toggle="buttons">
+                {% for child in GlobalFilters.Estado %}
+                    {{ form_label(child) }} 
+                    <label class="btn btn-sm btn-default {% if loop.index == 1 %}active{% endif %}">                                       
+                    {{ form_widget(child) }}
+                    </label>
+                {% endfor %}
+                </div>
+            </form>
+        </li>
+        <li class="divider-vertical"></li>                    
+    </ul>                 
+{% endblock %}
+{% block body %}
+    {% for flash_message in app.session.flashbag.get('notice') %}            
+    <div class="alert alert-info alert-dismissible" role="alert">                
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 style="margin:0px">
+            <img data-target="#panel" src="{{ asset('bundles/monsis/images/circle_1.png') }}" data-toggle="collapse" style="height:24px;width:24px" />
+            &nbspOperación realizada con éxito
+        </h3>
+        <div>
+            <ul>
+                {% set foo = flash_message|split('|') %}
+                {% for var in foo %}                            
+                <li style="margin:10px">                    
+                    {{ var }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>                    
+    {% endfor %}
+    <h1 id="title"></h1>
+
+    <table id="incidencias" class="display table-striped" style="display:none" width="100%">
+        <thead>
+            <tr>                
+                <th width="10%">N°Ticket</th>                                
+                <th width="10%">Fecha Reporte</th>             
+                <th width="8%">Origen</th>
+                <th width="14%">Categoria</th>   
+                <th width="8%">Componente</th>                                                              
+                <th width="12%">Estado</th>
+                <th width="20%">Acciones</th>
+                <th width="4%">Show/Edit</th>                
+            </tr>
+        </thead>
+        <tbody>        
+        </tbody>
+    </table>        
+    <ul>
+        <li>
+            <a href="{{ path('incidencia_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}
+{% block javascripts %}
+<script>
+    var $anio = $('#form_Anio');
+    var $mes = $('#form_Mes');
+    var $estado = $('#form_Estado');
+    
+    function updateTitle(){
+        $('#title').html("Incidencias "+
+                         $estado.find(':checked').parent().text()+" "+
+                         $mes.find('option:selected').text()+" "+
+                         $anio.val());        
+    }
+    
+    $(function() {
+        $('#incidencias th').removeClass('ui-state-default');    
+        $('#incidencias').show();                        
+        updateTitle();
+    });     
+    
+    var oTable = $('#incidencias').dataTable({
+            bPaginate: false,
+            bJQueryUI: false,
+            bServerSide: true,
+            sAjaxSource: '{{ path('incidencia_body') }}',
+            sServerMethod: 'GET',
+            bProcessing: true,
+            aoColumnDefs: [
+                    {
+                    aTargets: [0,1,2,3,4,5,6],
+                    class: 'cols'                
+                    }                
+                ],
+            dom: 'frtip<"toolbar">',
+            fnDrawCallback: function( oSettings ) {
+                $('#incidencias th').removeClass('ui-state-default');
+            },
+            fnServerData: function ( sSource, aoData, fnCallback ) {
+			/* Add some extra data to the sender */
+			aoData.push( { "name": "anio", "value": $anio.val() } );
+                        aoData.push( { "name": "mes", "value": $mes.val() } );
+                        aoData.push( { "name": "estado", "value": $estado.find(':checked').val() } );
+                        
+			$.getJSON( sSource, aoData, function (json) { 
+				/* Do whatever additional processing you want on the callback, then tell DataTables */                                
+                                $('div.toolbar').html(json.pap);
+				fnCallback(json)
+			} );
+            }                    
+        });        
+        
+        $anio.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        $mes.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        $estado.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        setInterval( function () {
+            oTable.fnDraw();
+        }, 30000 );
+    
+</script>
+{% endblock %}

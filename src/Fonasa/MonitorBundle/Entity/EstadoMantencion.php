@@ -36,7 +36,7 @@ class EstadoMantencion
     private $descripcion;
     
     /**          
-     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="EstadoMantencion")          
+     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="estadoMantencion")          
      */
     protected $mantenciones; 
 

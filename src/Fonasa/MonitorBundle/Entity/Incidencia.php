@@ -22,19 +22,12 @@ class Incidencia
     private $id;
 
     /**
-     * @var string
+     * @var integer
      *
-     * @ORM\Column(name="codigo_origen", type="string", length=255)
+     * @ORM\Column(name="numero_ticket", type="integer")
      */
-    private $codigoOrigen;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="codigo_interno", type="string", length=255, unique=true)
-     */
-    private $codigoInterno;
-
+    private $numeroTicket;
+    
     /**
      * @var string
      *
@@ -55,6 +48,13 @@ class Incidencia
      * @ORM\Column(name="fecha_ingreso", type="datetime")
      */
     private $fechaIngreso;
+        
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="fecha_inicio", type="datetime")
+     */
+    private $fechaInicio;
 
     /**
      * @var \DateTime
@@ -150,53 +150,29 @@ class Incidencia
     {
         return $this->id;
     }
-
+    
     /**
-     * Set codigoOrigen
+     * Set numeroTicket
      *
-     * @param string $codigoOrigen
+     * @param integer $numeroTicket
      *
      * @return Incidencia
      */
-    public function setCodigoOrigen($codigoOrigen)
+    public function setNumeroTicket($numeroTicket)
     {
-        $this->codigoOrigen = $codigoOrigen;
+        $this->numeroTicket = $numeroTicket;
 
         return $this;
     }
 
     /**
-     * Get codigoOrigen
+     * Get numeroTicket
      *
-     * @return string
+     * @return integer
      */
-    public function getCodigoOrigen()
+    public function getNumeroTicket()
     {
-        return $this->codigoOrigen;
-    }
-
-    /**
-     * Set codigoInterno
-     *
-     * @param string $codigoInterno
-     *
-     * @return Incidencia
-     */
-    public function setCodigoInterno($codigoInterno)
-    {
-        $this->codigoInterno = $codigoInterno;
-
-        return $this;
-    }
-
-    /**
-     * Get codigoInterno
-     *
-     * @return string
-     */
-    public function getCodigoInterno()
-    {
-        return $this->codigoInterno;
+        return $this->numeroTicket;
     }
 
     /**
@@ -270,6 +246,30 @@ class Incidencia
     {
         return $this->fechaIngreso;
     }
+    
+    /**
+     * Set fechaInicio
+     *
+     * @param \DateTime $fechaInicio
+     *
+     * @return Incidencia
+     */
+    public function setFechaInicio($fechaInicio)
+    {
+        $this->fechaInicio = $fechaInicio;
+
+        return $this;
+    }
+
+    /**
+     * Get fechaInicio
+     *
+     * @return \DateTime
+     */
+    public function getFechaInicio()
+    {
+        return $this->fechaInicio;
+    }
 
     /**
      * Set fechaSalida
@@ -318,5 +318,188 @@ class Incidencia
     {
         return $this->fechaUltHh;
     }
+        
+    /**
+     * Get componente
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Componente
+     */
+    public function getComponente()
+    {
+        return $this->componente;
+    }
+    
+    /**
+     * Set componente
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Servicio
+     */
+    public function setComponente(\Fonasa\MonitorBundle\Entity\Componente $componente = null)
+    {        
+        $this->componente=$componente;
+        
+        return $this;
+    }
+    
+    /**
+     * Get idComponente
+     *
+     * @return int
+     */
+    public function getIdComponente()
+    {
+        return $this->idComponente;
+    }
+    
+    /**
+    * Set idComponente
+    *
+    * @param int $idComponente
+    * @return Servicio
+    */
+    public function setIdComponente($idComponente)
+    {
+        $this->idComponente = $idComponente;
+        
+        return $this;
+    }     
+    
+   /**
+     * Get origenIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\OrigenIncidencia
+     */
+    public function getOrigenIncidencia()
+    {
+        return $this->origenIncidencia;
+    }
+    
+    /**
+     * Set origenIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Incidencia
+     */
+    public function setOrigenIncidencia(\Fonasa\MonitorBundle\Entity\OrigenIncidencia $origenIncidencia = null)
+    {
+        $this->origenIncidencia=$origenIncidencia;
+        
+        return $this;
+    }
+    
+    /**
+     * Get idOrigenIncidencia
+     *
+     * @return int
+     */
+    public function getIdOrigenIncidencia()
+    {
+        return $this->idOrigenIncidencia;
+    }
+    
+    /**
+    * Set idOrigenIncidencia
+    *
+    * @param int $idOrigenIncidencia
+    * @return Incidencia
+    */
+    public function setIdOrigenIncidencia($idOrigenIncidencia)
+    {
+        $this->idOrigenIncidencia = $idOrigenIncidencia;
+        
+        return $this;
+    }          
+
+     /**
+     * Get estadoIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\EstadoIncidencia
+     */
+    public function getEstadoIncidencia()
+    {
+        return $this->estadoIncidencia;
+    }
+    
+    /**
+     * Set estadoIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Incidencia
+     */
+    public function setEstadoIncidencia(\Fonasa\MonitorBundle\Entity\EstadoIncidencia $estadoIncidencia = null)
+    {
+        $this->estadoIncidencia=$estadoIncidencia;
+        
+        return $this;
+    }    
+    
+    /**
+     * Get idEstadoIncidencia
+     *
+     * @return int
+     */
+    public function getIdEstadoIncidencia()
+    {
+        return $this->idEstadoIncidencia;
+    }
+    
+    /**
+    * Set idEstadoIncidencia
+    *
+    * @param int $idEstadoIncidencia
+    * @return Incidencia
+    */
+    public function setIdEstadoIncidencia($idEstadoIncidencia)
+    {
+        $this->idEstadoIncidencia = $idEstadoIncidencia;
+        
+        return $this;
+    }  
+
+    //-----------------------------------------------------------------            
+    
+    /**
+     * Get categoriaIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\CategoriaIncidencia
+     */
+    public function getCategoriaIncidencia()
+    {
+        return $this->categoriaIncidencia;
+    }
+    
+    /**
+     * Set categoriaIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\CategoriaIncidencia
+     */
+    public function setCategoriaIncidencia(\Fonasa\MonitorBundle\Entity\CategoriaIncidencia $categoriaIncidencia = null)
+    {
+        $this->categoriaIncidencia=$categoriaIncidencia;
+        
+        return $this;
+    }  
+    
+    /**
+     * Get idCategoriaIncidencia
+     *
+     * @return int
+     */
+    public function getIdCategoriaIncidencia()
+    {
+        return $this->idCategoriaIncidencia;
+    }
+    
+    /**
+    * Set idCategoriaIncidencia
+    *
+    * @param int $idCategoriaIncidencia
+    * @return Incidencia
+    */
+    public function setIdCategoriaIncidencia($idCategoriaIncidencia)
+    {
+        $this->idCategoriaIncidencia = $idCategoriaIncidencia;
+        
+        return $this;
+    } 
+        
 }
 

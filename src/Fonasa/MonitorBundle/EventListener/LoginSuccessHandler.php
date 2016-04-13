@@ -48,7 +48,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
             {
                 // redirect the user to where they were before the login process begun.
                 // $referer_url = $request->headers->get('referer');                    
-                $referer_url = $this->router->generate('servicio_index');
+                $referer_url = $this->router->generate('incidencia_index');
 
                 $response = new RedirectResponse($referer_url);
             }

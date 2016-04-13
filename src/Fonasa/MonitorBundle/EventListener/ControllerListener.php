@@ -17,16 +17,16 @@ class ControllerListener
         
     protected $router;
     protected $security;        
-    protected $resolver;
+    //protected $resolver;
     protected $tokenStorage;
     protected $session;
 
 
-    public function __construct(Router $router, AuthorizationChecker $security, TraceableControllerResolver $resolver,
+    public function __construct(Router $router, AuthorizationChecker $security, /*TraceableControllerResolver $resolver,*/
                                 TokenStorage $tokenStorage = null, Session $session) {
         $this->router = $router;		
         $this->security = $security;                
-        $this->resolver = $resolver;
+        //$this->resolver = $resolver;
         $this->tokenStorage = $tokenStorage;
         $this->session = $session;
     }
@@ -51,11 +51,11 @@ class ControllerListener
         
         switch (explode('/',$routeName)[1]){
             case 'servicio':
-                $this->session->set('active', 'servicio_index');
+                $this->session->set('active', 'incidencia_index');
                 break;            
             case 'new':                
                 $this->session->set('active', 'servicio_new');
-                break;
+                break;            
         }
         
         if ($this->tokenStorage->getToken() != null && explode('/',$routeName)[1] == "login" &&

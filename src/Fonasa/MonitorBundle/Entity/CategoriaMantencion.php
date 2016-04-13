@@ -36,9 +36,25 @@ class CategoriaMantencion
     private $descripcion;
         
     /**          
-     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="CategoriaMantencion")          
+     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="categoriaMantencion")          
      */
     protected $mantenciones; 
+    
+    /**
+     * @var \Componente
+     *
+     * @ORM\ManyToOne(targetEntity="Componente", inversedBy="categoriasMantencion")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_COMPONENTE", referencedColumnName="id")
+     * })
+     */
+    protected $componente;
+    
+    /**
+     *      
+     * @ORM\Column(name="ID_COMPONENTE", type="integer", nullable=true)               
+     */
+    protected $idComponente;      
 
     /**
      * Get id

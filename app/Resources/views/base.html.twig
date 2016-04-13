@@ -12,15 +12,15 @@
     <title>{% block title %}Welcome!{% endblock %}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="{{ asset('bundles/fonasa-monitor/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('bundles/fonasa-monitor/css/simple-sidebar.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/monsis/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/monsis/css/simple-sidebar.css') }}" rel="stylesheet">
     <!-- Jquery-ui core CSS -->    
-    <link href="{{ asset('bundles/fonasa-monitor/css/jquery.qtip.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('bundles/fonasa-monitor/css/jquery.dataTables.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('bundles/fonasa-monitor/css/dataTables.bootstrap.css') }}" rel="stylesheet">  
-    <link href="{{ asset('bundles/fonasa-monitor/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/monsis/css/jquery.qtip.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/monsis/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/monsis/css/dataTables.bootstrap.css') }}" rel="stylesheet">  
+    <link href="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">
     {% block stylesheets %}{% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('bundles/fonasa-monitor/images/fonasalogo.png') }}" />
+        <link rel="icon" type="image/x-icon" href="{{ asset('bundles/monsis/images/fonasalogo.png') }}" />
         <style type="text/css">
             .qtip-content {
                 font-size:14px;
@@ -122,10 +122,10 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             {% if is_granted("ROLE_ADMIN") %}                
-                <li class="{% if app.session.get('active') == 'servicio_index'%}active{% endif %}">
-                    <a href="{{ path('servicio_index') }}">Lista Servicios</a></li>
+                <li class="{% if app.session.get('active') == 'incidencia_index'%}active{% endif %}">
+                    <a href="{{ path('incidencia_index') }}">Incidencias</a></li>
                 <li class="{% if app.session.get('active') == 'servicio_new'%}active{% endif %}">
-                    <a href="{{ path('servicio_new') }}">Crear Servicio</a></li>
+                    <a href="{{ path('incidencia_new') }}">Mantenciones</a></li>
             {% endif %}
             {% if is_granted("ROLE_USER") and not is_granted("ROLE_ADMIN") %}
                 <li class="active"><a href="{{ path('dashboard_index') }}">Dashboard</a></li>                                
@@ -141,7 +141,7 @@
                     </ul>
                 </li>
             </ul>
-            {% if app.request.attributes.get('_route') in ['servicio_index'] %}            
+            {% if app.request.attributes.get('_route') in ['incidencia_index'] %}            
                   {% block filtro %}                      
                   {% endblock %}            
             {% endif %}                    
@@ -159,19 +159,19 @@
     </div><!--/container-->
         <!-- /#page-content-wrapper -->   
     
-    <script src="{{ asset('bundles/fonasa-monitor/js/jquery-1.12.1.min.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/jquery-ui/jquery-ui.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/fonasa-monitor/js/datepicker-es.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/jquery.qtip.min.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/imagesloaded.pkg.min.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/dataTables.jqueryui.min.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/dataTables.bootstrap.min.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/highcharts.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/highcharts-3d.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/modules/exporting.js') }}"></script>
-    <script src="{{ asset('bundles/fonasa-monitor/js/modules/drilldown.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/jquery-1.12.1.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/monsis/js/datepicker-es.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/jquery.qtip.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/imagesloaded.pkg.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/dataTables.jqueryui.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/highcharts.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/highcharts-3d.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/modules/exporting.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/modules/drilldown.js') }}"></script>
     {% block javascripts %}
     <script>            
     $(function() {                        

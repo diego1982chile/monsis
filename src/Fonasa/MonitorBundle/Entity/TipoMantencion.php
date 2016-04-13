@@ -34,6 +34,11 @@ class TipoMantencion
      * @ORM\Column(name="descripcion", type="string", length=511, nullable=true)
      */
     private $descripcion;
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="tipoMantencion")          
+     */
+    protected $mantenciones;        
 
 
     /**

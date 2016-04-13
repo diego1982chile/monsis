@@ -1,0 +1,185 @@
+{% block stylesheets %}
+{% endblock %}
+{% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+{% block body %}    
+    <h1>Nueva Incidencia</h1>
+    <div style="width:60%">
+    {{ form_start(form) }}        
+        {{ form_errors(form) }}
+        {{ form_row(form.origenIncidencia) }}                           
+        {{ form_label(form.numeroTicket) }}
+        <div class="form-group input-group">        
+            {{ form_widget(form.numeroTicket) }}
+            <span class="input-group-btn">
+                <button id="validar" class="btn btn-secondary" type="button">Validar</button>
+            </span>
+        </div>
+        {{ form_row(form.componente) }}
+        {{ form_row(form.categoriaIncidencia) }}
+        {{ form_row(form.fechaReporte) }}
+        {{ form_row(form.descripcion) }}
+        <input type="submit" class='btn btn-primary' style="display:none" value="Create" />
+        <button id="validate_form" class="btn btn-primary" type="button">Create</button>
+    {{ form_end(form) }}
+    </div>
+    <ul>
+        <li>
+            <a href="{{ path('incidencia_index') }}">Back to the list</a>
+        </li>
+    </ul>
+{% endblock %}
+{% block javascripts %}
+<script>
+$(function() {
+    $( "#incidencia_fechaReporte_date" ).datepicker();    
+});  
+
+var $origen = $('#incidencia_origenIncidencia');
+
+var $codigoInterno = $('#incidencia_numeroTicket');
+var $validar= $('#validar');
+// When sport gets selected ...
+
+var $componente = $('#incidencia_componente');
+// When sport gets selected ...
+$componente.change(function() {
+  $('#incidencia_categoriaIncidencia').parent().children(':eq(0)')
+    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+  // ... retrieve the corresponding form.
+  var $form = $(this).closest('form');
+  // Simulate form data, but only include the selected sport value.
+  var data = {};
+  data[$componente.attr('name')] = $componente.val(); 
+  // Submit data via AJAX to the form's action path.
+  $.ajax({
+    url : $form.attr('action'),
+    type: $form.attr('method'),
+    data : data,
+    success: function(html) {
+      // Replace current position field ...
+      $('#incidencia_categoriaIncidencia').replaceWith(
+        // ... with the returned one from the AJAX response.
+        $(html).find('#incidencia_categoriaIncidencia')                
+      );
+      // Position field now displays the appropriate positions.
+      $('.loader').remove();
+    }
+  });
+});
+
+$validar.click(function(){
+    
+  $(this).parent().children(':eq(0)')
+    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+  // ... retrieve the corresponding form.  
+  // Simulate form data, but only include the selected sport value.
+  var data = {};
+  data['numeroTicket'] = $('#incidencia_numeroTicket').val();
+  data['id'] = $('#incidencia_id').val();
+  // Submit data via AJAX to the form's action path.
+  $.post("{{ path('incidencia_check') }}",data,function(data){
+        var src;
+        var css;
+        if(data.error){          
+            src="{{ asset('bundles/monsis/images/exclamation_2.png') }}";
+            css='alert alert-danger';
+            $('#incidencia_numeroTicket').focus();                    
+        } 
+        else{
+            src="{{ asset('bundles/monsis/images/circle_1.png') }}";            
+            css='alert alert-success';
+        }
+        $('#incidencia_numeroTicket').qtip({ // Grab some elements to apply the tooltip to
+            content: {
+                text: '<img alt="" style="width:20px;height:20px" src='+src+'> '+data.message
+            },
+            show: {
+                ready: true,
+                delay: 50
+            },
+            style: {
+                classes: css,
+                def: false,                    
+            },            
+            position: {
+                    my: 'top left',  // Position my top left...
+                    at: 'bottom center', // at the bottom right of...
+                    target: $('#incidencia_numeroTicket') // my target
+                }                
+        });      
+      // Position field now displays the appropriate positions.
+      $('.loader').remove();    
+  });    
+});
+
+$('#validate_form').click(function(){ 
+  var error = false;
+  var data = {};
+  data['numeroTicket'] = $('#incidencia_numeroTicket').val(); 
+  data['id'] = $('#incidencia_id').val();
+  // Submit data via AJAX to the form's action path.
+  $('.form-group').each(function(){           
+       $field=$(this).find('input,select,textarea');              
+       
+       if($field.val()===''){   
+            error = true;
+            $field.focus();
+            $field.qtip({ // Grab some elements to apply the tooltip to
+                content: {
+                    text: '<img alt="" style="width:20px;height:20px" src="{{ asset('bundles/monsis/images/exclamation_2.png') }}"> Completa este campo'
+                },
+                show: {
+                    ready: true,
+                    delay: 50
+                },
+                style: {
+                    classes: 'alert alert-danger',
+                    def: false,                    
+                },            
+                position: {
+                        my: 'top left',  // Position my top left...
+                        at: 'bottom center', // at the bottom right of...
+                        target: $field // my target
+                    }                
+            });
+            return false;
+       }           
+       else{
+            $('.qtip').remove();
+       }
+  });
+  
+  if(error)
+    return false;
+  
+  $.post("{{ path('incidencia_check') }}",data,function(data){
+      if(data.error){          
+          $('#incidencia_numeroTicket').focus();
+          $('#incidencia_numeroTicket').qtip({ // Grab some elements to apply the tooltip to
+                content: {
+                    text: '<img alt="" style="width:20px;height:20px" src="{{ asset('bundles/monsis/images/exclamation_2.png') }}"> '+data.message
+                },
+                show: {
+                    ready: true,
+                    delay: 50
+                },
+                style: {
+                    classes: 'alert alert-danger',
+                    def: false,                    
+                },            
+                position: {
+                        my: 'top left',  // Position my top left...
+                        at: 'bottom center', // at the bottom right of...
+                        target: $('#incidencia_numeroTicket') // my target
+                    }                
+            });          
+      } 
+      else{        
+        $('form[name="incidencia"]').submit();
+      }
+      // Position field now displays the appropriate positions.      
+  });    
+});
+</script>
+{% endblock %}

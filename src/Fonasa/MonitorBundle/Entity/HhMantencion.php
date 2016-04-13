@@ -38,7 +38,7 @@ class HhMantencion
     /**
      * @var \Mantencion
      *
-     * @ORM\ManyToOne(targetEntity="Mantencion", inversedBy="hhs")
+     * @ORM\ManyToOne(targetEntity="Mantencion", inversedBy="hhsMantencion")
      * @ORM\JoinColumns{(
      *    @ORM\JoinColumn(name="ID_MANTENCION", referencedColumnName="id")
      * })
@@ -54,7 +54,7 @@ class HhMantencion
     /**
      * @var \Usuario
      *
-     * @ORM\ManyToOne(targetEntity="Usuario", inversedBy="hhs")
+     * @ORM\ManyToOne(targetEntity="Usuario", inversedBy="hhsMantencion")
      * @ORM\JoinColumns{(
      *    @ORM\JoinColumn(name="ID_USUARIO", referencedColumnName="id")
      * })
@@ -71,16 +71,16 @@ class HhMantencion
     /**
      * @var \TareaUsuario
      *
-     * @ORM\ManyToOne(targetEntity="TareaUsuario", inversedBy="hhs")
+     * @ORM\ManyToOne(targetEntity="TareaUsuario", inversedBy="hhsMantencion")
      * @ORM\JoinColumns{(
-     *    @ORM\JoinColumn(name="ID_TAREA", referencedColumnName="id")
+     *    @ORM\JoinColumn(name="ID_TAREA_USUARIO", referencedColumnName="id")
      * })
      */
     protected $tareaUsuario;
     
     /**
      *      
-     * @ORM\Column(name="ID_TAREA", type="integer", nullable=true)               
+     * @ORM\Column(name="ID_TAREA_USUARIO", type="integer", nullable=true)               
      */
     private $idTareaUsuario;        
     

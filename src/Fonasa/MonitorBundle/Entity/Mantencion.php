@@ -140,6 +140,13 @@ class Mantencion
      * @ORM\OneToMany(targetEntity="HistorialMantencion", mappedBy="mantencion")          
      */
     protected $historialesMantencion;    
+    
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="HhMantencion", mappedBy="mantencion")          
+     */
+    protected $hhsMantencion;        
+    
 
     /**
      * Get id

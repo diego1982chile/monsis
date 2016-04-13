@@ -56,7 +56,7 @@ class RequestListener
             $event->setResponse(new RedirectResponse($url));
         }
         else if($routeName === "fos_user_security_login" && $this->security->isGranted('ROLE_ADMIN')){
-            $url = $this->router->generate('servicio_index');
+            $url = $this->router->generate('incidencia_index');
             $event->setResponse(new RedirectResponse($url));
         }              
     }

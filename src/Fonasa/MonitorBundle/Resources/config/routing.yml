@@ -14,50 +14,50 @@ root:
         permanent: true
 
 incidencia_index:
-    path:     /
+    path:     /incidencia
     defaults: { _controller: "MonitorBundle:Incidencia:index" }
     methods:  GET
 
 incidencia_show:
-    path:     /{id}/show
+    path:     /incidencia/{id}/show
     defaults: { _controller: "MonitorBundle:Incidencia:show" }
     methods:  GET
 
 incidencia_new:
-    path:     /new
+    path:     /incidencia/new
     defaults: { _controller: "MonitorBundle:Incidencia:new" }
     methods:  [GET, POST]
 
 incidencia_edit:
-    path:     /{id}/edit
+    path:     /incidencia/{id}/edit
     defaults: { _controller: "MonitorBundle:Incidencia:edit" }
     methods:  [GET, POST]
 
 incidencia_delete:
-    path:     /{id}/delete
+    path:     /incidencia/{id}/delete
     defaults: { _controller: "MonitorBundle:Incidencia:delete" }
     methods:  DELETE
     
-#servicio_check:
-#    path:     /servicio/check
-#    defaults: { _controller: "MonitorBundle:Servicio:check" }
-#    methods:  [POST]    
-#
-#servicio_body:
-#    path:   /servicio/body
-#    defaults: { _controller: "MonitorBundle:Servicio:body" }
-#    methods:  [GET]    
-#    
-#servicio_assign:
-#    path:   /{id}/assign
-#    defaults: { _controller: "MonitorBundle:Servicio:assign" }
-#    methods:  [GET,POST]        
-#    
-#servicio_finish:
-#    path:   /{id}/finish
-#    defaults: { _controller: "MonitorBundle:Servicio:finish" }
-#    methods:  [GET,POST]    
-#    
+incidencia_check:
+    path:     /incidencia/check
+    defaults: { _controller: "MonitorBundle:Incidencia:check" }
+    methods:  [POST]    
+
+incidencia_body:
+    path:   /incidencia/body
+    defaults: { _controller: "MonitorBundle:Incidencia:body" }
+    methods:  [GET]    
+    
+incidencia_init:
+    path:   /incidencia/{id}/init
+    defaults: { _controller: "MonitorBundle:Incidencia:init" }
+    methods:  [GET,POST]        
+    
+incidencia_finish:
+    path:   /incidencia/{id}/finish
+    defaults: { _controller: "MonitorBundle:Incidencia:finish" }
+    methods:  [GET,POST]    
+    
 #servicio_desa:
 #    path:   /{id}/desa
 #    defaults: { _controller: "MonitorBundle:Servicio:desa" }

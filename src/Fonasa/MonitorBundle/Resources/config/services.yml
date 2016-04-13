@@ -2,30 +2,30 @@ services:
 #    monitor.example:
 #        class: Fonasa\MonitorBundle\Example
 #        arguments: ["@service_id", "plain_value", %parameter%]
-    fonasa_monitor.authentication.login_success_handler:
+    monsis.authentication.login_success_handler:
         class:  Fonasa\MonitorBundle\EventListener\LoginSuccessHandler
         arguments:  ["@router", "@security.authorization_checker", "@security.token_storage"]
-    fonasa_monitor.authentication.logout_handler:
+    monsis.authentication.logout_handler:
         class:  Fonasa\MonitorBundle\EventListener\LogoutHandler
         arguments:  []
-    #fonasa_monitor.request_listener:
-     #   class: Fonasa\MonitorBundle\EventListener\RequestListener
-      #  arguments: ["@router", "@security.authorization_checker", "@security.token_storage"]
-       # tags:
-        #    - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest  }        
-    fonasa_monitor.response_listener:
+    monsis.request_listener:
+        class: Fonasa\MonitorBundle\EventListener\RequestListener
+        arguments: ["@router", "@security.authorization_checker", "@security.token_storage"]
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest  }        
+    monsis.response_listener:
         class: Fonasa\MonitorBundle\EventListener\ResponseListener
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse  }   
-    fonasa_monitor.controller_listener:
+    monsis.controller_listener:
          class: Fonasa\MonitorBundle\EventListener\ControllerListener
-         arguments: ["@router", "@security.authorization_checker", "@debug.controller_resolver", "@security.token_storage", "@session"]
+         arguments: ["@router", "@security.authorization_checker", "@security.token_storage", "@session"]
          tags:	
              - { name: kernel.event_listener, event: kernel.controller, method: onKernelController  }		                    
-    fonasa_monitor.helper.filters:
+    monsis.helper.filters:
         class:  Fonasa\MonitorBundle\Helper\FiltersHelper
         arguments: ["@form.factory", "@service_container"]
-    fonasa_monitor.twig.GlobalFiltersExtension:
+    monsis.twig.GlobalFiltersExtension:
         class: Fonasa\MonitorBundle\Twig\GlobalFiltersExtension
         arguments:  ["@service_container"]
         tags:

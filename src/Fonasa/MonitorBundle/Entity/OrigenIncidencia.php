@@ -36,7 +36,7 @@ class OrigenIncidencia
     private $descripcion;
     
     /**          
-     * @ORM\OneToMany(targetEntity="Incidencia", mappedBy="origen")          
+     * @ORM\OneToMany(targetEntity="Incidencia", mappedBy="origenIncidencia")          
      */
     protected $incidencias; 
 

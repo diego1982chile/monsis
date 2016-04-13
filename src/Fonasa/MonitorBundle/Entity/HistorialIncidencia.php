@@ -77,5 +77,146 @@ class HistorialIncidencia
     {
         return $this->id;
     }
+    
+    
+    /**
+     * Set inicio
+     *
+     * @param \DateTime $inicio
+     *
+     * @return HistorialIncidencia
+     */
+    public function setInicio($inicio)
+    {
+        $this->inicio = $inicio;
+
+        return $this;
+    }
+
+    /**
+     * Get inicio
+     *
+     * @return \DateTime
+     */
+    public function getInicio()
+    {
+        return $this->inicio;
+    }
+
+    /**
+     * Set termino
+     *
+     * @param \DateTime $termino
+     *
+     * @return Historial
+     */
+    public function setTermino($termino)
+    {
+        $this->termino = $termino;
+
+        return $this;
+    }
+
+    /**
+     * Get termino
+     *
+     * @return \DateTime
+     */
+    public function getTermino()
+    {
+        return $this->termino;
+    }
+    
+    /**
+     * Get incidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Incidencia
+     */
+    public function getIncidencia()
+    {
+        return $this->incidencia;
+    }
+    
+    /**
+     * Set incidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\HistorialIncidencia     
+     */
+    public function setIncidencia(\Fonasa\MonitorBundle\Entity\Incidencia $incidencia = null)
+    {
+        $this->incidencia = $incidencia;
+        
+        return $this;
+    }            
+    
+    /**
+     * Get idIncidencia
+     *
+     * @return int
+     */
+    public function getIdIncidencia()
+    {
+        return $this->idIncidencia;
+    }
+    
+    /**
+    * Set idIncidencia
+    *
+    * @param int $idServicio
+    * @return Historial
+    */
+    public function setIdIncidencia($idIncidencia)
+    {
+        $this->idIncidencia = $idIncidencia;
+        
+        return $this;
+    }      
+    
+    //-----------------------------------------------------------
+    
+    /**
+     * Get estadoIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\EstadoIncidencia
+     */
+    public function getEstadoIncidencia()
+    {
+        return $this->estadoIncidencia;
+    }
+    
+    /**
+     * Set estadoIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\HistorialIncidencia
+     */
+    public function setEstadoIncidencia(\Fonasa\MonitorBundle\Entity\EstadoIncidencia $estadoIncidencia = null)
+    {
+        $this->estadoIncidencia = $estadoIncidencia;
+        
+        return $this;
+    }            
+    
+    /**
+     * Get idEstadoIncidencia
+     *
+     * @return int
+     */
+    public function getIdEstadoIncidencia()
+    {
+        return $this->idEstadoIncidencia;
+    }
+    
+    /**
+    * Set idEstadoIncidencia
+    *
+    * @param int $idEstado
+    * @return Historial
+    */
+    public function setIdEstadoIncidencia($idEstadoIncidencia)
+    {
+        $this->idEstadoIncidencia = $idEstadoIncidencia;
+        
+        return $this;
+    }  
 }
 
