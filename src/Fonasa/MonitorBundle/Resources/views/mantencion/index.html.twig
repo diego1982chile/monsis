@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Mantencion list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Codigointerno</th>
+                <th>Descripcion</th>
+                <th>Fechaingreso</th>
+                <th>Fechainicio</th>
+                <th>Fechasalida</th>
+                <th>Fechaulthh</th>
+                <th>Idcomponente</th>
+                <th>Idtipomantencion</th>
+                <th>Idestadomantencion</th>
+                <th>Idcategoriamantencion</th>
+                <th>Idincidencia</th>
+                <th>Idrequerimiento</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for mantencion in mantencions %}
+            <tr>
+                <td><a href="{{ path('mantencion_show', { 'id': mantencion.id }) }}">{{ mantencion.id }}</a></td>
+                <td>{{ mantencion.codigoInterno }}</td>
+                <td>{{ mantencion.descripcion }}</td>
+                <td>{% if mantencion.fechaIngreso %}{{ mantencion.fechaIngreso|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if mantencion.fechaInicio %}{{ mantencion.fechaInicio|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if mantencion.fechaSalida %}{{ mantencion.fechaSalida|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if mantencion.fechaUltHh %}{{ mantencion.fechaUltHh|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ mantencion.idComponente }}</td>
+                <td>{{ mantencion.idTipoMantencion }}</td>
+                <td>{{ mantencion.idEstadoMantencion }}</td>
+                <td>{{ mantencion.idCategoriaMantencion }}</td>
+                <td>{{ mantencion.idIncidencia }}</td>
+                <td>{{ mantencion.idRequerimiento }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('mantencion_show', { 'id': mantencion.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('mantencion_edit', { 'id': mantencion.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('mantencion_new') }}">Create a new entry</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -50,11 +50,11 @@ class ControllerListener
         //$_SESSION['routes'][]=explode('/',$routeName)[1];          
         
         switch (explode('/',$routeName)[1]){
-            case 'servicio':
+            case 'incidencia':
                 $this->session->set('active', 'incidencia_index');
                 break;            
-            case 'new':                
-                $this->session->set('active', 'servicio_new');
+            case 'mantencion':                
+                $this->session->set('active', 'mantencion_index');
                 break;            
         }
         

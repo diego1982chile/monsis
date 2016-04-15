@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Mantencion</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ mantencion.id }}</td>
+            </tr>
+            <tr>
+                <th>Codigointerno</th>
+                <td>{{ mantencion.codigoInterno }}</td>
+            </tr>
+            <tr>
+                <th>Descripcion</th>
+                <td>{{ mantencion.descripcion }}</td>
+            </tr>
+            <tr>
+                <th>Fechaingreso</th>
+                <td>{% if mantencion.fechaIngreso %}{{ mantencion.fechaIngreso|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Fechainicio</th>
+                <td>{% if mantencion.fechaInicio %}{{ mantencion.fechaInicio|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Fechasalida</th>
+                <td>{% if mantencion.fechaSalida %}{{ mantencion.fechaSalida|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Fechaulthh</th>
+                <td>{% if mantencion.fechaUltHh %}{{ mantencion.fechaUltHh|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Idcomponente</th>
+                <td>{{ mantencion.idComponente }}</td>
+            </tr>
+            <tr>
+                <th>Idtipomantencion</th>
+                <td>{{ mantencion.idTipoMantencion }}</td>
+            </tr>
+            <tr>
+                <th>Idestadomantencion</th>
+                <td>{{ mantencion.idEstadoMantencion }}</td>
+            </tr>
+            <tr>
+                <th>Idcategoriamantencion</th>
+                <td>{{ mantencion.idCategoriaMantencion }}</td>
+            </tr>
+            <tr>
+                <th>Idincidencia</th>
+                <td>{{ mantencion.idIncidencia }}</td>
+            </tr>
+            <tr>
+                <th>Idrequerimiento</th>
+                <td>{{ mantencion.idRequerimiento }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('mantencion_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('mantencion_edit', { 'id': mantencion.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

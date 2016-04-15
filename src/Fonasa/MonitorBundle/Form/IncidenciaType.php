@@ -130,7 +130,19 @@ class IncidenciaType extends AbstractType
             ))
             ->add('descripcion', TextareaType::class, array(
                 //'disabled' => true
-            ))                                
+            ))    
+            ->add('estadoIncidencia', EntityType::class, array(
+                  'class' => 'MonitorBundle:EstadoIncidencia',
+                  'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('ei')
+                              ->orderBy('ei.nombre', 'ASC');
+                },
+                'choice_label' => 'nombre',
+                //'expanded' => true,
+                //'multiple' => false,
+                'position' => 'first',
+                //'attr' => array('class' => 'form-inline')
+            ))                  
         ;
         
         if($options['assign']==true){

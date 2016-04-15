@@ -58,6 +58,31 @@ incidencia_finish:
     defaults: { _controller: "MonitorBundle:Incidencia:finish" }
     methods:  [GET,POST]    
     
+mantencion_index:
+    path:     /mantencion
+    defaults: { _controller: "MonitorBundle:Mantencion:index" }
+    methods:  GET
+
+mantencion_show:
+    path:     /mantencion/{id}/show
+    defaults: { _controller: "MonitorBundle:Mantencion:show" }
+    methods:  GET
+
+mantencion_new:
+    path:     /mantencion/new
+    defaults: { _controller: "MonitorBundle:Mantencion:new" }
+    methods:  [GET, POST]
+
+mantencion_edit:
+    path:     /mantencion/{id}/edit
+    defaults: { _controller: "MonitorBundle:Mantencion:edit" }
+    methods:  [GET, POST]
+
+mantencion_delete:
+    path:     /mantencion/{id}/delete
+    defaults: { _controller: "MonitorBundle:Mantencion:delete" }
+    methods:  DELETE    
+    
 #servicio_desa:
 #    path:   /{id}/desa
 #    defaults: { _controller: "MonitorBundle:Servicio:desa" }

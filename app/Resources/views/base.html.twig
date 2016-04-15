@@ -124,8 +124,8 @@
             {% if is_granted("ROLE_ADMIN") %}                
                 <li class="{% if app.session.get('active') == 'incidencia_index'%}active{% endif %}">
                     <a href="{{ path('incidencia_index') }}">Incidencias</a></li>
-                <li class="{% if app.session.get('active') == 'servicio_new'%}active{% endif %}">
-                    <a href="{{ path('incidencia_new') }}">Mantenciones</a></li>
+                <li class="{% if app.session.get('active') == 'mantencion_index'%}active{% endif %}">
+                    <a href="{{ path('mantencion_index') }}">Mantenciones</a></li>
             {% endif %}
             {% if is_granted("ROLE_USER") and not is_granted("ROLE_ADMIN") %}
                 <li class="active"><a href="{{ path('dashboard_index') }}">Dashboard</a></li>                                

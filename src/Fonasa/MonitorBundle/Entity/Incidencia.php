@@ -52,7 +52,7 @@ class Incidencia
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="fecha_inicio", type="datetime")
+     * @ORM\Column(name="fecha_inicio", type="datetime", nullable=true)
      */
     private $fechaInicio;
 
@@ -141,6 +141,11 @@ class Incidencia
      */
     protected $historialesIncidencia;    
     
+    /**          
+     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="incidencia")          
+     */
+    protected $mantenciones;        
+    
     /**
      * Get id
      *
@@ -150,6 +155,19 @@ class Incidencia
     {
         return $this->id;
     }
+    
+    /**
+     * Set id
+     * @param int $id
+     * @return Incidencia
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        
+        return $this;
+        
+    }    
     
     /**
      * Set numeroTicket
@@ -355,7 +373,7 @@ class Incidencia
     * Set idComponente
     *
     * @param int $idComponente
-    * @return Servicio
+    * @return \Fonasa\MonitorBundle\Entity\Incidencia
     */
     public function setIdComponente($idComponente)
     {

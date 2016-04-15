@@ -19,14 +19,15 @@ class Mantencion
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    private $id;    
+    
+    
     /**
-     * @var string
+     * @var integer
      *
-     * @ORM\Column(name="codigo_origen", type="string", length=255)
+     * @ORM\Column(name="origen_mantencion", type="integer", nullable=false)
      */
-    private $codigoOrigen;
+    private $origenMantencion;
 
     /**
      * @var string
@@ -146,7 +147,39 @@ class Mantencion
      * @ORM\OneToMany(targetEntity="HhMantencion", mappedBy="mantencion")          
      */
     protected $hhsMantencion;        
+        
+    /**
+     * @var \Incidencia
+     *
+     * @ORM\ManyToOne(targetEntity="Incidencia", inversedBy="incidencias")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_INCIDENCIA", referencedColumnName="id", onDelete="CASCADE")
+     * })
+     */
+    protected $incidencia;
     
+    /**
+     *      
+     * @ORM\Column(name="ID_INCIDENCIA", type="integer", nullable=true)               
+     */
+    private $idIncidencia;     
+    
+    
+    /**
+     * @var \Requerimiento
+     *
+     * @ORM\ManyToOne(targetEntity="Requerimiento", inversedBy="mantenciones")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_REQUERIMIENTO", referencedColumnName="id", onDelete="CASCADE")
+     * })
+     */
+    protected $rquerimiento;
+    
+    /**
+     *      
+     * @ORM\Column(name="ID_REQUERIMIENTO", type="integer", nullable=true)               
+     */
+    private $idRequerimiento;        
 
     /**
      * Get id
@@ -159,27 +192,27 @@ class Mantencion
     }
 
     /**
-     * Set codigoOrigen
+     * Set origenMantencion
      *
-     * @param string $codigoOrigen
+     * @param string $origenMantencion
      *
      * @return Mantencion
      */
-    public function setCodigoOrigen($codigoOrigen)
+    public function setOrigenMantencion($origenMantencion)
     {
-        $this->codigoOrigen = $codigoOrigen;
+        $this->origenMantencion = $origenMantencion;
 
         return $this;
     }
 
     /**
-     * Get codigoOrigen
+     * Get origenMantencion
      *
-     * @return string
+     * @return integer
      */
-    public function getCodigoOrigen()
+    public function getOrigenMantencion()
     {
-        return $this->codigoOrigen;
+        return $this->origenMantencion;
     }
 
     /**
@@ -325,5 +358,97 @@ class Mantencion
     {
         return $this->fechaUltHh;
     }
+    
+        /**
+     * Get componente
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Componente
+     */
+    public function getComponente()
+    {
+        return $this->componente;
+    }
+    
+    /**
+     * Set componente
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Mantencion
+     */
+    public function setComponente(\Fonasa\MonitorBundle\Entity\Componente $componente = null)
+    {        
+        $this->componente=$componente;
+        
+        return $this;
+    }
+    
+    /**
+     * Get idComponente
+     *
+     * @return int
+     */
+    public function getIdComponente()
+    {
+        return $this->idComponente;
+    }
+    
+    /**
+    * Set idComponente
+    *
+    * @param int $idComponente
+    * @return \Fonasa\MonitorBundle\Entity\Mantencion
+    */
+    public function setIdComponente($idComponente)
+    {
+        $this->idComponente = $idComponente;
+        
+        return $this;
+    } 
+    
+    //-------------------------------------------------------------------------
+    
+    /**
+     * Get tipoMantencion
+     *
+     * @return \Fonasa\MonitorBundle\Entity\TipoMantencion
+     */
+    public function getTipoMantencion()
+    {
+        return $this->tipoMantencion;
+    }
+    
+    /**
+     * Set tipoMantencion
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Mantencion
+     */
+    public function setTipoMantencion(\Fonasa\MonitorBundle\Entity\TipoMantencion $tipoMantencion = null)
+    {        
+        $this->tipoMantencion=$tipoMantencion;
+        
+        return $this;
+    }
+    
+    /**
+     * Get idTipoMantencion
+     *
+     * @return int
+     */
+    public function getIdTipoMantencion()
+    {
+        return $this->idTipoMantencion;
+    }
+    
+    /**
+    * Set idTipoMantencion
+    *
+    * @param int $idTipoMantencion
+    * @return \Fonasa\MonitorBundle\Entity\TipoMantencion
+    */
+    public function setIdTipoMantencion($idTipoMantencion)
+    {
+        $this->idTipoMantencion = $idTipoMantencion;
+        
+        return $this;
+    } 
 }
 

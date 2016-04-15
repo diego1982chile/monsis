@@ -6,8 +6,8 @@
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/TareaUsuario.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/HhMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/app/config/services.yml</file>
-            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/incidencia/new.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/MonitorBundle.php</file>
+            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/incidencia/new.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/EstadoIncidencia.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/EstadoMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/config/routing.yml</file>
@@ -22,7 +22,9 @@
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/Componente.php</file>
             <file>file:/C:/xampp/htdocs/monsis/app/config/config.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/app/Resources/views/base.html.twig</file>
+            <file>file:/C:/xampp/htdocs/monsis/app/config/config_dev.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/CategoriaMantencion.php</file>
+            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/HistorialMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/EventListener/RequestListener.php</file>
             <file>file:/C:/xampp/htdocs/monsis/app/config/parameters.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/config/services.yml</file>
@@ -42,6 +44,7 @@
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/HistorialIncidencia.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/SeveridadMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/EventListener/ResponseListener.php</file>
+            <file>file:/C:/xampp/htdocs/monsis/app/config/config_prod.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/EventListener/LoginSuccessHandler.php</file>
             <file>file:/C:/xampp/htdocs/monsis/app/Resources/FOSUserBundle/views/Security/login.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/OrigenIncidencia.php</file>

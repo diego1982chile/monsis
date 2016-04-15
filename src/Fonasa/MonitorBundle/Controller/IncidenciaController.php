@@ -98,25 +98,31 @@ class IncidenciaController extends Controller
      * Displays a form to edit an existing Servicio entity.
      *
      */
-    public function editAction(Request $request, Servicio $servicio)
+    public function editAction(Request $request, Incidencia $incidencia)
     {
-        $deleteForm = $this->createDeleteForm($servicio);
+        $deleteForm = $this->createDeleteForm($incidencia);
         
-        $editForm = $this->createForm('Fonasa\MonitorBundle\Form\ServicioType', $servicio, array('assign' => false));                        
+        $editForm = $this->createForm('Fonasa\MonitorBundle\Form\IncidenciaType', $incidencia, array('assign' => false));                        
         
         $editForm->handleRequest($request);
                 
-
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($servicio);
+            $em->persist($incidencia);
             $em->flush();
 
-            return $this->redirectToRoute('servicio_edit', array('id' => $servicio->getId()));
+            //return $this->redirectToRoute('incidencia_edit', array('id' => $incidencia->getId()));
+            
+            $this->addFlash(
+                'notice',
+                'Se ha modificado la incidencia N°Ticket '.$incidencia->getNumeroTicket().'.'
+            );               
+
+            return $this->redirectToRoute('incidencia_show', array('id' => $incidencia->getId()));
         }
 
         return $this->render('MonitorBundle:incidencia:edit.html.twig', array(
-            'servicio' => $servicio,
+            'incidencia' => $incidencia,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ));
@@ -189,36 +195,36 @@ class IncidenciaController extends Controller
         $em = $this->getDoctrine()->getManager();
         $fechaTerminado=new\DateTime('now');       
         
-        $servicio= $em->getRepository('MonitorBundle:Servicio')
+        $incidencia= $em->getRepository('MonitorBundle:Incidencia')
             ->createQueryBuilder('s')                                
             ->where('s.id = ?1')
             ->setParameter(1, $id)
             ->getQuery()
             ->getResult();                            
                 
-        $estado= $em->getRepository('MonitorBundle:Estado')
+        $estado= $em->getRepository('MonitorBundle:EstadoIncidencia')
             ->createQueryBuilder('e')                                
             ->where('e.nombre = ?1')
             ->setParameter(1, 'Resuelta MT')
             ->getQuery()
             ->getResult();                    
 
-        $servicio[0]->setEstado($estado[0]);
-        $servicio[0]->setIdEstado($estado[0]->getId()); 
-        $servicio[0]->setFechaSalida($fechaTerminado);
+        $incidencia[0]->setEstadoIncidencia($estado[0]);
+        $incidencia[0]->setIdEstadoIncidencia($estado[0]->getId()); 
+        $incidencia[0]->setFechaSalida($fechaTerminado);
 
         $em = $this->getDoctrine()->getManager();
-        $em->persist($servicio[0]);
+        $em->persist($incidencia[0]);
         $em->flush();
 
         // Guardar el historial del cambio de estado               
         $fechaInicio=new\DateTime('now');            
-        $historial = new Historial();
+        $historial = new HistorialIncidencia();
 
-        $historial->setServicio($servicio[0]);                     
-        $historial->setIdServicio($servicio[0]->getId());
-        $historial->setEstado($estado[0]);
-        $historial->setIdEstado($estado[0]->getId());            
+        $historial->setIncidencia($incidencia[0]);                     
+        $historial->setIdIncidencia($incidencia[0]->getId());
+        $historial->setEstadoIncidencia($estado[0]);
+        $historial->setIdEstadoIncidencia($estado[0]->getId());            
         $historial->setInicio($fechaInicio);                   
 
         $em = $this->getDoctrine()->getManager();
@@ -228,11 +234,11 @@ class IncidenciaController extends Controller
  
         $this->addFlash(
             'notice',
-            'Se ha finalizado el servicio '.$servicio[0]->getCodigoInterno().' de tipo Resolución de Incidencia.| El servicio puede ser visualizado en el panel principal mediante el filto "Finalizados".'
+            'Se ha finalizado la incidencia N°Ticket '.$incidencia[0]->getNumeroTicket().'.| Esta puede ser visualizada en el panel principal mediante el filtro "Finalizados".'
         );   
                 
         //return $this->render('MonitorBundle:incidencia:index.html.twig');                         
-        return $this->redirectToRoute('servicio_index');
+        return $this->redirectToRoute('incidencia_index');
     }    
         
     /**
@@ -642,7 +648,7 @@ class IncidenciaController extends Controller
                     break;                                
                 case 'Resuelta MT':                                    
                     array_push($fila,'<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%"><span>'.$incidencia->getEstadoIncidencia()->getDescripcion().'</span></div></div>');
-                    array_push($fila,'<a id="'.$incidencia->getId().'" href="'.$this->generateUrl('servicio_assign', array('id' => $incidencia->getId())).'" role="button" class="btn btn-default btn-sm">Asignar</button>');                                                            
+                    array_push($fila,'<a id="'.$incidencia->getId().'" href="'.$this->generateUrl('incidencia_init', array('id' => $incidencia->getId())).'" role="button" class="btn btn-default">Iniciar</button>');                                                            
                     break;
             }                   
             

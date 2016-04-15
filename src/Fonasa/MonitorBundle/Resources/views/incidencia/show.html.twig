@@ -56,10 +56,13 @@
     </div>
     <ul>
         <li>
-            <a href="{{ path('incidencia_index') }}">Back to the list</a>
+            <a href="{{ path('incidencia_index') }}">Volver a la lista</a>
         </li>
         <li>
-            <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Edit</a>
+            <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Editar</a>
+        </li>
+        <li>
+            <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Levantar Mantención</a>
         </li>
         <li>
             {{ form_start(delete_form) }}
