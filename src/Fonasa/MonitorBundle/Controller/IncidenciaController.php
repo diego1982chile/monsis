@@ -463,23 +463,22 @@ class IncidenciaController extends Controller
     }            
     
     
-
     /**
-     * Deletes a Servicio entity.
+     * Deletes a Incidencia entity.
      *
      */
-    public function deleteAction(Request $request, Servicio $servicio)
+    public function deleteAction(Request $request, Incidencia $incidencia)
     {
-        $form = $this->createDeleteForm($servicio);
+        $form = $this->createDeleteForm($incidencia);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->remove($servicio);
+            $em->remove($incidencia);
             $em->flush();
         }
 
-        return $this->redirectToRoute('servicio_index');
+        return $this->redirectToRoute('incidencia_index');
     }
 
     /**
@@ -535,7 +534,7 @@ class IncidenciaController extends Controller
 
             if(!empty($incidencia)){
                 $error = true;
-                $message = 'Ya existe un servicio con este código';                
+                $message = 'Ya existe una incidencia con este n° de Ticket';                
             }                    
         }        
         return new JsonResponse(array('error' => $error, 'message' => $message));                

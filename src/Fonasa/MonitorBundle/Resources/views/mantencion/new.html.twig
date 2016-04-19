@@ -1,16 +1,254 @@
 {% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
 
 {% block body %}
     <h1>Mantencion creation</h1>
-
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <input type="submit" value="Create" />
+    <div style="width:60%">
+    {{ form_start(form) }}              
+        {{ form_start(form) }}        
+        {{ form_errors(form) }}                        
+        {{ form_row(form.componente) }}
+        {{ form_row(form.tipoRequerimiento) }}
+        {{ form_label(form.numeroRequerimiento) }}        
+        <div class="form-group input-group">        
+            <span class="input-group-addon" id="basic-addon1">Req#</span>
+            {{ form_widget(form.numeroRequerimiento) }}
+            <span class="input-group-btn">
+                <button id="validar" class="btn btn-secondary" type="button">Validar</button>
+            </span>
+        </div>                 
+        {{ form_label(form.tipoMantencion) }}                    
+        <div id="form_tipoMantencion">                    
+            {% for child in form.tipoMantencion %}
+                {{ form_label(child) }} 
+                <label class="radio-inline">                                       
+                {{ form_widget(child) }}
+                </label>                
+            {% endfor %}
+        </div>    
+        {{ form_label(form.codigoInterno) }}
+        <div class="form-group input-group">
+            <span class="input-group-addon" id="basic-addon2">SIGG-M?</span>
+            {{ form_widget(form.codigoInterno) }}
+        </div>                    
+        {{ form_row(form.descripcion) }}
+        {{ form_row(form.usuario) }}                
+        {{ form_row(form.hhEstimadas) }}                
+        <div id="form_inicioProgramado">                    
+            {% for child in form.inicioProgramado %}
+                {{ form_label(child) }} 
+                <label class="radio-inline">                                       
+                {{ form_widget(child) }}
+                </label>                
+            {% endfor %}
+        </div>            
+        {% if form.fechaInicio is defined %}
+        {{ form_row(form.fechaInicio) }}        
+        {% endif %}
+        <input type="submit" class='btn btn-primary' style="display:none" value="Create" />
+        <button id="validate_form" class="btn btn-primary" type="button">Create</button>
     {{ form_end(form) }}
-
+    </div>
     <ul>
         <li>
             <a href="{{ path('mantencion_index') }}">Back to the list</a>
         </li>
     </ul>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+
+var $inicioProgramado = $('#mantencion_inicioProgramado');
+
+var $numeroReq = $('#mantencion_numeroRequerimiento');
+
+var $validar= $('#validar');
+// When sport gets selected ...
+var $inicioProgramado = $('#form_inicioProgramado');
+
+var $tipoMantencion = $('#form_tipoMantencion');
+
+$inicioProgramado.change(function() {  
+  $inicioProgramado
+    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+  // ... retrieve the corresponding form.
+  var $form = $(this).closest('form');
+  // Simulate form data, but only include the selected sport value.
+  var data = {};  
+  data[$inicioProgramado.find(':checked').attr('name')] = $inicioProgramado.find(':checked').val();   
+  // Submit data via AJAX to the form's action path.
+  $.ajax({
+    url : $form.attr('action'),
+    type: $form.attr('method'),
+    data : data,
+    success: function(html) {
+      // Replace current position field ...      
+      $('#mantencion_fechaInicio').parent().html('');
+      $inicioProgramado.after(
+        // ... with the returned one from the AJAX response.                
+        $(html).find('#mantencion_fechaInicio').parent()                        
+      );
+      $( "#mantencion_fechaInicio_date" ).datepicker();    
+      // Position field now displays the appropriate positions.
+      $('.loader').remove();
+    }
+  });
+});
+
+$prefijoCodigo = $('#basic-addon2');
+
+$tipoMantencion.change(function() {      
+    switch($(this).find(':checked').val()){
+        case '1':
+            $prefijoCodigo.html('SIGG-MC');
+            break;
+        case '2':
+            $prefijoCodigo.html('SIGG-ME');
+            break;
+    }
+});
+
+var $componente = $('#mantencion_componente');
+// When sport gets selected ...
+$componente.change(function() {
+  $('#mantencion_tipoRequerimiento').parent().children(':eq(0)')
+    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+  // ... retrieve the corresponding form.
+  var $form = $(this).closest('form');
+  // Simulate form data, but only include the selected sport value.
+  var data = {};
+  data[$componente.attr('name')] = $componente.val(); 
+  // Submit data via AJAX to the form's action path.
+  $.ajax({
+    url : $form.attr('action'),
+    type: $form.attr('method'),
+    data : data,
+    success: function(html) {
+      // Replace current position field ...
+      $('#mantencion_tipoRequerimiento').replaceWith(
+        // ... with the returned one from the AJAX response.
+        $(html).find('#mantencion_tipoRequerimiento')
+      );
+      // Position field now displays the appropriate positions.
+      $('.loader').remove();
+    }
+  });
+});
+
+$validar.click(function(){
+    
+  $(this).parent().children(':eq(0)')
+    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+  // ... retrieve the corresponding form.  
+  // Simulate form data, but only include the selected sport value.
+  var data = {};
+  data['numeroRequerimiento'] = $('#mantencion_numeroRequerimiento').val();
+  data['id'] = $('#mantencion_id').val();
+  // Submit data via AJAX to the form's action path.
+  $.post("{{ path('mantencion_check') }}",data,function(data){
+        var icon;
+        var css;
+        if(data.error){          
+            icon='<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;';
+            css='alert alert-danger';
+            $('#mantencion_numeroRequerimiento').focus();                    
+        } 
+        else{
+            icon='<span class="glyphicon glyphicon glyphicon-ok-sign"></span>&nbsp;';
+            css='alert alert-success';
+        }
+        $('#mantencion_numeroRequerimiento').qtip({ // Grab some elements to apply the tooltip to
+            content: {
+                text: icon+data.message
+            },
+            show: {
+                ready: true,
+                delay: 50
+            },
+            style: {
+                classes: css,
+                def: false,                    
+            },            
+            position: {
+                    my: 'top left',  // Position my top left...
+                    at: 'bottom center', // at the bottom right of...
+                    target: $('#mantencion_numeroRequerimiento') // my target
+                }                
+        });      
+      // Position field now displays the appropriate positions.
+      $('.loader').remove();    
+  });    
+});
+
+$('#validate_form').click(function(){ 
+  var error = false;
+  var data = {};
+  data['numeroRequerimiento'] = $('#mantencion_numeroRequerimiento').val(); 
+  data['id'] = $('#mantencion_id').val();
+  // Submit data via AJAX to the form's action path.
+  $('.form-group').each(function(){           
+       $field=$(this).find('input,select,textarea');              
+       
+       if($field.val()===''){   
+            error = true;
+            $field.focus();
+            $field.qtip({ // Grab some elements to apply the tooltip to
+                content: {
+                    text: '<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;Completa este campo'
+                },
+                show: {
+                    ready: true,
+                    delay: 50
+                },
+                style: {
+                    classes: 'alert alert-danger',
+                    def: false,                    
+                },            
+                position: {
+                        my: 'top left',  // Position my top left...
+                        at: 'bottom center', // at the bottom right of...
+                        target: $field // my target
+                    }                
+            });
+            return false;
+       }           
+       else{
+            $('.qtip').remove();
+       }
+  });
+  
+  if(error)
+    return false;
+  
+  $.post("{{ path('mantencion_check') }}",data,function(data){
+      if(data.error){          
+          $('#mantencion_numeroRequerimiento').focus();
+          $('#mantencion_numeroRequerimiento').qtip({ // Grab some elements to apply the tooltip to
+                content: {
+                    text: '<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;'+data.message
+                },
+                show: {
+                    ready: true,
+                    delay: 50
+                },
+                style: {
+                    classes: 'alert alert-danger',
+                    def: false,                    
+                },            
+                position: {
+                        my: 'top left',  // Position my top left...
+                        at: 'bottom center', // at the bottom right of...
+                        target: $('#mantencion_numeroRequerimiento') // my target
+                    }                
+            });          
+      } 
+      else{        
+        $('form[name="mantencion"]').submit();
+      }
+      // Position field now displays the appropriate positions.      
+  });    
+});
+
+</script>
 {% endblock %}

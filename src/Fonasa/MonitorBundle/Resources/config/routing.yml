@@ -83,6 +83,11 @@ mantencion_delete:
     defaults: { _controller: "MonitorBundle:Mantencion:delete" }
     methods:  DELETE    
     
+mantencion_check:
+    path:     /mantencion/check
+    defaults: { _controller: "MonitorBundle:Mantencion:check" }
+    methods:  [POST]        
+    
 #servicio_desa:
 #    path:   /{id}/desa
 #    defaults: { _controller: "MonitorBundle:Servicio:desa" }

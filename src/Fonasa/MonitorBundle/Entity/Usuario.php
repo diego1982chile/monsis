@@ -20,7 +20,8 @@ class Usuario extends BaseUser
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    protected $id;        
+    
     
     /**
      * @var \Area
@@ -37,6 +38,11 @@ class Usuario extends BaseUser
      * @ORM\Column(name="ID_AREA", type="integer", nullable=true)               
      */
     private $idArea;             
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="usuario")          
+     */
+    protected $mantenciones;     
     
     /**          
      * @ORM\OneToMany(targetEntity="HhMantencion", mappedBy="usuario")          

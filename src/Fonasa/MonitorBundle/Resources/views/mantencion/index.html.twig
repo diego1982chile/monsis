@@ -16,9 +16,7 @@
                 <th>Idcomponente</th>
                 <th>Idtipomantencion</th>
                 <th>Idestadomantencion</th>
-                <th>Idcategoriamantencion</th>
-                <th>Idincidencia</th>
-                <th>Idrequerimiento</th>
+                <th>Idincidencia</th>                
                 <th>Actions</th>
             </tr>
         </thead>
@@ -34,10 +32,8 @@
                 <td>{% if mantencion.fechaUltHh %}{{ mantencion.fechaUltHh|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{{ mantencion.idComponente }}</td>
                 <td>{{ mantencion.idTipoMantencion }}</td>
-                <td>{{ mantencion.idEstadoMantencion }}</td>
-                <td>{{ mantencion.idCategoriaMantencion }}</td>
-                <td>{{ mantencion.idIncidencia }}</td>
-                <td>{{ mantencion.idRequerimiento }}</td>
+                <td>{{ mantencion.idEstadoMantencion }}</td>                
+                <td>{{ mantencion.idIncidencia }}</td>               
                 <td>
                     <ul>
                         <li>

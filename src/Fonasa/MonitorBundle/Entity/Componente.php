@@ -51,9 +51,9 @@ class Componente
     protected $categoriasIncidencia;       
     
     /**          
-     * @ORM\OneToMany(targetEntity="CategoriaMantencion", mappedBy="componente")          
+     * @ORM\OneToMany(targetEntity="TipoRequerimiento", mappedBy="componente")          
      */
-    protected $categoriasMantencion; 
+    protected $tiposRequerimiento; 
 
     /**
      * Get id
@@ -142,9 +142,9 @@ class Componente
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getCategoriasMantencion()
+    public function getTiposRequerimiento()
     {
-        return $this->categoriasMantencion;
+        return $this->tiposRequerimiento;
     }            
 }
 

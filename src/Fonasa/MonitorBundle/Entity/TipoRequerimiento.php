@@ -5,12 +5,12 @@ namespace Fonasa\MonitorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CategoriaMantencion
+ * TipoRequerimiento
  *
- * @ORM\Table(name="categoria_mantencion")
- * @ORM\Entity(repositoryClass="Fonasa\MonitorBundle\Repository\CategoriaMantencionRepository")
+ * @ORM\Table(name="tipo_requerimiento")
+ * @ORM\Entity(repositoryClass="Fonasa\MonitorBundle\Repository\TipoRequerimientoRepository")
  */
-class CategoriaMantencion
+class TipoRequerimiento
 {
     /**
      * @var int
@@ -24,7 +24,7 @@ class CategoriaMantencion
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre", type="string", length=255, unique=true)
+     * @ORM\Column(name="nombre", type="string", length=255)
      */
     private $nombre;
 
@@ -36,14 +36,14 @@ class CategoriaMantencion
     private $descripcion;
         
     /**          
-     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="categoriaMantencion")          
+     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="tipoRequerimiento")          
      */
     protected $mantenciones; 
     
     /**
      * @var \Componente
      *
-     * @ORM\ManyToOne(targetEntity="Componente", inversedBy="categoriasMantencion")
+     * @ORM\ManyToOne(targetEntity="Componente", inversedBy="tiposRequerimiento")
      * @ORM\JoinColumns{(
      *    @ORM\JoinColumn(name="ID_COMPONENTE", referencedColumnName="id")
      * })

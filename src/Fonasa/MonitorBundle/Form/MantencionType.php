@@ -6,7 +6,23 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+
+use Symfony\Component\Form\FormInterface;
+
+use Doctrine\ORM\EntityRepository;
+
+use Fonasa\MonitorBundle\Entity\OrigenMantencion;
+use Fonasa\MonitorBundle\Entity\Componente;
 
 class MantencionType extends AbstractType
 {
@@ -16,32 +32,227 @@ class MantencionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $origenes = array(            
-            'Requerimiento' => 1,
-            'Incidencia' => 2                    
-        );    
         
-        $builder
-            ->add('origenMantencion', ChoiceType::class, array('choices' => $origenes, 'expanded' => true, 'data' => 1, 'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')))
-            ->add('codigoInterno')
-            ->add('descripcion')
-            //->add('fechaIngreso', 'datetime')
-            //->add('fechaInicio', 'datetime')
-            //->add('fechaSalida', 'datetime')
-            //->add('fechaUltHh', 'datetime')
-            ->add('idComponente')
-            ->add('idTipoMantencion')
-            ->add('idEstadoMantencion')
-            ->add('idCategoriaMantencion')
-            ->add('idIncidencia')
-            ->add('idRequerimiento')
-            ->add('componente')
-            ->add('tipoMantencion')
-            ->add('estadoMantencion')
-            ->add('categoriaMantencion')
-            ->add('incidencia')
-            ->add('rquerimiento')
-        ;
+        $builder        
+            ->add('id', HiddenType::class);
+              
+        /*
+        $builder        
+            ->add('origenMantencion', EntityType::class, array(
+                  'class' => 'MonitorBundle:OrigenMantencion',
+                  'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('om')
+                              ->orderBy('om.nombre', 'DESC');
+                },
+                'choice_label' => 'nombre',
+                'expanded' => true,                
+                'choice_attr' => function($val, $key, $index) {
+                     // adds a class like attending_yes, attending_no, etc
+                     if($val->getNombre()=='Requerimiento')
+                        return ['checked' => true];
+                     else
+                        return ['checked' => false];
+                 },                                  
+                //'placeholder' => 'Seleccione una opción...',
+                'position' => 'first',
+                //'attr' => array('class' => 'form-inline')
+            ))
+            */
+                
+        if($options['origen']=='incidencia'){
+            $builder        
+                ->add('incidencia', EntityType::class, array(
+                      'class' => 'MonitorBundle:Incidencia',
+                      'choice_label' => 'numeroTicket',                   
+                      'placeholder' => 'Seleccione una opción...',
+                      'position' => array('after' => 'numeroRequerimiento'),
+                      //'disabled' => true, 
+                ));                            
+        }                     
+        if($options['origen']=='requerimiento'){
+            $builder        
+                ->add('componente', EntityType::class, array(
+                      'class' => 'MonitorBundle:Componente',
+                      'choice_label' => 'nombre',                   
+                      'placeholder' => 'Seleccione una opción...',
+                      'position' => 'first',
+                      //'position' => array('after' => 'origenMantencion'),
+                      //'disabled' => true, 
+                ))            
+                ->add('numeroRequerimiento', TextType::class, array(
+                      'position' => array('after' => 'tipoRequerimiento'),
+                      //'disabled' => true,
+                    ))                
+                ->add('tipoMantencion', EntityType::class, array(
+                      'class' => 'MonitorBundle:TipoMantencion',
+                      'query_builder' => function (EntityRepository $er) {
+                        return $er->createQueryBuilder('om')
+                                  ->where('om.nombre in (?1)')
+                                  ->setParameter(1, ['Mantención Correctiva','Mantención Evolutiva'])
+                                  ->orderBy('om.nombre', 'DESC');
+                        
+                    },
+                    'choice_label' => 'nombre',
+                    'expanded' => true,                                                                      
+                    //'placeholder' => 'Seleccione una opción...',
+                    'position' => 'first',
+                    //'attr' => array('class' => 'form-inline')
+                ))                    
+                ->add('codigoInterno', TextType::class, array(
+                      'position' => array('after' => 'numeroRequerimiento'),
+                      //'disabled' => true,
+                    ))
+                    ;
+               
+        }        
+                         
+        
+        $formModifierTipo = function (FormInterface $form, Componente $componente = null) {
+            
+            $tipos = null === $componente ? array() : $componente->getTiposRequerimiento();             
+            
+            $placeHolder= 'No hay opciones';
+            $disabled = false;                        
+            
+            if($componente!=null){                
+                $disabled = false;
+                $placeHolder= 'Seleccione una opción...';
+            }
+
+            $form->add('tipoRequerimiento', EntityType::class, array(
+                       'class'       => 'MonitorBundle:TipoRequerimiento',
+                       'choices'     => $tipos,
+                       'choice_label' => function($tipo, $key, $index) {
+                            /** @var Category $category */
+                            return $tipo->getNombre();
+                        },
+                       'choices_as_values' => true,
+                       /*
+                       'choice_attr' => function($val, $key, $index) {
+                            // adds a class like attending_yes, attending_no, etc
+                            return ['idTipoAlcance' => $val->getTipoAlcance()->getId()];
+                        },                 
+                        */                                   
+                       'placeholder' => $placeHolder,
+                       'disabled' => $disabled,
+                       'position' => array('after' => 'componente')
+            ));            
+        };        
+        
+        $formModifierInicioProgramado = function (FormInterface $form, $inicioProgramado = null) {
+        
+            if($inicioProgramado == null)
+                return;                         
+            
+            if($inicioProgramado){
+                $form 
+                ->add('fechaInicio', DateTimeType::class, array(
+                'date_widget'=> 'single_text',
+                'date_format'=>'d/MM/y',
+                'data'=> new \DateTime()
+                //'disabled' => true
+                )); 
+            }
+            else{
+                $form 
+                ->remove('fechaInicio');
+            }
+            
+        };        
+        
+        $builder                        
+            ->addEventListener(
+                FormEvents::PRE_SET_DATA,
+                function (FormEvent $event) use ($formModifierTipo, $formModifierInicioProgramado) {                    
+                    // this would be your entity, i.e. SportMeetup
+                    $data = $event->getData();                                        
+                    
+                    $formModifierTipo($event->getForm(), $data->getComponente()); 
+                    $formModifierInicioProgramado($event->getForm(), $data->getInicioProgramado()); 
+                }
+            );
+                            
+        $builder                                    
+            ->get('componente')->addEventListener(
+                FormEvents::POST_SUBMIT,
+                function (FormEvent $event) use ($formModifierTipo) {
+                    // It's important here to fetch $event->getForm()->getData(), as
+                    // $event->getData() will get you the client data (that is, the ID)
+                    $componente = $event->getForm()->getData();
+
+                    // since we've added the listener to the child, we'll have to pass on
+                    // the parent to the callback functions!                    
+                    $formModifierTipo($event->getForm()->getParent(), $componente);                    
+                }
+            );                                   
+            
+        $choices = array(            
+            'Iniciar Inmediatamente' => false,
+            'Inicio Programado' => true                    
+        );              
+        
+        $builder                               
+            ->add('inicioProgramado', ChoiceType::class, array(
+                'choices' => $choices, 
+                'choices_as_values' => true, 
+                'expanded' => true,
+                'data' => false,
+                'position' => array('after' => 'hhEstimadas'),
+                'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')
+            ))
+            /*
+            ->add('fechaInicio', DateTimeType::class, array(
+                'date_widget'=> 'single_text',
+                'date_format'=>'d/MM/y',
+                'data'=> new \DateTime()
+                //'disabled' => true
+            ))             
+             */
+            ->add('descripcion', TextareaType::class, array(
+                //'disabled' => true
+            ))                                
+            ->add('usuario', EntityType::class, array(
+                  'class' => 'MonitorBundle:Usuario',
+                  'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('om')                                            
+                              ->join('om.area', 'a')
+                              ->where('a.nombre in (?1)')
+                              ->setParameter(1, ['Desarrollo','Testing'])
+                              ->orderBy('om.username', 'DESC');
+                },
+                'choice_label' => 'userName',                                          
+                'placeholder' => 'Seleccione una opción...',                
+                //'attr' => array('class' => 'form-inline')
+            ))                            
+            ->add('hhEstimadas', NumberType::class);
+            /*
+            ->add('estadoMantencion', EntityType::class, array(
+                  'class' => 'MonitorBundle:EstadoMantencion',
+                  'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('ei')
+                              ->orderBy('ei.nombre', 'ASC');
+                },
+                'choice_label' => 'nombre',
+                //'expanded' => true,
+                //'multiple' => false,
+                //'position' => 'first',
+                //'attr' => array('class' => 'form-inline')
+            ));                       
+            */
+                
+        $builder                                    
+            ->get('inicioProgramado')->addEventListener(
+                FormEvents::POST_SUBMIT,
+                function (FormEvent $event) use ($formModifierInicioProgramado) {
+                    // It's important here to fetch $event->getForm()->getData(), as
+                    // $event->getData() will get you the client data (that is, the ID)
+                    $inicioProgramado = $event->getForm()->getData();
+
+                    // since we've added the listener to the child, we'll have to pass on
+                    // the parent to the callback functions!                    
+                    $formModifierInicioProgramado($event->getForm()->getParent(), $inicioProgramado);                    
+                }
+            );                 
     }
     
     /**
@@ -50,7 +261,8 @@ class MantencionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Fonasa\MonitorBundle\Entity\Mantencion'
+            'data_class' => 'Fonasa\MonitorBundle\Entity\Mantencion',
+            'origen' => ['incidencia','requerimiento']
         ));
     }        
 }

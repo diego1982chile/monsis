@@ -6,16 +6,18 @@ namespace AppBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Fonasa\MonitorBundle\Entity\Area;
+use Fonasa\MonitorBundle\Entity\Usuario;
 use Fonasa\MonitorBundle\Entity\EstadoIncidencia;
 use Fonasa\MonitorBundle\Entity\EstadoMantencion;
 use Fonasa\MonitorBundle\Entity\OrigenIncidencia;
+use Fonasa\MonitorBundle\Entity\OrigenMantencion;
 use Fonasa\MonitorBundle\Entity\SeveridadMantencion;
 use Fonasa\MonitorBundle\Entity\Componente;
 use Fonasa\MonitorBundle\Entity\Tarea;
 use Fonasa\MonitorBundle\Entity\TipoMantencion;
 use Fonasa\MonitorBundle\Entity\TareaUsuario;
 use Fonasa\MonitorBundle\Entity\CategoriaIncidencia;
-use Fonasa\MonitorBundle\Entity\CategoriaMantencion;
+use Fonasa\MonitorBundle\Entity\TipoRequerimiento;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -53,6 +55,37 @@ class LoadFixtures extends Controller implements FixtureInterface
         
         $manager->persist($area4);
         $manager->flush(); 
+        
+        $connection->exec("ALTER TABLE usuario AUTO_INCREMENT = 1;");
+        $userManager = $this->container->get('fos_user.user_manager');
+        
+        $usuario1 = new Usuario();
+                
+        $usuario1->setUserName("dsoto");
+        $usuario1->setEmail("desa@example.com");
+        $usuario1->setPlainPassword('123');
+        $usuario1->setArea('Desarrollo');
+        $userManager->updateUser($usuario1,false);
+        
+        $usuario2 = new Usuario();
+        
+        $usuario2->setUserName("rmercado");
+        $usuario2->setEmail("desa@example.com");
+        $usuario2->setPlainPassword('123');
+        $usuario2->setArea('Desarrollo');
+        $userManager->updateUser($usuario2,false);
+        
+        $usuario3 = new Usuario();
+        
+        $usuario3->setUserName("rmercado");
+        $usuario3->setEmail("test@example.com");
+        $usuario3->setPlainPassword('123');
+        $usuario3->setArea('Testing');
+        $userManager->updateUser($usuario3,false);
+                
+        $area1->setDescripcion("Área encargada de analizar y gestionar los requerimientos y/o incidencias, generando servicios asociados");        
+        
+        $manager->persist($area1);        
                 
         $connection->exec("ALTER TABLE estado_incidencia AUTO_INCREMENT = 1;");
         
@@ -134,6 +167,20 @@ class LoadFixtures extends Controller implements FixtureInterface
         
         $manager->persist($origen2);
         $manager->flush();         
+        
+        $connection->exec("ALTER TABLE origen_mantencion AUTO_INCREMENT = 1;");
+        
+        $origen1 = new OrigenMantencion();                
+        $origen1->setNombre("Incidencia");                    
+        
+        $manager->persist($origen1);
+        $manager->flush();         
+        
+        $origen2 = new OrigenMantencion();                
+        $origen2->setNombre("Requerimiento");        
+        
+        $manager->persist($origen2);
+        $manager->flush();                 
                         
         $connection->exec("ALTER TABLE severidad_mantencion AUTO_INCREMENT = 1;");        
         
@@ -175,15 +222,15 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->flush();                
         
         $componente3 = new Componente();
-        $componente3->setNombre("Préstamo Médico");
+        $componente3->setNombre("PM");
         $componente3->setDescripcion("Préstamo Médico");                                
         
         $manager->persist($componente3);
         $manager->flush();                
         
         $componente4 = new Componente();
-        $componente4->setNombre("DWH");
-        $componente4->setDescripcion("DWH");                                
+        $componente4->setNombre("BGI / DataWareHouse");
+        $componente4->setDescripcion("BGI / DataWareHouse");                                
         
         $manager->persist($componente4);
         $manager->flush();                        
@@ -377,9 +424,11 @@ class LoadFixtures extends Controller implements FixtureInterface
         
         $connection->exec("ALTER TABLE categoria_incidencia AUTO_INCREMENT = 1;");                
         
+        //-------------------INCIDENCIAS SIGGES---------------------------
+        
         $tipoAlcance1 = new CategoriaIncidencia();
-        $tipoAlcance1->setNombre("Corrección de datos Paciente");
-        $tipoAlcance1->setDescripcion("Corrección de datos Paciente");                
+        $tipoAlcance1->setNombre("Error/ Falla Acceso");
+        $tipoAlcance1->setDescripcion("Crear Acceso");                
         $tipoAlcance1->setComponente($componente1);
         $tipoAlcance1->setIdComponente($componente1->getId());
         
@@ -387,18 +436,467 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->flush();                         
         
         $tipoAlcance2 = new CategoriaIncidencia();   
-        $tipoAlcance2->setNombre("Extracción");
-        $tipoAlcance2->setDescripcion("Extracción");                
+        $tipoAlcance2->setNombre("Solicitud Clave");
+        $tipoAlcance2->setDescripcion("Solicitud Clave");                
         $tipoAlcance2->setComponente($componente1);
         $tipoAlcance2->setIdComponente($componente1->getId());
         
         $manager->persist($tipoAlcance2);
         $manager->flush();                          
         
-        $connection->exec("ALTER TABLE categoria_mantencion AUTO_INCREMENT = 1;");                
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Actualizar Prevision");
+        $tipoAlcance2->setDescripcion("Actualizar Prevision");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
         
-        $tipoAlcance1 = new CategoriaMantencion();
-        $tipoAlcance1->setNombre("ACR Consulta");
+        $manager->persist($tipoAlcance2);
+        $manager->flush();                                  
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Solicitud Clave");
+        $tipoAlcance2->setDescripcion("Solicitud Clave");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();                          
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Duplicidad de Caso");
+        $tipoAlcance2->setDescripcion("Duplicidad de Caso");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();                                  
+
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Falla en carga de formulario");
+        $tipoAlcance2->setDescripcion("Falla en carga de formulario");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();                          
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Falla en Ingreso de Paciente a SIGGES");
+        $tipoAlcance2->setDescripcion("Falla en Ingreso de Paciente a SIGGES");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();                                  
+
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Ingresar Paciente");
+        $tipoAlcance2->setDescripcion("Ingresar Paciente");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();                          
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Llamada Grupo Resolutor");
+        $tipoAlcance2->setDescripcion("Llamada Grupo Resolutor");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();                                          
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Paciente Bloqueado");
+        $tipoAlcance2->setDescripcion("Paciente Bloqueado");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();        
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Recalculo");
+        $tipoAlcance2->setDescripcion("Recalculo");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();      
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Apoyo Usuario");
+        $tipoAlcance2->setDescripcion("Apoyo Usuario");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();           
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Eliminacion de Paciente");
+        $tipoAlcance2->setDescripcion("Eliminacion de Paciente");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();       
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Modificacion de datos");
+        $tipoAlcance2->setDescripcion("Modificacion de datos");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();              
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Configuración del Browser");
+        $tipoAlcance2->setDescripcion("Configuración del Browser");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();          
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Eliminación de documentos fuera de plazo");
+        $tipoAlcance2->setDescripcion("Eliminación de documentos fuera de plazo");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush(); 
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Actualizar Datos del beneficiario");
+        $tipoAlcance2->setDescripcion("Actualizar Datos del beneficiario");                
+        $tipoAlcance2->setComponente($componente1);
+        $tipoAlcance2->setIdComponente($componente1->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();         
+        
+        //-------------------INCIDENCIAS GGPF-----------------------
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Error/ Falla Acceso");
+        $tipoAlcance2->setDescripcion("Error/ Falla Acceso");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();  
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Crear Acceso");
+        $tipoAlcance2->setDescripcion("Crear Acceso");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();          
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Solicitud Clave");
+        $tipoAlcance2->setDescripcion("Solicitud Clave");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();         
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Anular Folio");
+        $tipoAlcance2->setDescripcion("Anular Folio");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();   
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Cuenta de usuario bloqueada");
+        $tipoAlcance2->setDescripcion("Cuenta de usuario bloqueada");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();         
+                
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Desbloquer cuenta de usuario");
+        $tipoAlcance2->setDescripcion("Desbloquer cuenta de usuario");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();   
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Beneficiario no puede pagar por Cuenta Cerrada");
+        $tipoAlcance2->setDescripcion("Beneficiario no puede pagar por Cuenta Cerrada");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();           
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Abrir cuenta de titular");
+        $tipoAlcance2->setDescripcion("Abrir cuenta de titular");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush(); 
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Sistema no muestra deuda");
+        $tipoAlcance2->setDescripcion("Sistema no muestra deuda");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();      
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Sistema no registra el pago");
+        $tipoAlcance2->setDescripcion("Sistema no registra el pago");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();      
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Sistema no permite condonar GES");
+        $tipoAlcance2->setDescripcion("Sistema no permite condonar GES");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();  
+
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Sistema no permite condonar MAI NO GES");
+        $tipoAlcance2->setDescripcion("Sistema no permite condonar MAI NO GES");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();     
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("No se muestra la condonación GES");
+        $tipoAlcance2->setDescripcion("No se muestra la condonación GES");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();  
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("No se muestra la condonación MAI NO GES");
+        $tipoAlcance2->setDescripcion("No se muestra la condonación MAI NO GES");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();            
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Sistema no muestra la prestación");
+        $tipoAlcance2->setDescripcion("Sistema no muestra la prestación");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();   
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Folio congelado");
+        $tipoAlcance2->setDescripcion("Folio congelado");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();     
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Descongelar Folio");
+        $tipoAlcance2->setDescripcion("Descongelar Folio");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();  
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Sistema despliega venta con error");
+        $tipoAlcance2->setDescripcion("Sistema despliega venta con error");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush(); 
+
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("No permite ingresar valores en el campo");
+        $tipoAlcance2->setDescripcion("No permite ingresar valores en el campo");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();        
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("No despliega valores en la ventana");
+        $tipoAlcance2->setDescripcion("No despliega valores en la ventana");                
+        $tipoAlcance2->setComponente($componente2);
+        $tipoAlcance2->setIdComponente($componente2->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();   
+        
+        //------------------------------Incidencias PM------------------------------
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("No despliega valores en la ventana");
+        $tipoAlcance2->setDescripcion("No despliega valores en la ventana");                
+        $tipoAlcance2->setComponente($componente3);
+        $tipoAlcance2->setIdComponente($componente3->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();   
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Crear Acceso");
+        $tipoAlcance2->setDescripcion("Crear Acceso");                
+        $tipoAlcance2->setComponente($componente3);
+        $tipoAlcance2->setIdComponente($componente3->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();  
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Solicitud Clave");
+        $tipoAlcance2->setDescripcion("Solicitud Clave");                
+        $tipoAlcance2->setComponente($componente3);
+        $tipoAlcance2->setIdComponente($componente3->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();         
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("No se puede imprimir");
+        $tipoAlcance2->setDescripcion("No se puede imprimir");                
+        $tipoAlcance2->setComponente($componente3);
+        $tipoAlcance2->setIdComponente($componente3->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();         
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Modificacion Prestamo Medico");
+        $tipoAlcance2->setDescripcion("Modificacion Prestamo Medico");                
+        $tipoAlcance2->setComponente($componente3);
+        $tipoAlcance2->setIdComponente($componente3->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();          
+        
+        //-----------------Incidencias BGI / DataWareHouse--------------------------
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Error/ Falla Acceso");
+        $tipoAlcance2->setDescripcion("Error/ Falla Acceso");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();          
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Crear Acceso");
+        $tipoAlcance2->setDescripcion("Crear Acceso");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();   
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Solicitud Clave");
+        $tipoAlcance2->setDescripcion("Solicitud Clave");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();     
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Extractores/procesos especiales");
+        $tipoAlcance2->setDescripcion("Extractores/procesos especiales");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();  
+
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Soporte creación/mantención de consultas");
+        $tipoAlcance2->setDescripcion("Soporte creación/mantención de consultas");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();        
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Cuadratura/Análisis de Informes");
+        $tipoAlcance2->setDescripcion("Cuadratura/Análisis de Informes");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();       
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Soporte uso de Discoverer/herramientas");
+        $tipoAlcance2->setDescripcion("Soporte uso de Discoverer/herramientas");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();    
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Soporte Ejecución Informes/Consultas");
+        $tipoAlcance2->setDescripcion("Soporte Ejecución Informes/Consultas");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();   
+        
+        $tipoAlcance2 = new CategoriaIncidencia();   
+        $tipoAlcance2->setNombre("Corrección de datos");
+        $tipoAlcance2->setDescripcion("Corrección de datos");                
+        $tipoAlcance2->setComponente($componente4);
+        $tipoAlcance2->setIdComponente($componente4->getId());
+        
+        $manager->persist($tipoAlcance2);
+        $manager->flush();   
+        
+        //--------------------------------------------------------------------------
+        
+        $connection->exec("ALTER TABLE tipo_requerimiento AUTO_INCREMENT = 1;");                
+        
+        $tipoAlcance1 = new TipoRequerimiento();
+        $tipoAlcance1->setNombre("Error/ Falla Acceso");
         $tipoAlcance1->setDescripcion("ACR Consulta");                
         $tipoAlcance1->setComponente($componente1);
         $tipoAlcance1->setIdComponente($componente1->getId());
@@ -406,7 +904,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance1);
         $manager->flush();                         
         
-        $tipoAlcance2 = new CategoriaMantencion();   
+        $tipoAlcance2 = new TipoRequerimiento();   
         $tipoAlcance2->setNombre("Adm. Establecimiento");
         $tipoAlcance2->setDescripcion("Adm. Establecimiento");                
         $tipoAlcance2->setComponente($componente1);
@@ -415,7 +913,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance2);
         $manager->flush();                           
                 
-        $tipoAlcance3 = new CategoriaMantencion();
+        $tipoAlcance3 = new TipoRequerimiento();
         $tipoAlcance3->setNombre("Adm. Colas");
         $tipoAlcance3->setDescripcion("Adm. Colas");          
         $tipoAlcance3->setComponente($componente1);
@@ -424,7 +922,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance3);
         $manager->flush();                 
                 
-        $tipoAlcance4 = new CategoriaMantencion();
+        $tipoAlcance4 = new TipoRequerimiento();
         $tipoAlcance4->setNombre("Arancel");
         $tipoAlcance4->setDescripcion("Arancel");                
         $tipoAlcance4->setComponente($componente1);
@@ -433,7 +931,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance4);
         $manager->flush();              
                 
-        $tipoAlcance5 = new CategoriaMantencion();
+        $tipoAlcance5 = new TipoRequerimiento();
         $tipoAlcance5->setNombre("Beneficiario");
         $tipoAlcance5->setDescripcion("Beneficiario");        
         $tipoAlcance5->setComponente($componente1);
@@ -442,7 +940,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance5);
         $manager->flush();                   
                 
-        $tipoAlcance6 = new CategoriaMantencion();
+        $tipoAlcance6 = new TipoRequerimiento();
         $tipoAlcance6->setNombre("Búsqueda paciente");
         $tipoAlcance6->setDescripcion("Búsqueda paciente");                
         $tipoAlcance6->setComponente($componente1);
@@ -451,7 +949,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance6);
         $manager->flush();        
                 
-        $tipoAlcance7 = new CategoriaMantencion();
+        $tipoAlcance7 = new TipoRequerimiento();
         $tipoAlcance7->setNombre("CAT");
         $tipoAlcance7->setDescripcion("CAT");                
         $tipoAlcance7->setComponente($componente1);
@@ -460,7 +958,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance7);
         $manager->flush();              
                 
-        $tipoAlcance8 = new CategoriaMantencion();
+        $tipoAlcance8 = new TipoRequerimiento();
         $tipoAlcance8->setNombre("CUP");
         $tipoAlcance8->setDescripcion("CUP");                
         $tipoAlcance8->setComponente($componente1);
@@ -469,7 +967,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance8);
         $manager->flush();          
         
-        $tipoAlcance9 = new CategoriaMantencion();
+        $tipoAlcance9 = new TipoRequerimiento();
         $tipoAlcance9->setNombre("Datamart");
         $tipoAlcance9->setDescripcion("Datamart");            
         $tipoAlcance9->setComponente($componente1);
@@ -478,7 +976,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance9);
         $manager->flush();               
                 
-        $tipoAlcance10 = new CategoriaMantencion();
+        $tipoAlcance10 = new TipoRequerimiento();
         $tipoAlcance10->setNombre("DDE");
         $tipoAlcance10->setDescripcion("DDE");                
         $tipoAlcance10->setComponente($componente1);
@@ -487,7 +985,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance10);
         $manager->flush();          
         
-        $tipoAlcance11 = new CategoriaMantencion();
+        $tipoAlcance11 = new TipoRequerimiento();
         $tipoAlcance11->setNombre("Desbloqueo prev. fallecido");
         $tipoAlcance11->setDescripcion("Desbloqueo prev. fallecido");                
         $tipoAlcance11->setComponente($componente1);
@@ -496,7 +994,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance11);
         $manager->flush();                  
                 
-        $tipoAlcance12 = new CategoriaMantencion();
+        $tipoAlcance12 = new TipoRequerimiento();
         $tipoAlcance12->setNombre("ENDECA");
         $tipoAlcance12->setDescripcion("ENDECA");             
         $tipoAlcance12->setComponente($componente1);
@@ -505,7 +1003,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance12);
         $manager->flush();                  
                 
-        $tipoAlcance13 = new CategoriaMantencion();
+        $tipoAlcance13 = new TipoRequerimiento();
         $tipoAlcance13->setNombre("Extracción");
         $tipoAlcance13->setDescripcion("Extracción");         
         $tipoAlcance13->setComponente($componente1);
@@ -514,7 +1012,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance13);
         $manager->flush();                     
                 
-        $tipoAlcance14 = new CategoriaMantencion();
+        $tipoAlcance14 = new TipoRequerimiento();
         $tipoAlcance14->setNombre("EXTRAEGGPF");
         $tipoAlcance14->setDescripcion("EXTRAEGGPF");         
         $tipoAlcance14->setComponente($componente1);
@@ -523,7 +1021,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance14);
         $manager->flush();                         
                 
-        $tipoAlcance15 = new CategoriaMantencion();
+        $tipoAlcance15 = new TipoRequerimiento();
         $tipoAlcance15->setNombre("Facturación");
         $tipoAlcance15->setDescripcion("Facturación");        
         $tipoAlcance15->setComponente($componente1);
@@ -532,7 +1030,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance15);
         $manager->flush();                  
                 
-        $tipoAlcance16 = new CategoriaMantencion();
+        $tipoAlcance16 = new TipoRequerimiento();
         $tipoAlcance16->setNombre("Parametrización eventos GO");
         $tipoAlcance16->setDescripcion("Parametrización eventos GO");                
         $tipoAlcance16->setComponente($componente1);
@@ -541,7 +1039,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance16);
         $manager->flush();                  
                 
-        $tipoAlcance17 = new CategoriaMantencion();
+        $tipoAlcance17 = new TipoRequerimiento();
         $tipoAlcance17->setNombre("IFL");
         $tipoAlcance17->setDescripcion("IFL");                
         $tipoAlcance17->setComponente($componente1);
@@ -550,7 +1048,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance17);
         $manager->flush();                 
                 
-        $tipoAlcance18 = new CategoriaMantencion();
+        $tipoAlcance18 = new TipoRequerimiento();
         $tipoAlcance18->setNombre("Manuales");
         $tipoAlcance18->setDescripcion("Manuales");           
         $tipoAlcance18->setComponente($componente1);
@@ -559,7 +1057,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance18);
         $manager->flush();                         
                 
-        $tipoAlcance19 = new CategoriaMantencion();
+        $tipoAlcance19 = new TipoRequerimiento();
         $tipoAlcance19->setNombre("Monitoreo y consultas");
         $tipoAlcance19->setDescripcion("Monitoreo y consultas");                
         $tipoAlcance19->setComponente($componente1);
@@ -568,7 +1066,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance19);
         $manager->flush();                       
                 
-        $tipoAlcance20 = new CategoriaMantencion();
+        $tipoAlcance20 = new TipoRequerimiento();
         $tipoAlcance20->setNombre("Reporte OFF-Line");
         $tipoAlcance20->setDescripcion("Reporte OFF-Line");   
         $tipoAlcance20->setComponente($componente1);
@@ -577,7 +1075,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance20);
         $manager->flush();                               
                 
-        $tipoAlcance21 = new CategoriaMantencion();
+        $tipoAlcance21 = new TipoRequerimiento();
         $tipoAlcance21->setNombre("RNP");
         $tipoAlcance21->setDescripcion("RNP");                
         $tipoAlcance21->setComponente($componente1);
@@ -586,7 +1084,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance21);
         $manager->flush();                               
                 
-        $tipoAlcance22 = new CategoriaMantencion();    
+        $tipoAlcance22 = new TipoRequerimiento();    
         $tipoAlcance22->setNombre("POII-POIM");
         $tipoAlcance22->setDescripcion("POII-POIM");          
         $tipoAlcance22->setComponente($componente1);
@@ -595,7 +1093,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance22);
         $manager->flush();          
                 
-        $tipoAlcance23 = new CategoriaMantencion();
+        $tipoAlcance23 = new TipoRequerimiento();
         $tipoAlcance23->setNombre("Recálculo GO");
         $tipoAlcance23->setDescripcion("Recálculo GO");       
         $tipoAlcance23->setComponente($componente1);
@@ -604,7 +1102,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance23);
         $manager->flush();                  
                 
-        $tipoAlcance24 = new CategoriaMantencion();
+        $tipoAlcance24 = new TipoRequerimiento();
         $tipoAlcance24->setNombre("Revalorizar");
         $tipoAlcance24->setDescripcion("Revalorizar");        
         $tipoAlcance24->setComponente($componente1);
@@ -613,7 +1111,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance24);
         $manager->flush();                          
                 
-        $tipoAlcance25 = new CategoriaMantencion();
+        $tipoAlcance25 = new TipoRequerimiento();
         $tipoAlcance25->setNombre("Proceso CAC");
         $tipoAlcance25->setDescripcion("Proceso CAC");                
         $tipoAlcance25->setComponente($componente1);
@@ -622,7 +1120,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance25);
         $manager->flush();                          
                 
-        $tipoAlcance26 = new CategoriaMantencion();
+        $tipoAlcance26 = new TipoRequerimiento();
         $tipoAlcance26->setNombre("VIH");
         $tipoAlcance26->setDescripcion("VIH");                
         $tipoAlcance26->setComponente($componente1);
@@ -631,7 +1129,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($tipoAlcance26);
         $manager->flush();                          
                 
-        $tipoAlcance27 = new CategoriaMantencion();
+        $tipoAlcance27 = new TipoRequerimiento();
         $tipoAlcance27->setNombre("WS Certificador Prev.");
         $tipoAlcance27->setDescripcion("WS Certificador Prev.");                
         $tipoAlcance27->setComponente($componente1);
