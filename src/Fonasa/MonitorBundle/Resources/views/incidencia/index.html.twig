@@ -2,7 +2,7 @@
 {% form_theme GlobalFilters 'bootstrap_3_layout.html.twig' %}
 {% block stylesheets %}    
 {% endblock %}
-{% block title %}MonSis{% endblock %}
+{% block title %}Monsis{% endblock %}
 {% block filtro %}        
     <ul class="nav navbar-nav"> 
         <li class="divider-vertical"></li>
@@ -50,13 +50,12 @@
     <table id="incidencias" class="display table-striped" style="display:none" width="100%">
         <thead>
             <tr>                
-                <th width="10%">N°Ticket</th>                                
+                <th width="5%">N°Ticket</th>                                
                 <th width="10%">Fecha Reporte</th>             
-                <th width="8%">Origen</th>
+                <th width="8%">Severidad</th>
                 <th width="14%">Categoria</th>   
                 <th width="8%">Componente</th>                                                              
-                <th width="12%">Estado</th>
-                <th width="20%">Acciones</th>
+                <th width="12%">Estado</th>                
                 <th width="4%">Show/Edit</th>                
             </tr>
         </thead>
@@ -103,7 +102,7 @@
                 ],
             dom: 'frtip<"toolbar">',
             fnDrawCallback: function( oSettings ) {
-                $('#incidencias th').removeClass('ui-state-default');
+                $('#incidencias th').removeClass('ui-state-default');                                                       
             },
             fnServerData: function ( sSource, aoData, fnCallback ) {
 			/* Add some extra data to the sender */
@@ -112,9 +111,9 @@
                         aoData.push( { "name": "estado", "value": $estado.find(':checked').val() } );
                         
 			$.getJSON( sSource, aoData, function (json) { 
-				/* Do whatever additional processing you want on the callback, then tell DataTables */                                
-                                $('div.toolbar').html(json.pap);
-				fnCallback(json)
+                            /* Do whatever additional processing you want on the callback, then tell DataTables */                                
+                            //$('div.toolbar').html(json.pap);
+                            fnCallback(json)
 			} );
             }                    
         });        

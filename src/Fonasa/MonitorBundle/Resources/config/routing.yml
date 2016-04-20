@@ -16,7 +16,7 @@ root:
 incidencia_index:
     path:     /incidencia
     defaults: { _controller: "MonitorBundle:Incidencia:index" }
-    methods:  GET
+    methods:  [GET,POST]
 
 incidencia_show:
     path:     /incidencia/{id}/show
@@ -47,6 +47,11 @@ incidencia_body:
     path:   /incidencia/body
     defaults: { _controller: "MonitorBundle:Incidencia:body" }
     methods:  [GET]    
+    
+incidencia_status:    
+    path:   /incidencia/{id}/{status}/status
+    defaults: { _controller: "MonitorBundle:Incidencia:status" }
+    methods:  [GET,POST]
     
 incidencia_init:
     path:   /incidencia/{id}/init

@@ -23,6 +23,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Fonasa\MonitorBundle\Entity\OrigenMantencion;
 use Fonasa\MonitorBundle\Entity\Componente;
+use Fonasa\MonitorBundle\Entity\Severidad;
 
 class MantencionType extends AbstractType
 {
@@ -34,32 +35,10 @@ class MantencionType extends AbstractType
     {
         
         $builder        
-            ->add('id', HiddenType::class);
-              
-        /*
-        $builder        
-            ->add('origenMantencion', EntityType::class, array(
-                  'class' => 'MonitorBundle:OrigenMantencion',
-                  'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('om')
-                              ->orderBy('om.nombre', 'DESC');
-                },
-                'choice_label' => 'nombre',
-                'expanded' => true,                
-                'choice_attr' => function($val, $key, $index) {
-                     // adds a class like attending_yes, attending_no, etc
-                     if($val->getNombre()=='Requerimiento')
-                        return ['checked' => true];
-                     else
-                        return ['checked' => false];
-                 },                                  
-                //'placeholder' => 'Seleccione una opción...',
-                'position' => 'first',
-                //'attr' => array('class' => 'form-inline')
-            ))
-            */
+            ->add('id', HiddenType::class);                                       
+            
                 
-        if($options['origen']=='incidencia'){
+        if($options['origen']=='Incidencia'){
             $builder        
                 ->add('incidencia', EntityType::class, array(
                       'class' => 'MonitorBundle:Incidencia',
@@ -68,8 +47,8 @@ class MantencionType extends AbstractType
                       'position' => array('after' => 'numeroRequerimiento'),
                       //'disabled' => true, 
                 ));                            
-        }                     
-        if($options['origen']=='requerimiento'){
+        }        
+        if($options['origen']=='Requerimiento'){
             $builder        
                 ->add('componente', EntityType::class, array(
                       'class' => 'MonitorBundle:Componente',
@@ -78,7 +57,25 @@ class MantencionType extends AbstractType
                       'position' => 'first',
                       //'position' => array('after' => 'origenMantencion'),
                       //'disabled' => true, 
-                ))            
+                ))                                         
+                ->add('origenMantencion', EntityType::class, array(
+                          'class' => 'MonitorBundle:OrigenMantencion',
+                          'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('om')
+                                      ->orderBy('om.nombre', 'DESC');
+                        },
+                        'choice_label' => 'nombre',                    
+                        'choice_attr' => function($val, $key, $index) {
+                             // adds a class like attending_yes, attending_no, etc
+                             if($val->getNombre()=='Requerimiento')
+                                return ['selected' => true];
+                             else
+                                return ['selected' => false];
+                         },                                                               
+                         'attr' => array('style' => 'display:none'),
+                         'label' => false
+                                 
+                ))
                 ->add('numeroRequerimiento', TextType::class, array(
                       'position' => array('after' => 'tipoRequerimiento'),
                       //'disabled' => true,
@@ -217,7 +214,7 @@ class MantencionType extends AbstractType
                     return $er->createQueryBuilder('om')                                            
                               ->join('om.area', 'a')
                               ->where('a.nombre in (?1)')
-                              ->setParameter(1, ['Desarrollo','Testing'])
+                              ->setParameter(1, ['Desarrollo'])
                               ->orderBy('om.username', 'DESC');
                 },
                 'choice_label' => 'userName',                                          
@@ -262,7 +259,7 @@ class MantencionType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Fonasa\MonitorBundle\Entity\Mantencion',
-            'origen' => ['incidencia','requerimiento']
+            'origen' => ['Incidencia','Requerimiento']
         ));
     }        
 }

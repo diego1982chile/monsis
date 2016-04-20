@@ -1,61 +1,163 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    {% for flash_message in app.session.flashbag.get('notice') %}            
+    <div class="alert alert-info alert-dismissible" role="alert">                
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 style="margin:0px">
+            <span class="glyphicon glyphicon glyphicon-ok-sign"></span>&nbsp;
+            &nbspOperación realizada con éxito
+        </h3>
+        <div>
+            <ul>
+                {% set foo = flash_message|split('|') %}
+                {% for var in foo %}                            
+                <li style="margin:10px">                    
+                    {{ var }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>                    
+    {% endfor %}
     <h1>Mantencion</h1>
 
-    <table>
-        <tbody>
+<div style="width:100%">
+    <fieldset class="scheduler-border" >
+    <legend class="scheduler-border">Datos de la Mantención</legend>
+    <div class="control-group">
+        <table width="100%" class="table" border="0">
             <tr>
-                <th>Id</th>
-                <td>{{ mantencion.id }}</td>
+                <th width="20%">
+                    Componente:
+                </th>
+                <td width="80%">
+                    {{ mantencion.componente.nombre }}        
+                </td>                            
             </tr>
             <tr>
-                <th>Codigointerno</th>
-                <td>{{ mantencion.codigoInterno }}</td>
+                <th width="20%">
+                    Origen:
+                </th>
+                <td width="80%">
+                    {{ mantencion.origenMantencion.nombre }}        
+                </td>                     
             </tr>
             <tr>
-                <th>Descripcion</th>
-                <td>{{ mantencion.descripcion }}</td>
+                <th width="20%">
+                    Tipo Requerimiento:
+                </th>
+                <td width="80%">
+                    {{ mantencion.tipoRequerimiento.nombre }}        
+                </td>                     
             </tr>
             <tr>
-                <th>Fechaingreso</th>
-                <td>{% if mantencion.fechaIngreso %}{{ mantencion.fechaIngreso|date('Y-m-d H:i:s') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Fechainicio</th>
-                <td>{% if mantencion.fechaInicio %}{{ mantencion.fechaInicio|date('Y-m-d H:i:s') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Fechasalida</th>
-                <td>{% if mantencion.fechaSalida %}{{ mantencion.fechaSalida|date('Y-m-d H:i:s') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Fechaulthh</th>
-                <td>{% if mantencion.fechaUltHh %}{{ mantencion.fechaUltHh|date('Y-m-d H:i:s') }}{% endif %}</td>
-            </tr>
-            <tr>
-                <th>Idcomponente</th>
-                <td>{{ mantencion.idComponente }}</td>
-            </tr>
-            <tr>
-                <th>Idtipomantencion</th>
-                <td>{{ mantencion.idTipoMantencion }}</td>
-            </tr>
-            <tr>
-                <th>Idestadomantencion</th>
-                <td>{{ mantencion.idEstadoMantencion }}</td>
-            </tr>
-            <tr>
-                <th>Idcategoriamantencion</th>
-                <td>{{ mantencion.idTipoRequerimiento }}</td>
-            </tr>
-            <tr>
-                <th>Idincidencia</th>
-                <td>{{ mantencion.idIncidencia }}</td>
+                <th width="20%">
+                    N°Requerimiento:
+                </th>
+                <td width="80%">
+                    {{ mantencion.numeroRequerimiento }}        
+                </td>                     
             </tr>            
-        </tbody>
-    </table>
-
+            <tr>
+                <th width="20%">
+                    N°Mantencion:
+                </th>
+                <td width="80%">
+                    {{ mantencion.codigoInterno }}        
+                </td>                     
+            </tr>                        
+            <tr>
+                <th width="20%">
+                    Estado:
+                </th>
+                <td width="80%">
+                    {{ mantencion.estadoMantencion.nombre }}        
+                </td>                     
+            </tr>                                                            
+            <tr>
+                <th width="20%">
+                    Descripción:
+                </th>
+                <td width="80%">
+                    {{ mantencion.descripcion }}                         
+                </td>                     
+            </tr>               
+        </table>
+    </div>
+    </fieldset>        
+    <fieldset class="scheduler-border" >
+    <legend class="scheduler-border">Datos de la Asignación</legend>
+    <div class="control-group">
+        <table width="100%" class="table" border="0">
+            <tr>
+                <th width="20%">
+                    Responsable:
+                </th>
+                <td width="80%">
+                    {{ mantencion.usuario.username }}        
+                </td>                            
+            </tr>
+            <tr>
+                <th width="20%">
+                    HH Estimadas:
+                </th>
+                <td width="80%">
+                    {{ mantencion.hhEstimadas }}        
+                </td>                     
+            </tr>
+            <tr>
+                <th width="20%">
+                    HH Reales:
+                </th>
+                <td width="80%">
+                    {{ mantencion.hhEfectivas }}        
+                </td>                     
+            </tr>                        
+        </table>
+    </div>
+    </fieldset>                        
+    <fieldset class="scheduler-border">
+        <legend class="scheduler-border">Eventos</legend>
+            <div class="control-group">
+                <table width="100%" class="table" border="0">                                   
+                    <tr>
+                        <th width="20%">
+                            Fecha Ingreso:
+                        </th>
+                        <td width="80%">
+                            {% if mantencion.fechaIngreso %}
+                                {{ mantencion.fechaIngreso|date('Y-m-d H:i') }}
+                            {% endif %}
+                        </td>                     
+                    </tr>                                   
+                    <tr>
+                        <th width="20%">
+                            Fecha Inicio:
+                        </th>
+                        <td width="80%">
+                            {% if mantencion.fechaInicio %}
+                                {{ mantencion.fechaInicio|date('Y-m-d H:i') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>                     
+                    </tr>                    
+                    <tr>
+                        <th width="20%">
+                            Fecha Término:
+                        </th>
+                        <td width="80%">
+                            {% if mantencion.fechaSalida %}
+                                {{ mantencion.fechaSalida|date('Y-m-d H:i') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>                     
+                    </tr>                                        
+                </table>
+            </div>
+    </fieldset>                        
     <ul>
         <li>
             <a href="{{ path('mantencion_index') }}">Back to the list</a>

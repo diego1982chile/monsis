@@ -6,19 +6,19 @@
     <h1>Nueva Incidencia</h1>
     <div style="width:60%">
     {{ form_start(form) }}        
-        {{ form_errors(form) }}
-        {{ form_row(form.origenIncidencia) }}                           
+        {{ form_errors(form) }}        
+        {{ form_row(form.componente) }}
+        {{ form_row(form.categoriaIncidencia) }}
         {{ form_label(form.numeroTicket) }}
         <div class="form-group input-group">        
             {{ form_widget(form.numeroTicket) }}
             <span class="input-group-btn">
                 <button id="validar" class="btn btn-secondary" type="button">Validar</button>
             </span>
-        </div>
-        {{ form_row(form.componente) }}
-        {{ form_row(form.categoriaIncidencia) }}
+        </div>        
         {{ form_row(form.fechaReporte) }}
         {{ form_row(form.descripcion) }}
+        {{ form_row(form.severidad) }}
         {{ form_row(form.estadoIncidencia) }}
         <input type="submit" class='btn btn-primary' style="display:none" value="Create" />
         <button id="validate_form" class="btn btn-primary" type="button">Create</button>

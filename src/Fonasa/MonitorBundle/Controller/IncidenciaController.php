@@ -85,7 +85,8 @@ class IncidenciaController extends Controller
      *
      */
     public function showAction(Incidencia $incidencia)
-    {
+    {        
+        
         $deleteForm = $this->createDeleteForm($incidencia);
 
         return $this->render('MonitorBundle:incidencia:show.html.twig', array(
@@ -231,68 +232,83 @@ class IncidenciaController extends Controller
         $em->persist($historial);
         $em->flush();
 
- 
         $this->addFlash(
             'notice',
             'Se ha finalizado la incidencia N°Ticket '.$incidencia[0]->getNumeroTicket().'.| Esta puede ser visualizada en el panel principal mediante el filtro "Finalizados".'
         );   
                 
+        echo 'pase';
         //return $this->render('MonitorBundle:incidencia:index.html.twig');                         
-        return $this->redirectToRoute('incidencia_index');
+        return $this->redirectToRoute('incidencia_new');
     }    
         
     /**
      * Displays a form to edit an existing Servicio entity.
      *
      */
-    public function desaAction($id)
-    {                                           
+    public function statusAction($id, $status)
+    {                                            
+        //$id= $request->request->get('id');
+        //$status= $request->request->get('status');
         
         $em = $this->getDoctrine()->getManager();
         
-        $servicio= $em->getRepository('MonitorBundle:Servicio')
+        $incidencia= $em->getRepository('MonitorBundle:Incidencia')
             ->createQueryBuilder('s')                                
             ->where('s.id = ?1')
             ->setParameter(1, $id)
             ->getQuery()
             ->getResult();                            
                 
-        $estado= $em->getRepository('MonitorBundle:Estado')
+        $estado= $em->getRepository('MonitorBundle:EstadoIncidencia')
             ->createQueryBuilder('e')                                
             ->where('e.nombre = ?1')
-            ->setParameter(1, 'Desa')
+            ->setParameter(1, $status)
             ->getQuery()
-            ->getResult();                    
+            ->getResult();                                  
 
-        $servicio[0]->setEstado($estado[0]);
-        $servicio[0]->setIdEstado($estado[0]->getId());                
+        $incidencia[0]->setEstadoIncidencia($estado[0]);
+        $incidencia[0]->setIdEstadoIncidencia($estado[0]->getId());                
+        
+        switch ($status){
+            case 'En Cola': // Si se deja en cola, la fecha de inicio salida se anulan
+                $incidencia[0]->setFechaInicio(null);
+                $incidencia[0]->setFechaSalida(null);
+                break;
+            case 'En Gestión FONASA': // Si se deja en gestión FONASA, no se hace nada
+                break;            
+            case 'Pendiente MT': // Si se deja Pendiente MT se actualiza la fecha inicio
+                $incidencia[0]->setFechaInicio(new\DateTime('now'));
+                break;        
+            case 'Resuelta MT':
+                $incidencia[0]->setFechaSalida(new\DateTime('now'));
+                break;            
+        }
 
         $em = $this->getDoctrine()->getManager();
-        $em->persist($servicio[0]);
+        $em->persist($incidencia[0]);
         $em->flush();
 
         // Guardar el historial del cambio de estado               
         $fechaTerminado=new\DateTime('now');            
-        $historial = new Historial();
+        $historial = new HistorialIncidencia();
 
-        $historial->setServicio($servicio[0]);                     
-        $historial->setIdServicio($servicio[0]->getId());
-        $historial->setEstado($estado[0]);
-        $historial->setIdEstado($estado[0]->getId());            
+        $historial->setIncidencia($incidencia[0]);                     
+        $historial->setIdIncidencia($incidencia[0]->getId());
+        $historial->setEstadoIncidencia($estado[0]);
+        $historial->setIdEstadoIncidencia($estado[0]->getId());            
         $historial->setInicio($fechaTerminado);                   
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($historial);
         $em->flush();
-
  
         $this->addFlash(
             'notice',
-            'El servicio '.$servicio[0]->getCodigoInterno().' de tipo Mantención ha sido asignado al área de desarrollo.'
+            'La incidencia asociada al n°Ticket:'.$incidencia[0]->getNumeroTicket().' ha cambiado al estado '.$estado[0]->getNombre().'.'
         );   
-                
-        //return $this->render('MonitorBundle:incidencia:index.html.twig');                         
-        return $this->redirectToRoute('servicio_index');
+                                        
+        return $this->redirectToRoute('incidencia_index');
     }    
         
     /**
@@ -561,7 +577,7 @@ class IncidenciaController extends Controller
                 ->createQueryBuilder('i')                
                 ->join('i.categoriaIncidencia', 'ci')
                 ->join('i.componente', 'c')
-                ->join('i.origenIncidencia', 'o')
+                ->join('i.severidad', 'o')
                 ->join('i.estadoIncidencia', 'e')                                                
                 ->where('YEAR(i.fechaReporte) = ?1')
                 ->andWhere('MONTH(i.fechaReporte) = ?2')
@@ -616,7 +632,13 @@ class IncidenciaController extends Controller
         $incidencias= $qb->setParameters($parameters)
                          ->getQuery()
                          ->getResult();   
-                
+        
+        $estados = $em->getRepository('MonitorBundle:EstadoIncidencia')
+                ->createQueryBuilder('e')                                
+                //->where('e.nombre in (?1)')
+                //->setParameter(1, ['Desa','Test','PaP'])
+                ->getQuery()
+                ->getResult();                                          
         
         $body = array();              
         $cont = 0;                
@@ -628,12 +650,29 @@ class IncidenciaController extends Controller
             array_push($fila,$incidencia->getNumeroTicket());
             array_push($fila,$incidencia->getFechaReporte()->format('d/m/Y H:i'));
             //array_push($fila,$servicio->getComponente()->getNombre());
-            array_push($fila,$incidencia->getOrigenIncidencia()->getNombre());
+            array_push($fila,$incidencia->getSeveridad()->getNombre());
             //array_push($fila,$servicio->getTipoServicio()->getTipo()->getNombre());
             array_push($fila,$incidencia->getCategoriaIncidencia()->getNombre());
             array_push($fila,$incidencia->getComponente()->getNombre());
             //array_push($fila,$incidencia->getPrioridad()->getNombre());                                                                                    
-                        
+
+            $html='<select class="incidencia_estadoIncidencia" onchange="location = this.value;">';
+            $selected;
+            
+            foreach($estados as $estado)                        
+            {
+                if($estado->getNombre()==$incidencia->getEstadoIncidencia()->getNombre())
+                    $selected='selected';
+                else
+                    $selected=null;
+                
+                $html=$html.'<option value='.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre())).' '.$selected.'>'.$estado->getNombre().'</button>';
+            }            
+            '</select>';    
+            
+            array_push($fila,$html);
+            
+            /*
             switch($incidencia->getEstadoIncidencia()->getNombre()){
 
                 case 'En Cola':
@@ -649,7 +688,8 @@ class IncidenciaController extends Controller
                     array_push($fila,'<div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%"><span>'.$incidencia->getEstadoIncidencia()->getDescripcion().'</span></div></div>');
                     array_push($fila,'<a id="'.$incidencia->getId().'" href="'.$this->generateUrl('incidencia_init', array('id' => $incidencia->getId())).'" role="button" class="btn btn-default">Iniciar</button>');                                                            
                     break;
-            }                   
+            }              
+            */                  
             
             array_push($fila,'<ul><li><a href="'.$this->generateUrl('incidencia_show', array('id' => $incidencia->getId())).'">ver</a></li><li><a href="'.$this->generateUrl('incidencia_edit', array('id' => $incidencia->getId())).'">editar</a></li></ul>');
             

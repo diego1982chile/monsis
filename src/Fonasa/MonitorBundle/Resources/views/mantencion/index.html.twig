@@ -1,51 +1,43 @@
 {% extends 'base.html.twig' %}
-
+{% block filtro %}        
+    <ul class="nav navbar-nav"> 
+        <li class="divider-vertical"></li>
+        <li class="active"> 
+            <form id="filtros" action="" method="post" class="navbar-form navbar-left">                 
+                {{ form_start(GlobalFilters) }}        
+                {{ form_errors(GlobalFilters) }}                
+                {{ form_widget(GlobalFilters.Anio) }}                
+                {{ form_widget(GlobalFilters.Mes) }}                                                 
+                <div id="form_Estado" class="btn-group" data-toggle="buttons">
+                {% for child in GlobalFilters.Estado %}
+                    {{ form_label(child) }} 
+                    <label class="btn btn-sm btn-default {% if loop.index == 1 %}active{% endif %}">                                       
+                    {{ form_widget(child) }}
+                    </label>
+                {% endfor %}
+                </div>
+            </form>
+        </li>
+        <li class="divider-vertical"></li>                    
+    </ul>                 
+{% endblock %}
 {% block body %}
     <h1>Mantencion list</h1>
 
     <table>
         <thead>
-            <tr>
-                <th>Id</th>
-                <th>Codigointerno</th>
-                <th>Descripcion</th>
-                <th>Fechaingreso</th>
-                <th>Fechainicio</th>
-                <th>Fechasalida</th>
-                <th>Fechaulthh</th>
-                <th>Idcomponente</th>
-                <th>Idtipomantencion</th>
-                <th>Idestadomantencion</th>
-                <th>Idincidencia</th>                
-                <th>Actions</th>
+            <tr>                
+                <th width="5%">N°Mantencion</th>                                
+                <th width="10%">Fecha inicio</th>                                
+                <th width="8%">Fecha término</th>
+                <th width="8%">HH Estimadas</th>
+                <th width="8%">HH Reales</th>
+                <th width="8%">Componente</th>                
+                <th width="12%">Estado</th>                
+                <th width="4%">Show/Edit</th>                  
             </tr>
         </thead>
-        <tbody>
-        {% for mantencion in mantencions %}
-            <tr>
-                <td><a href="{{ path('mantencion_show', { 'id': mantencion.id }) }}">{{ mantencion.id }}</a></td>
-                <td>{{ mantencion.codigoInterno }}</td>
-                <td>{{ mantencion.descripcion }}</td>
-                <td>{% if mantencion.fechaIngreso %}{{ mantencion.fechaIngreso|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if mantencion.fechaInicio %}{{ mantencion.fechaInicio|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if mantencion.fechaSalida %}{{ mantencion.fechaSalida|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if mantencion.fechaUltHh %}{{ mantencion.fechaUltHh|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{{ mantencion.idComponente }}</td>
-                <td>{{ mantencion.idTipoMantencion }}</td>
-                <td>{{ mantencion.idEstadoMantencion }}</td>                
-                <td>{{ mantencion.idIncidencia }}</td>               
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('mantencion_show', { 'id': mantencion.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('mantencion_edit', { 'id': mantencion.id }) }}">edit</a>
-                        </li>
-                    </ul>
-                </td>
-            </tr>
-        {% endfor %}
+        <tbody>        
         </tbody>
     </table>
 
@@ -54,4 +46,75 @@
             <a href="{{ path('mantencion_new') }}">Create a new entry</a>
         </li>
     </ul>
+{% endblock %}
+{% block javascripts %}
+<script>
+    var $anio = $('#form_Anio');
+    var $mes = $('#form_Mes');
+    var $estado = $('#form_Estado');
+    
+    function updateTitle(){
+        $('#title').html("Mantenciones "+
+                         $estado.find(':checked').parent().text()+" "+
+                         $mes.find('option:selected').text()+" "+
+                         $anio.val());        
+    }
+    
+    $(function() {
+        $('#incidencias th').removeClass('ui-state-default');    
+        $('#incidencias').show();                        
+        updateTitle();
+    });     
+    
+    var oTable = $('#incidencias').dataTable({
+            bPaginate: false,
+            bJQueryUI: false,
+            bServerSide: true,
+            sAjaxSource: '{{ path('incidencia_body') }}',
+            sServerMethod: 'GET',
+            bProcessing: true,
+            aoColumnDefs: [
+                    {
+                    aTargets: [0,1,2,3,4,5,6],
+                    class: 'cols'                
+                    }                
+                ],
+            dom: 'frtip<"toolbar">',
+            fnDrawCallback: function( oSettings ) {
+                $('#incidencias th').removeClass('ui-state-default');                                                       
+            },
+            fnServerData: function ( sSource, aoData, fnCallback ) {
+			/* Add some extra data to the sender */
+			aoData.push( { "name": "anio", "value": $anio.val() } );
+                        aoData.push( { "name": "mes", "value": $mes.val() } );
+                        aoData.push( { "name": "estado", "value": $estado.find(':checked').val() } );
+                        
+			$.getJSON( sSource, aoData, function (json) { 
+                            /* Do whatever additional processing you want on the callback, then tell DataTables */                                
+                            //$('div.toolbar').html(json.pap);
+                            fnCallback(json)
+			} );
+            }                    
+        });        
+        
+        $anio.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        $mes.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        $estado.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        setInterval( function () {
+            oTable.fnDraw();
+        }, 30000 );
+    
+</script>
 {% endblock %}

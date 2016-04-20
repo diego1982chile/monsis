@@ -39,6 +39,7 @@ class IncidenciaType extends AbstractType
             ->add('id', HiddenType::class);
         
         $builder        
+            /*
             ->add('origenIncidencia', EntityType::class, array(
                   'class' => 'MonitorBundle:OrigenIncidencia',
                   'query_builder' => function (EntityRepository $er) {
@@ -51,7 +52,8 @@ class IncidenciaType extends AbstractType
                 'placeholder' => 'Seleccione una opción...',
                 'position' => 'first',
                 //'attr' => array('class' => 'form-inline')
-            ))                  
+            ))
+            */
             ->add('componente', EntityType::class, array(
                   'class' => 'MonitorBundle:Componente',
                   'choice_label' => 'nombre',                   
@@ -60,7 +62,7 @@ class IncidenciaType extends AbstractType
                   //'disabled' => true, 
             ))
             ->add('numeroTicket', TextType::class, array(
-                  'position' => array('after' => 'origenIncidencia'),
+                  'position' => 'first',
                   //'disabled' => true,
                 ));
         ;                
@@ -131,6 +133,18 @@ class IncidenciaType extends AbstractType
             ->add('descripcion', TextareaType::class, array(
                 //'disabled' => true
             ))    
+            ->add('severidad', EntityType::class, array(
+                  'class' => 'MonitorBundle:Severidad',
+                  'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('ei')
+                              ->orderBy('ei.nombre', 'ASC');
+                },
+                'choice_label' => 'nombre',
+                //'expanded' => true,
+                //'multiple' => false,
+                'position' => 'first',
+                //'attr' => array('class' => 'form-inline')
+            ))                                  
             ->add('estadoIncidencia', EntityType::class, array(
                   'class' => 'MonitorBundle:EstadoIncidencia',
                   'query_builder' => function (EntityRepository $er) {

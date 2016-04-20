@@ -6,7 +6,7 @@
     <div class="alert alert-info alert-dismissible" role="alert">                
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h3 style="margin:0px">
-            <img data-target="#panel" src="{{ asset('bundles/monsis/images/circle_1.png') }}" data-toggle="collapse" style="height:24px;width:24px" />
+            <span class="glyphicon glyphicon glyphicon-ok-sign"></span>&nbsp;
             &nbspOperación realizada con éxito
         </h3>
         <div>
@@ -21,38 +21,122 @@
         </div>
     </div>                    
     {% endfor %}
-    <h1>Incidencia</h1>
+    <h1>Incidencia</h1>    
     <div style="width:100%">
-    <table class="table table-striped display">
-        <tbody>
+    <fieldset class="scheduler-border" >
+    <legend class="scheduler-border">Datos de la Incidencia</legend>
+    <div class="control-group">
+        <table width="100%" class="table" border="0">
             <tr>
-                <th width="10%">N°Ticket</th>
-                <td width="20%">{{ incidencia.numeroTicket }}</td>
-                <th width="10%">Origen</th>
-                <td width="20%">{{ incidencia.origenIncidencia.nombre }}</td>
-                <th width="10%">Componente</th>
-                <td width="20%">{{ incidencia.componente.nombre }}</td>
-            </tr>
-            <tr>                
-                <th width="10%">Categoría</th>
-                <td width="20%" colspan="3">{{ incidencia.categoriaIncidencia.nombre }}</td>                
-                <th width="10%">Estado</th>
-                <td width="20%">{{ incidencia.estadoIncidencia.nombre }}</td>                                
+                <th width="20%">
+                    Componente:
+                </th>
+                <td width="80%">
+                    {{ incidencia.componente.nombre }}        
+                </td>                            
             </tr>
             <tr>
-                <th width="10%">Fecha Reporte</th>
-                <td width="20%">{% if incidencia.fechaReporte %}{{ incidencia.fechaReporte|date('Y-m-d H:i') }}{% endif %}</td>                
-                <th width="10%">Fecha Ingreso</th>
-                <td width="20%">{% if incidencia.fechaIngreso %}{{ incidencia.fechaIngreso|date('Y-m-d H:i') }}{% endif %}</td>                
-                <th width="10%">Fecha Salida</th>
-                <td width="20%">{% if incidencia.fechaSalida %}{{ incidencia.fechaSalida|date('Y-m-d H:i') }}{% endif %}</td>                                
+                <th width="20%">
+                    Tipo:
+                </th>
+                <td width="80%">
+                    {{ incidencia.categoriaIncidencia.nombre }}        
+                </td>                     
+            </tr>
+            <tr>
+                <th width="20%">
+                    N°Ticket:
+                </th>
+                <td width="80%">
+                    {{ incidencia.numeroTicket }}        
+                </td>                     
             </tr>            
-            <tr>                                
-                <th width="10%" colspan="3">Descripción</th>
-                <td colspan="6">{{ incidencia.descripcion }}</td>                
-            </tr>                                    
-        </tbody>
-    </table>
+            <tr>
+                <th width="20%">
+                    Severidad:
+                </th>
+                <td width="80%">
+                    {{ incidencia.severidad.nombre }}        
+                </td>                     
+            </tr>                        
+            <tr>
+                <th width="20%">
+                    Estado:
+                </th>
+                <td width="80%">
+                    {{ incidencia.estadoIncidencia.nombre }}        
+                </td>                     
+            </tr>                  
+            <tr>
+                <th width="20%">
+                    Mantención asociada:
+                </th>
+                <td width="80%">
+                    {% if incidencia.mantenciones|length > 0 %}
+                        {{ incidncia.mantenciones[0].codigoIngerno }}
+                    {% else %}
+                        -
+                    {% endif %}                          
+                </td>                     
+            </tr>                              
+            <tr>
+                <th width="20%">
+                    Descripción:
+                </th>
+                <td width="80%">
+                    {{ incidencia.descripcion }}                         
+                </td>                     
+            </tr>               
+        </table>
+    </div>
+    </fieldset>    
+    <fieldset class="scheduler-border">
+        <legend class="scheduler-border">Eventos</legend>
+            <div class="control-group">
+                <table width="100%" class="table" border="0">
+                    <tr>
+                        <th width="20%">
+                            Fecha Reporte:
+                        </th>
+                        <td width="80%">
+                            {% if incidencia.fechaReporte %}{{ incidencia.fechaReporte|date('Y-m-d H:i') }}{% endif %}                
+                        </td>                     
+                    </tr>               
+                    <tr>
+                        <th width="20%">
+                            Fecha Ingreso:
+                        </th>
+                        <td width="80%">
+                            {% if incidencia.fechaIngreso %}{{ incidencia.fechaIngreso|date('Y-m-d H:i') }}{% endif %}
+                        </td>                     
+                    </tr>                                   
+                    <tr>
+                        <th width="20%">
+                            Fecha Inicio:
+                        </th>
+                        <td width="80%">
+                            {% if incidencia.fechaInicio %}
+                                {{ incidencia.fechaInicio|date('Y-m-d H:i') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>                     
+                    </tr>                    
+                    <tr>
+                        <th width="20%">
+                            Fecha Término:
+                        </th>
+                        <td width="80%">
+                            {% if incidencia.fechaSalida %}
+                                {{ incidencia.fechaSalida|date('Y-m-d H:i') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>                     
+                    </tr>                                        
+                </table>
+            </div>
+    </fieldset>                    
     </div>
     <ul>
         <li>

@@ -40,7 +40,7 @@ class MantencionController extends Controller
         $em = $this->getDoctrine()->getManager();
         
         $mantencion = new Mantencion();
-        $form = $this->createForm('Fonasa\MonitorBundle\Form\MantencionType', $mantencion, array('origen' => 'requerimiento'));
+        $form = $this->createForm('Fonasa\MonitorBundle\Form\MantencionType', $mantencion, array('origen' => 'Requerimiento'));
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

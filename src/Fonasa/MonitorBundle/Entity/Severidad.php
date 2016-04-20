@@ -5,12 +5,12 @@ namespace Fonasa\MonitorBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * SeveridadMantencion
+ * Severidad
  *
- * @ORM\Table(name="severidad_mantencion")
- * @ORM\Entity(repositoryClass="Fonasa\MonitorBundle\Repository\SeveridadMantencionRepository")
+ * @ORM\Table(name="severidad")
+ * @ORM\Entity(repositoryClass="Fonasa\MonitorBundle\Repository\SeveridadRepository")
  */
-class SeveridadMantencion
+class Severidad
 {
     /**
      * @var int
@@ -34,7 +34,16 @@ class SeveridadMantencion
      * @ORM\Column(name="descripcion", type="string", length=511, nullable=true)
      */
     private $descripcion;
-
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="Incidencia", mappedBy="severidad")          
+     */
+    protected $incidencias;        
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="mantenciones")          
+     */
+    protected $mantenciones;  
 
     /**
      * Get id
@@ -51,7 +60,7 @@ class SeveridadMantencion
      *
      * @param string $nombre
      *
-     * @return SeveridadMantencion
+     * @return Severidad
      */
     public function setNombre($nombre)
     {
@@ -75,7 +84,7 @@ class SeveridadMantencion
      *
      * @param string $descripcion
      *
-     * @return SeveridadMantencion
+     * @return Severidad
      */
     public function setDescripcion($descripcion)
     {

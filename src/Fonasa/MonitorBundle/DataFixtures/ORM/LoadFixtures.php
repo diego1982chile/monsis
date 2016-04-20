@@ -11,7 +11,7 @@ use Fonasa\MonitorBundle\Entity\EstadoIncidencia;
 use Fonasa\MonitorBundle\Entity\EstadoMantencion;
 use Fonasa\MonitorBundle\Entity\OrigenIncidencia;
 use Fonasa\MonitorBundle\Entity\OrigenMantencion;
-use Fonasa\MonitorBundle\Entity\SeveridadMantencion;
+use Fonasa\MonitorBundle\Entity\Severidad;
 use Fonasa\MonitorBundle\Entity\Componente;
 use Fonasa\MonitorBundle\Entity\Tarea;
 use Fonasa\MonitorBundle\Entity\TipoMantencion;
@@ -62,30 +62,26 @@ class LoadFixtures extends Controller implements FixtureInterface
         $usuario1 = new Usuario();
                 
         $usuario1->setUserName("dsoto");
-        $usuario1->setEmail("desa@example.com");
+        $usuario1->setEmail("desa1@example.com");
         $usuario1->setPlainPassword('123');
-        $usuario1->setArea('Desarrollo');
+        $usuario1->setArea($area2);
         $userManager->updateUser($usuario1,false);
         
         $usuario2 = new Usuario();
         
         $usuario2->setUserName("rmercado");
-        $usuario2->setEmail("desa@example.com");
+        $usuario2->setEmail("desa2@example.com");
         $usuario2->setPlainPassword('123');
-        $usuario2->setArea('Desarrollo');
+        $usuario2->setArea($area2);
         $userManager->updateUser($usuario2,false);
         
         $usuario3 = new Usuario();
         
-        $usuario3->setUserName("rmercado");
+        $usuario3->setUserName("mvillarroel");
         $usuario3->setEmail("test@example.com");
         $usuario3->setPlainPassword('123');
-        $usuario3->setArea('Testing');
-        $userManager->updateUser($usuario3,false);
-                
-        $area1->setDescripcion("Área encargada de analizar y gestionar los requerimientos y/o incidencias, generando servicios asociados");        
-        
-        $manager->persist($area1);        
+        $usuario3->setArea($area3);
+        $userManager->updateUser($usuario3,false);                                        
                 
         $connection->exec("ALTER TABLE estado_incidencia AUTO_INCREMENT = 1;");
         
@@ -182,23 +178,23 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->persist($origen2);
         $manager->flush();                 
                         
-        $connection->exec("ALTER TABLE severidad_mantencion AUTO_INCREMENT = 1;");        
+        $connection->exec("ALTER TABLE severidad AUTO_INCREMENT = 1;");        
         
-        $severidad1 = new SeveridadMantencion();
+        $severidad1 = new Severidad();
         $severidad1->setNombre("Alta");
         $severidad1->setDescripcion("Severidad alta");                
         
         $manager->persist($severidad1);
         $manager->flush();            
         
-        $severidad2 = new SeveridadMantencion();
+        $severidad2 = new Severidad();
         $severidad2->setNombre("Media");
         $severidad2->setDescripcion("Severidad media");                
         
         $manager->persist($severidad2);
         $manager->flush();            
         
-        $severidad3 = new SeveridadMantencion();
+        $severidad3 = new Severidad();
         $severidad3->setNombre("Baja");
         $severidad3->setDescripcion("Severidad baja");                
         

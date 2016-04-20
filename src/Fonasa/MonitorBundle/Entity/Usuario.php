@@ -85,6 +85,18 @@ class Usuario extends BaseUser
     }
     
     /**
+     * Set area
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Usuario
+     */
+    public function setArea(\Fonasa\MonitorBundle\Entity\Area $area = null)
+    {
+        $this->area=$area;
+        
+        return $this;
+    }  
+    
+    /**
     * Set idArea
     *
     * @param int $idArea

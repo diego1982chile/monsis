@@ -105,7 +105,23 @@ class Mantencion
      *      
      * @ORM\Column(name="ID_COMPONENTE", type="integer", nullable=true)               
      */
-    protected $idComponente;     
+    protected $idComponente;  
+        
+    /**
+     * @var \Severidad
+     *
+     * @ORM\ManyToOne(targetEntity="Severidad", inversedBy="mantenciones")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_SEVERIDAD", referencedColumnName="id")
+     * })
+     */
+    protected $severidad;
+    
+    /**
+     *      
+     * @ORM\Column(name="ID_SEVERIDAD", type="integer", nullable=true)               
+     */
+    protected $idSeveridad;             
     
     
     /**

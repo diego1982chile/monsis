@@ -86,6 +86,22 @@ class Incidencia
      */
     protected $idComponente;     
     
+    /**
+     * @var \Severidad
+     *
+     * @ORM\ManyToOne(targetEntity="Severidad", inversedBy="incidencias")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_SEVERIDAD", referencedColumnName="id")
+     * })
+     */
+    protected $severidad;
+    
+    /**
+     *      
+     * @ORM\Column(name="ID_SEVERIDAD", type="integer", nullable=true)               
+     */
+    protected $idSeveridad;         
+    
     
     /**
      * @var \OrigenIncidencia
@@ -518,6 +534,62 @@ class Incidencia
         
         return $this;
     } 
+    
+    //-------------------------------------------------------------------------
+    
+    /**
+     * Get severidad
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Severidad
+     */
+    public function getSeveridad()
+    {
+        return $this->severidad;
+    }
+    
+    /**
+     * Set severidad
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Incidencia
+     */
+    public function setSeveridad(\Fonasa\MonitorBundle\Entity\Severidad $severidad = null)
+    {
+        $this->severidad=$severidad;
         
+        return $this;
+    }  
+    
+    /**
+     * Get idSeveridad
+     *
+     * @return int
+     */
+    public function getIdSeveridad()
+    {
+        return $this->idSeveridad;
+    }
+    
+    /**
+    * Set idSeveridad
+    *
+    * @param int $idSeveridad
+    * @return Incidencia
+    */
+    public function setIdSeveridad($idSeveridad)
+    {
+        $this->idSeveridad = $idSeveridad;
+        
+        return $this;
+    } 
+      
+    /**
+    * Get mantenciones
+    *    
+    * @return \Doctrine\Common\Collections\Collection
+    */
+    public function getMantenciones(){
+        
+        return $this->mantenciones;
+    }
 }
 
