@@ -1,22 +1,25 @@
 {% extends 'base.html.twig' %}
 {% form_theme form 'bootstrap_3_layout.html.twig' %}
-
-{% block body %}
+{% block body %}        
     <h1>Mantencion creation</h1>
     <div style="width:60%">
     {{ form_start(form) }}              
         {{ form_start(form) }}        
         {{ form_errors(form) }}                        
         {{ form_row(form.componente) }}
-        {{ form_row(form.tipoRequerimiento) }}
-        {{ form_label(form.numeroRequerimiento) }}        
-        <div class="form-group input-group">        
-            <span class="input-group-addon" id="basic-addon1">Req#</span>
-            {{ form_widget(form.numeroRequerimiento) }}
-            <span class="input-group-btn">
-                <button id="validar" class="btn btn-secondary" type="button">Validar</button>
-            </span>
-        </div>                 
+        {% if form.tipoRequerimiento is defined %}
+            {{ form_row(form.tipoRequerimiento) }}
+        {% endif %}
+        {% if form.numeroRequerimiento is defined %}
+            {{ form_label(form.numeroRequerimiento) }}        
+            <div class="form-group input-group">        
+                <span class="input-group-addon" id="basic-addon1">Req#</span>
+                {{ form_widget(form.numeroRequerimiento) }}
+                <span class="input-group-btn">
+                    <button id="validar" class="btn btn-secondary" type="button">Validar</button>
+                </span>
+            </div>                 
+        {% endif %}
         {{ form_label(form.tipoMantencion) }}                    
         <div id="form_tipoMantencion">                    
             {% for child in form.tipoMantencion %}
@@ -43,7 +46,7 @@
             {% endfor %}
         </div>            
         {% if form.fechaInicio is defined %}
-        {{ form_row(form.fechaInicio) }}        
+            {{ form_row(form.fechaInicio) }}        
         {% endif %}
         <input type="submit" class='btn btn-primary' style="display:none" value="Create" />
         <button id="validate_form" class="btn btn-primary" type="button">Create</button>
@@ -56,9 +59,8 @@
     </ul>
 {% endblock %}
 
-{% block javascripts %}
-<script>
-
+{% block javascripts %}    
+<script>    
 var $inicioProgramado = $('#mantencion_inicioProgramado');
 
 var $numeroReq = $('#mantencion_numeroRequerimiento');
@@ -182,10 +184,9 @@ $validar.click(function(){
 });
 
 $('#validate_form').click(function(){ 
+  
   var error = false;
-  var data = {};
-  data['numeroRequerimiento'] = $('#mantencion_numeroRequerimiento').val(); 
-  data['id'] = $('#mantencion_id').val();
+  
   // Submit data via AJAX to the form's action path.
   $('.form-group').each(function(){           
        $field=$(this).find('input,select,textarea');              
@@ -219,35 +220,82 @@ $('#validate_form').click(function(){
   });
   
   if(error)
-    return false;
+    return false; 
   
-  $.post("{{ path('mantencion_check') }}",data,function(data){
-      if(data.error){          
-          $('#mantencion_numeroRequerimiento').focus();
-          $('#mantencion_numeroRequerimiento').qtip({ // Grab some elements to apply the tooltip to
-                content: {
-                    text: '<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;'+data.message
-                },
-                show: {
-                    ready: true,
-                    delay: 50
-                },
-                style: {
-                    classes: 'alert alert-danger',
-                    def: false,                    
-                },            
-                position: {
-                        my: 'top left',  // Position my top left...
-                        at: 'bottom center', // at the bottom right of...
-                        target: $('#mantencion_numeroRequerimiento') // my target
-                    }                
-            });          
-      } 
-      else{        
-        $('form[name="mantencion"]').submit();
-      }
-      // Position field now displays the appropriate positions.      
-  });    
+  var $numeroRequerimiento = $('#mantencion_numeroRequerimiento');     
+  var $numeroMantencion = $('#mantencion_codigoInterno');     
+  
+    if($numeroRequerimiento.length){
+      
+        var data = {};
+        data['numeroRequerimiento'] = $numeroRequerimiento.val(); 
+        data['id'] = $('#mantencion_id').val();
+
+        $.post("{{ path('mantencion_check') }}",data,function(data){
+            if(data.error){          
+                $numeroRequerimiento.focus();
+                $numeroRequerimiento.qtip({ // Grab some elements to apply the tooltip to
+                      content: {
+                          text: '<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;'+data.message
+                      },
+                      show: {
+                          ready: true,
+                          delay: 50
+                      },
+                      style: {
+                          classes: 'alert alert-danger',
+                          def: false,                    
+                      },            
+                      position: {
+                              my: 'top left',  // Position my top left...
+                              at: 'bottom center', // at the bottom right of...
+                              target: $('#mantencion_numeroRequerimiento') // my target
+                          }                
+                });          
+            } 
+            else{        
+                $('form[name="mantencion"]').submit();
+            }
+        // Position field now displays the appropriate positions.      
+        });                  
+    }
+    else{        
+        if($numeroMantencion.length){
+      
+            var data = {};
+            data['numeroMantencion'] = $numeroMantencion.val(); 
+            data['id'] = $('#mantencion_id').val();
+
+            $.post("{{ path('mantencion_check2') }}",data,function(data){
+                if(data.error){          
+                    $numeroMantencion.focus();
+                    $numeroMantencion.qtip({ // Grab some elements to apply the tooltip to
+                          content: {
+                              text: '<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;'+data.message
+                          },
+                          show: {
+                              ready: true,
+                              delay: 50
+                          },
+                          style: {
+                              classes: 'alert alert-danger',
+                              def: false,                    
+                          },            
+                          position: {
+                                  my: 'top left',  // Position my top left...
+                                  at: 'bottom center', // at the bottom right of...
+                                  target: $numeroMantencion // my target
+                              }                
+                      });          
+                } 
+                else{        
+                    $('form[name="mantencion"]').submit();
+                }
+            // Position field now displays the appropriate positions.      
+            });                  
+        }
+    }
+        
 });
 
 </script>

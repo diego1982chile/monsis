@@ -77,5 +77,121 @@ class HistorialMantencion
     {
         return $this->id;
     }
+    
+    /**
+     * Set inicio
+     *
+     * @param \DateTime $inicio
+     *
+     * @return HistorialIncidencia
+     */
+    public function setInicio($inicio)
+    {
+        $this->inicio = $inicio;
+
+        return $this;
+    }
+
+    /**
+     * Get inicio
+     *
+     * @return \DateTime
+     */
+    public function getInicio()
+    {
+        return $this->inicio;
+    }    
+    
+    /**
+     * Get mantencion
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Mantencion
+     */
+    public function getMantencion()
+    {
+        return $this->mantencion;
+    }
+    
+    /**
+     * Set mantencion
+     *
+     * @return \Fonasa\MonitorBundle\Entity\HistorialMantencion
+     */
+    public function setMantencion(\Fonasa\MonitorBundle\Entity\Mantencion $mantencion = null)
+    {
+        $this->mantencion = $mantencion;
+        
+        return $this;
+    }            
+    
+    /**
+     * Get idMantencion
+     *
+     * @return int
+     */
+    public function getIdMantencion()
+    {
+        return $this->idMantencion;
+    }
+    
+    /**
+    * Set idMantencion
+    *
+    * @param int $idMantencion
+    * @return Historial
+    */
+    public function setIdMantencion($idMantencion)
+    {
+        $this->idMantencion = $idMantencion;
+        
+        return $this;
+    }      
+    
+    //-----------------------------------------------------------
+    
+    /**
+     * Get estadoMantencion
+     *
+     * @return \Fonasa\MonitorBundle\Entity\EstadoMantencion
+     */
+    public function getEstadoMantencion()
+    {
+        return $this->estadoMantencion;
+    }
+    
+    /**
+     * Set estadoMantencion
+     *
+     * @return \Fonasa\MonitorBundle\Entity\HistorialMantencion
+     */
+    public function setEstadoMantencion(\Fonasa\MonitorBundle\Entity\EstadoMantencion $estadoMantencion = null)
+    {
+        $this->estadoMantencion = $estadoMantencion;
+        
+        return $this;
+    }            
+    
+    /**
+     * Get idEstadoMantencion
+     *
+     * @return int
+     */
+    public function getIdEstadoMantencion()
+    {
+        return $this->idEstadoMantencion;
+    }
+    
+    /**
+    * Set idEstadoMantencion
+    *
+    * @param int $idEstadoMantencion
+    * @return HistorialMantencion
+    */
+    public function setIdEstadoMantencion($idEstadoMantencion)
+    {
+        $this->idEstadoMantencion = $idEstadoMantencion;
+        
+        return $this;
+    }      
 }
 

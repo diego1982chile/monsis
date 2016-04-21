@@ -1,4 +1,8 @@
 {% extends 'base.html.twig' %}
+{% form_theme GlobalFilters 'bootstrap_3_layout.html.twig' %}
+{% block stylesheets %}    
+{% endblock %}
+{% block title %}Monsis{% endblock %}
 {% block filtro %}        
     <ul class="nav navbar-nav"> 
         <li class="divider-vertical"></li>
@@ -22,17 +26,34 @@
     </ul>                 
 {% endblock %}
 {% block body %}
-    <h1>Mantencion list</h1>
+    {% for flash_message in app.session.flashbag.get('notice') %}            
+    <div class="alert alert-info alert-dismissible" role="alert">                
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 style="margin:0px">
+            <span class="glyphicon glyphicon glyphicon-ok-sign"></span>&nbsp;
+            &nbspOperación realizada con éxito
+        </h3>
+        <div>
+            <ul>
+                {% set foo = flash_message|split('|') %}
+                {% for var in foo %}                            
+                <li style="margin:10px">                    
+                    {{ var }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>                    
+    {% endfor %}
+    <h1 id="title"></h1>
 
-    <table>
+    <table id="mantenciones" class="display table-striped" style="display:none" width="100%">
         <thead>
             <tr>                
                 <th width="5%">N°Mantencion</th>                                
                 <th width="10%">Fecha inicio</th>                                
-                <th width="8%">Fecha término</th>
-                <th width="8%">HH Estimadas</th>
-                <th width="8%">HH Reales</th>
-                <th width="8%">Componente</th>                
+                <th width="10%">Fecha término</th>
+                <th width="10%">HH Estimadas</th>                                               
                 <th width="12%">Estado</th>                
                 <th width="4%">Show/Edit</th>                  
             </tr>
@@ -61,27 +82,27 @@
     }
     
     $(function() {
-        $('#incidencias th').removeClass('ui-state-default');    
-        $('#incidencias').show();                        
+        $('#mantenciones th').removeClass('ui-state-default');    
+        $('#mantenciones').show();                        
         updateTitle();
     });     
     
-    var oTable = $('#incidencias').dataTable({
+    var oTable = $('#mantenciones').dataTable({
             bPaginate: false,
             bJQueryUI: false,
             bServerSide: true,
-            sAjaxSource: '{{ path('incidencia_body') }}',
+            sAjaxSource: '{{ path('mantencion_body') }}',
             sServerMethod: 'GET',
             bProcessing: true,
             aoColumnDefs: [
                     {
-                    aTargets: [0,1,2,3,4,5,6],
+                    aTargets: [0,1,2,3,4,5],
                     class: 'cols'                
                     }                
                 ],
             dom: 'frtip<"toolbar">',
             fnDrawCallback: function( oSettings ) {
-                $('#incidencias th').removeClass('ui-state-default');                                                       
+                $('#mantenciones th').removeClass('ui-state-default');                                                                 
             },
             fnServerData: function ( sSource, aoData, fnCallback ) {
 			/* Add some extra data to the sender */
@@ -93,6 +114,23 @@
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                
                             //$('div.toolbar').html(json.pap);
                             fnCallback(json)
+                            
+                            $(".dropdown-menu > li > a.trigger").on("click",function(e){                                                    
+                                var current=$(this).next();
+                                var grandparent=$(this).parent().parent();
+                                if($(this).hasClass('left-caret')||$(this).hasClass('right-caret'))
+                                    $(this).toggleClass('right-caret left-caret');
+                                grandparent.find('.left-caret').not(this).toggleClass('right-caret left-caret');
+                                grandparent.find(".sub-menu:visible").not(current).hide();
+                                current.toggle();
+                                e.stopPropagation();
+                            });
+
+                            $(".dropdown-menu > li > a:not(.trigger)").on("click",function(){
+                                var root=$(this).closest('.dropdown');
+                                root.find('.left-caret').toggleClass('right-caret left-caret');
+                                root.find('.sub-menu:visible').hide();
+                            });                                                           
 			} );
             }                    
         });        

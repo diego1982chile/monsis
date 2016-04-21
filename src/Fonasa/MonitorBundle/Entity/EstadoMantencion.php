@@ -38,7 +38,17 @@ class EstadoMantencion
     /**          
      * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="estadoMantencion")          
      */
-    protected $mantenciones; 
+    protected $mantenciones;         
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="HistorialMantencion", mappedBy="estadoMantencion")          
+     */
+    protected $historialesMantencion;   
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="Usuario", mappedBy="estadoMantencion")          
+     */
+    protected $usuarios; 
 
     /**
      * Get id

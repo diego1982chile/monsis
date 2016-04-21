@@ -51,17 +51,12 @@ incidencia_body:
 incidencia_status:    
     path:   /incidencia/{id}/{status}/status
     defaults: { _controller: "MonitorBundle:Incidencia:status" }
-    methods:  [GET,POST]
+    methods:  [GET,POST]     
     
-incidencia_init:
-    path:   /incidencia/{id}/init
-    defaults: { _controller: "MonitorBundle:Incidencia:init" }
-    methods:  [GET,POST]        
-    
-incidencia_finish:
-    path:   /incidencia/{id}/finish
-    defaults: { _controller: "MonitorBundle:Incidencia:finish" }
-    methods:  [GET,POST]    
+incidencia_mantencion:
+    path:   /incidencia/{id}/mantencion
+    defaults: { _controller: "MonitorBundle:Incidencia:mantencion" }
+    methods:  [GET,POST]                
     
 mantencion_index:
     path:     /mantencion
@@ -72,6 +67,11 @@ mantencion_show:
     path:     /mantencion/{id}/show
     defaults: { _controller: "MonitorBundle:Mantencion:show" }
     methods:  GET
+    
+mantencion_body:
+    path:   /mantencion/body
+    defaults: { _controller: "MonitorBundle:Mantencion:body" }
+    methods:  [GET]        
 
 mantencion_new:
     path:     /mantencion/new
@@ -93,27 +93,17 @@ mantencion_check:
     defaults: { _controller: "MonitorBundle:Mantencion:check" }
     methods:  [POST]        
     
-#servicio_desa:
-#    path:   /{id}/desa
-#    defaults: { _controller: "MonitorBundle:Servicio:desa" }
-#    methods:  [GET,POST]      
-#    
-#servicio_test:
-#    path:   /{id}/test
-#    defaults: { _controller: "MonitorBundle:Servicio:test" }
-#    methods:  [GET,POST]      
-#    
-#servicio_pap:
-#    path:   /{id}/pap
-#    defaults: { _controller: "MonitorBundle:Servicio:pap" }
-#    methods:  [GET,POST]   
-#    
-#servicio_complete:
-#    path:   /complete
-#    defaults: { _controller: "MonitorBundle:Servicio:complete" }
-#    methods:  [GET,POST]      
-#
-#dashboard_index:
-#    path:  /dashboard
-#    defaults: { _controller: "MonitorBundle:Dashboard:index" } 
-#    methods:  [GET,POST]     
+mantencion_check2:
+    path:     /mantencion/check2
+    defaults: { _controller: "MonitorBundle:Mantencion:check2" }
+    methods:  [POST]        
+    
+mantencion_status:    
+    path:   /mantencion/{id}/{status}/{usuario}/status
+    defaults: { _controller: "MonitorBundle:Mantencion:status" }
+    methods:  [GET,POST]    
+    
+dashboard_index:
+    path:  /dashboard
+    defaults: { _controller: "MonitorBundle:Dashboard:index" } 
+    methods:  [GET,POST]     

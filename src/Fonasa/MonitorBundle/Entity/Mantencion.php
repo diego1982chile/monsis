@@ -24,7 +24,7 @@ class Mantencion
     /**
      * @var integer
      *
-     * @ORM\Column(name="numero_requerimiento", type="integer", nullable=false)
+     * @ORM\Column(name="numero_requerimiento", type="integer", nullable=true)
      */
     private $numeroRequerimiento;
 

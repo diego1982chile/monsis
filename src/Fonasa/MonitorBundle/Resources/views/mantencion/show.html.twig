@@ -43,14 +43,15 @@
                     {{ mantencion.origenMantencion.nombre }}        
                 </td>                     
             </tr>
-            <tr>
+            {% if mantencion.tipoRequerimiento is not null %}            
+            <tr>                        
                 <th width="20%">
                     Tipo Requerimiento:
                 </th>
                 <td width="80%">
                     {{ mantencion.tipoRequerimiento.nombre }}        
-                </td>                     
-            </tr>
+                </td>                                     
+            </tr>            
             <tr>
                 <th width="20%">
                     N°Requerimiento:
@@ -58,7 +59,26 @@
                 <td width="80%">
                     {{ mantencion.numeroRequerimiento }}        
                 </td>                     
+            </tr>
+            {% endif %}            
+            {% if mantencion.incidencia is not null %}            
+            <tr>                        
+                <th width="20%">
+                    Tipo Incidencia:
+                </th>
+                <td width="80%">
+                    {{ mantencion.incidencia.categoriaIncidencia.nombre }}        
+                </td>                                     
             </tr>            
+            <tr>
+                <th width="20%">
+                    N°Ticket:
+                </th>
+                <td width="80%">
+                    {{ mantencion.incidencia.numeroTicket }}        
+                </td>                     
+            </tr>
+            {% endif %}                        
             <tr>
                 <th width="20%">
                     N°Mantencion:

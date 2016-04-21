@@ -62,6 +62,13 @@ class Incidencia
      * @ORM\Column(name="fecha_salida", type="datetime", nullable=true)
      */
     private $fechaSalida;
+    
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="hh_efectivas", type="float", nullable=true)
+     */
+    private $hhEfectivas;    
 
     /**
      * @var \DateTime
@@ -351,6 +358,30 @@ class Incidencia
     public function getFechaUltHh()
     {
         return $this->fechaUltHh;
+    }
+    
+    /**
+     * Set hhEfectivas
+     *
+     * @param float $hhEfectivas
+     *
+     * @return Incidencia
+     */
+    public function setHhEfectivas($hhEfectivas)
+    {
+        $this->hhEfectivas = $hhEfectivas;
+
+        return $this;
+    }
+
+    /**
+     * Get hhEfectivas
+     *
+     * @return float
+     */
+    public function getHhEfectivas()
+    {
+        return $this->hhEfectivas;
     }
         
     /**

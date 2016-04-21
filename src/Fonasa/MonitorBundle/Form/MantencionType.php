@@ -35,29 +35,59 @@ class MantencionType extends AbstractType
     {
         
         $builder        
-            ->add('id', HiddenType::class);                                       
-            
-                
-        if($options['origen']=='Incidencia'){
+            ->add('id', HiddenType::class);            
+        
+        if($options['idIncidencia'] != null){
             $builder        
+                ->add('origenMantencion', EntityType::class, array(
+                          'class' => 'MonitorBundle:OrigenMantencion',
+                          'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('om')
+                                      ->orderBy('om.nombre', 'DESC');
+                        },
+                        'choice_label' => 'nombre',                    
+                        'choice_attr' => function($val, $key, $index) {
+                             // adds a class like attending_yes, attending_no, etc
+                             if($val->getNombre()=='Incidencia')
+                                return ['selected' => true];
+                             else
+                                return ['selected' => false];
+                         },                                                               
+                         'attr' => array('style' => 'display:none'),
+                         'label' => false                                 
+                ))                    
+                ->add('componente', EntityType::class, array(
+                      'class' => 'MonitorBundle:Componente',
+                      'query_builder' => function (EntityRepository $er) use ($options) {
+                                       return $er->createQueryBuilder('c')
+                                       ->join('c.incidencias', 'i')
+                                       ->where('i.id = ?1')
+                                       ->setParameter(1, $options['idIncidencia'])                                       
+                                       ->orderBy('c.nombre', 'DESC');
+                      },                    
+                      'choice_label' => 'nombre',                                         
+                      'position' => 'first',                      
+                      'attr' => array('style' => 'display:none'),
+                      'label' => false                    
+                      //'position' => array('after' => 'origenMantencion'),
+                      //'disabled' => true, 
+                ))                    
                 ->add('incidencia', EntityType::class, array(
                       'class' => 'MonitorBundle:Incidencia',
-                      'choice_label' => 'numeroTicket',                   
-                      'placeholder' => 'Seleccione una opción...',
-                      'position' => array('after' => 'numeroRequerimiento'),
+                      'query_builder' => function (EntityRepository $er) use ($options) {
+                                       return $er->createQueryBuilder('i')                                       
+                                       ->where('i.id = ?1')
+                                       ->setParameter(1, $options['idIncidencia']);                                              
+                      },                                        
+                      'choice_label' => 'numeroTicket',                                         
+                      'attr' => array('style' => 'display:none'),
+                      'label' => false                    
+                      //'position' => array('after' => 'numeroRequerimiento'),
                       //'disabled' => true, 
                 ));                            
         }        
-        if($options['origen']=='Requerimiento'){
+        else{
             $builder        
-                ->add('componente', EntityType::class, array(
-                      'class' => 'MonitorBundle:Componente',
-                      'choice_label' => 'nombre',                   
-                      'placeholder' => 'Seleccione una opción...',
-                      'position' => 'first',
-                      //'position' => array('after' => 'origenMantencion'),
-                      //'disabled' => true, 
-                ))                                         
                 ->add('origenMantencion', EntityType::class, array(
                           'class' => 'MonitorBundle:OrigenMantencion',
                           'query_builder' => function (EntityRepository $er) {
@@ -73,36 +103,42 @@ class MantencionType extends AbstractType
                                 return ['selected' => false];
                          },                                                               
                          'attr' => array('style' => 'display:none'),
-                         'label' => false
-                                 
+                         'label' => false                                 
                 ))
+                ->add('componente', EntityType::class, array(
+                      'class' => 'MonitorBundle:Componente',
+                      'choice_label' => 'nombre',                   
+                      'placeholder' => 'Seleccione una opción...',
+                      'position' => 'first',
+                      //'position' => array('after' => 'origenMantencion'),
+                      //'disabled' => true, 
+                ))                                                         
                 ->add('numeroRequerimiento', TextType::class, array(
                       'position' => array('after' => 'tipoRequerimiento'),
                       //'disabled' => true,
-                    ))                
-                ->add('tipoMantencion', EntityType::class, array(
-                      'class' => 'MonitorBundle:TipoMantencion',
-                      'query_builder' => function (EntityRepository $er) {
-                        return $er->createQueryBuilder('om')
-                                  ->where('om.nombre in (?1)')
-                                  ->setParameter(1, ['Mantención Correctiva','Mantención Evolutiva'])
-                                  ->orderBy('om.nombre', 'DESC');
-                        
-                    },
-                    'choice_label' => 'nombre',
-                    'expanded' => true,                                                                      
-                    //'placeholder' => 'Seleccione una opción...',
-                    'position' => 'first',
-                    //'attr' => array('class' => 'form-inline')
-                ))                    
-                ->add('codigoInterno', TextType::class, array(
-                      'position' => array('after' => 'numeroRequerimiento'),
-                      //'disabled' => true,
-                    ))
-                    ;
-               
-        }        
-                         
+                    ));                                               
+        }                        
+        
+        $builder                 
+            ->add('tipoMantencion', EntityType::class, array(
+                  'class' => 'MonitorBundle:TipoMantencion',
+                  'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('om')
+                              ->where('om.nombre in (?1)')
+                              ->setParameter(1, ['Mantención Correctiva','Mantención Evolutiva'])
+                              ->orderBy('om.nombre', 'DESC');
+
+                },
+                'choice_label' => 'nombre',
+                'expanded' => true,                                                                      
+                //'placeholder' => 'Seleccione una opción...',
+                'position' => 'first',
+                //'attr' => array('class' => 'form-inline')
+            ))                    
+            ->add('codigoInterno', TextType::class, array(
+                  //'position' => array('after' => 'numeroRequerimiento'),
+                  //'disabled' => true,
+                ));                         
         
         $formModifierTipo = function (FormInterface $form, Componente $componente = null) {
             
@@ -115,7 +151,7 @@ class MantencionType extends AbstractType
                 $disabled = false;
                 $placeHolder= 'Seleccione una opción...';
             }
-
+                        
             $form->add('tipoRequerimiento', EntityType::class, array(
                        'class'       => 'MonitorBundle:TipoRequerimiento',
                        'choices'     => $tipos,
@@ -153,18 +189,17 @@ class MantencionType extends AbstractType
             else{
                 $form 
                 ->remove('fechaInicio');
-            }
-            
+            }            
         };        
         
         $builder                        
             ->addEventListener(
                 FormEvents::PRE_SET_DATA,
-                function (FormEvent $event) use ($formModifierTipo, $formModifierInicioProgramado) {                    
+                function (FormEvent $event) use ($formModifierTipo, $formModifierInicioProgramado, $options) {                    
                     // this would be your entity, i.e. SportMeetup
                     $data = $event->getData();                                        
-                    
-                    $formModifierTipo($event->getForm(), $data->getComponente()); 
+                    if($options['idIncidencia'] == null)
+                        $formModifierTipo($event->getForm(), $data->getComponente()); 
                     $formModifierInicioProgramado($event->getForm(), $data->getInicioProgramado()); 
                 }
             );
@@ -259,7 +294,7 @@ class MantencionType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Fonasa\MonitorBundle\Entity\Mantencion',
-            'origen' => ['Incidencia','Requerimiento']
+            'idIncidencia' => 'Symfony\Component\Form\Extension\Core\Type\IntegerType'
         ));
     }        
 }

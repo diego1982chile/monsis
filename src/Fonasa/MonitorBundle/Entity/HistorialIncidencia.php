@@ -210,7 +210,7 @@ class HistorialIncidencia
     * Set idEstadoIncidencia
     *
     * @param int $idEstado
-    * @return Historial
+    * @return HistorialIncidencia
     */
     public function setIdEstadoIncidencia($idEstadoIncidencia)
     {

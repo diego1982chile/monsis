@@ -27,6 +27,13 @@ class Severidad
      * @ORM\Column(name="nombre", type="string", length=255, unique=true)
      */
     private $nombre;
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="sla", type="integer", nullable=false)
+     */
+    private $sla;    
 
     /**
      * @var string
@@ -41,7 +48,7 @@ class Severidad
     protected $incidencias;        
     
     /**          
-     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="mantenciones")          
+     * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="severidad")          
      */
     protected $mantenciones;  
 
@@ -78,6 +85,30 @@ class Severidad
     {
         return $this->nombre;
     }
+    
+    /**
+     * Set sla
+     *
+     * @param integer $sla
+     *
+     * @return Severidad
+     */
+    public function setSla($sla)
+    {
+        $this->sla = $sla;
+
+        return $this;
+    }
+
+    /**
+     * Get sla
+     *
+     * @return integer
+     */
+    public function getSla()
+    {
+        return $this->sla;
+    }    
 
     /**
      * Set descripcion

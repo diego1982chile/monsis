@@ -38,6 +38,22 @@ class Usuario extends BaseUser
      * @ORM\Column(name="ID_AREA", type="integer", nullable=true)               
      */
     private $idArea;             
+        
+    /**
+     * @var \EstadoMantencion
+     *
+     * @ORM\ManyToOne(targetEntity="EstadoMantencion", inversedBy="usuarios")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_ESTADO_MANTENCION", referencedColumnName="id")
+     * })
+     */
+    protected $estadoMantencion;
+    
+    /**
+     *      
+     * @ORM\Column(name="ID_ESTADO_MANTENCION", type="integer", nullable=true)               
+     */
+    private $idEstadoMantencion;     
     
     /**          
      * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="usuario")          
@@ -105,6 +121,53 @@ class Usuario extends BaseUser
     public function setIdArea($idArea)
     {
         $this->idArea = $idArea;
+        
+        return $this;
+    }
+    
+    //--------------------------------------------------------------------------
+        
+    /**
+     * Get estadoMantencion
+     *
+     * @return \Fonasa\MonitorBundle\Entity\EstadoMantencion
+     */
+    public function getEstadoMantencion()
+    {
+        return $this->estadoMantencion;
+    }
+    
+    /**
+     * Get idEstadoMantencion
+     *
+     * @return int
+     */
+    public function getIdEstadoMantencion()
+    {
+        return $this->idEstadoMantencion;
+    }
+    
+    /**
+     * Set estadoMantencion
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Usuario
+     */
+    public function setEstadoMantencion(\Fonasa\MonitorBundle\Entity\EstadoMantencion $estadoMantencion = null)
+    {
+        $this->estadoMantencion=$estadoMantencion;
+        
+        return $this;
+    }  
+    
+    /**
+    * Set idEstadoMantencion
+    *
+    * @param int $idEstadoMantencion
+    * @return Usuario
+    */
+    public function setIdEstadoMantencion($idEstadoMantencion)
+    {
+        $this->idEstadoMantencion = $idEstadoMantencion;
         
         return $this;
     }

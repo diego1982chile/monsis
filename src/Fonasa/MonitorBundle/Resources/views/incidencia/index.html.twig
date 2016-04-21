@@ -30,7 +30,7 @@
     <div class="alert alert-info alert-dismissible" role="alert">                
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h3 style="margin:0px">
-            <img data-target="#panel" src="{{ asset('bundles/monsis/images/circle_1.png') }}" data-toggle="collapse" style="height:24px;width:24px" />
+            <span class="glyphicon glyphicon glyphicon-ok-sign"></span>&nbsp;
             &nbspOperación realizada con éxito
         </h3>
         <div>
@@ -51,10 +51,10 @@
         <thead>
             <tr>                
                 <th width="5%">N°Ticket</th>                                
-                <th width="10%">Fecha Reporte</th>             
+                <th width="10%">Fecha Inicio</th>             
+                <th width="10%">Fecha Salida</th>             
                 <th width="8%">Severidad</th>
-                <th width="14%">Categoria</th>   
-                <th width="8%">Componente</th>                                                              
+                <th width="10%">HH</th>                   
                 <th width="12%">Estado</th>                
                 <th width="4%">Show/Edit</th>                
             </tr>
@@ -114,9 +114,26 @@
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                
                             //$('div.toolbar').html(json.pap);
                             fnCallback(json)
-			} );
-            }                    
-        });        
+                            
+                            $(".dropdown-menu > li > a.trigger").on("click",function(e){                                                    
+                                var current=$(this).next();
+                                var grandparent=$(this).parent().parent();
+                                if($(this).hasClass('left-caret')||$(this).hasClass('right-caret'))
+                                    $(this).toggleClass('right-caret left-caret');
+                                grandparent.find('.left-caret').not(this).toggleClass('right-caret left-caret');
+                                grandparent.find(".sub-menu:visible").not(current).hide();
+                                current.toggle();
+                                e.stopPropagation();
+                            });
+
+                            $(".dropdown-menu > li > a:not(.trigger)").on("click",function(){
+                                var root=$(this).closest('.dropdown');
+                                root.find('.left-caret').toggleClass('right-caret left-caret');
+                                root.find('.sub-menu:visible').hide();
+                            });                                                           
+			});
+                    }                    
+                });        
         
         $anio.change(function() {
             updateTitle();

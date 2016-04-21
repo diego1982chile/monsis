@@ -45,8 +45,8 @@ class FiltersHelper {
                     'Diciembre' => 12);
         
         $estados = array(            
-                    'Activos' => 1,
-                    'Finalizados' => 2                    
+                    'Activas' => 1,
+                    'Resueltas' => 2                    
         );                
         
         return $form_filtros = $this->formFactory->createBuilder()

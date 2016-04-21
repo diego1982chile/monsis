@@ -41,11 +41,9 @@
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/config/routing.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/CategoriaIncidencia.php</file>
             <file>file:/C:/xampp/htdocs/monsis/app/config/security.yml</file>
-            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/incidencia/assign.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/app/config/config.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/app/Resources/views/base.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/mantencion/show.html.twig</file>
-            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/HistorialMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/web/app_dev.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/config/services.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/app/Resources/FOSUserBundle/views/layout.html.twig</file>
@@ -55,7 +53,6 @@
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/TipoMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/incidencia/index.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/EventListener/ControllerListener.php</file>
-            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/SeveridadMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/EventListener/LoginSuccessHandler.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/OrigenIncidencia.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/Mantencion.php</file>

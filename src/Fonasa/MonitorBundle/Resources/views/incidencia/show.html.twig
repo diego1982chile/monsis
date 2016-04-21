@@ -73,7 +73,7 @@
                 </th>
                 <td width="80%">
                     {% if incidencia.mantenciones|length > 0 %}
-                        {{ incidncia.mantenciones[0].codigoIngerno }}
+                        {{ incidencia.mantenciones[0].codigoInterno }}
                     {% else %}
                         -
                     {% endif %}                          
@@ -145,9 +145,11 @@
         <li>
             <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Editar</a>
         </li>
+        {% if incidencia.estadoIncidencia.nombre in ['Pendiente MT'] and incidencia.mantenciones|length == 0 %}
         <li>
-            <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Levantar Mantención</a>
+            <a href="{{ path('incidencia_mantencion', { 'id': incidencia.id }) }}">Levantar Mantención</a>
         </li>
+        {% endif %}
         <li>
             {{ form_start(delete_form) }}
                 <input type="submit" value="Eliminar" class="btn btn-warning">

@@ -80,20 +80,20 @@ $validar.click(function(){
   data['id'] = $('#incidencia_id').val();
   // Submit data via AJAX to the form's action path.
   $.post("{{ path('incidencia_check') }}",data,function(data){
-        var src;
+        var icon;
         var css;
         if(data.error){          
-            src="{{ asset('bundles/monsis/images/exclamation_2.png') }}";
+            icon='<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;';
             css='alert alert-danger';
             $('#incidencia_numeroTicket').focus();                    
         } 
         else{
-            src="{{ asset('bundles/monsis/images/circle_1.png') }}";            
+            icon='<span class="glyphicon glyphicon glyphicon-ok-sign"></span>&nbsp;';
             css='alert alert-success';
         }
         $('#incidencia_numeroTicket').qtip({ // Grab some elements to apply the tooltip to
             content: {
-                text: '<img alt="" style="width:20px;height:20px" src='+src+'> '+data.message
+                text: icon+data.message
             },
             show: {
                 ready: true,

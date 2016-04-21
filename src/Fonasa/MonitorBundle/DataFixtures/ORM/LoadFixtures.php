@@ -54,34 +54,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $area4->setDescripcion("Área encargada de certificar las mantenciones generadas por testing y realizar PaP");                
         
         $manager->persist($area4);
-        $manager->flush(); 
-        
-        $connection->exec("ALTER TABLE usuario AUTO_INCREMENT = 1;");
-        $userManager = $this->container->get('fos_user.user_manager');
-        
-        $usuario1 = new Usuario();
-                
-        $usuario1->setUserName("dsoto");
-        $usuario1->setEmail("desa1@example.com");
-        $usuario1->setPlainPassword('123');
-        $usuario1->setArea($area2);
-        $userManager->updateUser($usuario1,false);
-        
-        $usuario2 = new Usuario();
-        
-        $usuario2->setUserName("rmercado");
-        $usuario2->setEmail("desa2@example.com");
-        $usuario2->setPlainPassword('123');
-        $usuario2->setArea($area2);
-        $userManager->updateUser($usuario2,false);
-        
-        $usuario3 = new Usuario();
-        
-        $usuario3->setUserName("mvillarroel");
-        $usuario3->setEmail("test@example.com");
-        $usuario3->setPlainPassword('123');
-        $usuario3->setArea($area3);
-        $userManager->updateUser($usuario3,false);                                        
+        $manager->flush();                 
                 
         $connection->exec("ALTER TABLE estado_incidencia AUTO_INCREMENT = 1;");
         
@@ -112,6 +85,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         
         $manager->persist($estadoIncidencia4);
         $manager->flush();                 
+        
+        $connection->exec("ALTER TABLE estado_mantencion AUTO_INCREMENT = 1;");
                 
         $estadoMantencion1 = new EstadoMantencion();              
         $estadoMantencion1->setNombre("En cola");
@@ -121,14 +96,14 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->flush();                       
                 
         $estadoMantencion2 = new EstadoMantencion();              
-        $estadoMantencion2->setNombre("Desa");
+        $estadoMantencion2->setNombre("En Desarrollo");
         $estadoMantencion2->setDescripcion("En Desarrollo");                
         
         $manager->persist($estadoMantencion2);
         $manager->flush();                       
         
         $estadoMantencion3 = new EstadoMantencion();              
-        $estadoMantencion3->setNombre("Test");
+        $estadoMantencion3->setNombre("En Testing");
         $estadoMantencion3->setDescripcion("En Testing");                
         
         $manager->persist($estadoMantencion3);
@@ -146,7 +121,37 @@ class LoadFixtures extends Controller implements FixtureInterface
         $estadoMantencion6->setDescripcion("Cerrada");                
         
         $manager->persist($estadoMantencion6);
-        $manager->flush();          
+        $manager->flush(); 
+        
+        $connection->exec("ALTER TABLE usuario AUTO_INCREMENT = 1;");
+        $userManager = $this->container->get('fos_user.user_manager');
+        
+        $usuario1 = new Usuario();
+                
+        $usuario1->setUserName("dsoto");
+        $usuario1->setEmail("desa1@example.com");
+        $usuario1->setPlainPassword('123');
+        $usuario1->setArea($area2);
+        $usuario1->setEstadoMantencion($estadoMantencion2);
+        $userManager->updateUser($usuario1,false);
+        
+        $usuario2 = new Usuario();
+        
+        $usuario2->setUserName("rmercado");
+        $usuario2->setEmail("desa2@example.com");
+        $usuario2->setPlainPassword('123');
+        $usuario2->setArea($area2);
+        $usuario2->setEstadoMantencion($estadoMantencion2);
+        $userManager->updateUser($usuario2,false);
+        
+        $usuario3 = new Usuario();
+        
+        $usuario3->setUserName("mvillarroel");
+        $usuario3->setEmail("test@example.com");
+        $usuario3->setPlainPassword('123');
+        $usuario3->setArea($area3);
+        $usuario3->setEstadoMantencion($estadoMantencion3);
+        $userManager->updateUser($usuario3,false);                                                
         
         $connection->exec("ALTER TABLE origen_incidencia AUTO_INCREMENT = 1;");
         
@@ -182,7 +187,9 @@ class LoadFixtures extends Controller implements FixtureInterface
         
         $severidad1 = new Severidad();
         $severidad1->setNombre("Alta");
-        $severidad1->setDescripcion("Severidad alta");                
+        $severidad1->setDescripcion("Severidad alta");
+        $severidad1->setSla(1);
+        
         
         $manager->persist($severidad1);
         $manager->flush();            
@@ -190,6 +197,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $severidad2 = new Severidad();
         $severidad2->setNombre("Media");
         $severidad2->setDescripcion("Severidad media");                
+        $severidad2->setSla(2);
         
         $manager->persist($severidad2);
         $manager->flush();            
@@ -197,6 +205,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $severidad3 = new Severidad();
         $severidad3->setNombre("Baja");
         $severidad3->setDescripcion("Severidad baja");                
+        $severidad3->setSla(3);
         
         $manager->persist($severidad3);
         $manager->flush();                    
