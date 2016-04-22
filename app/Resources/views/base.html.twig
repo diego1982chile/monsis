@@ -18,7 +18,8 @@
     <link href="{{ asset('bundles/monsis/css/jquery.qtip.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/dataTables.bootstrap.css') }}" rel="stylesheet">  
-    <link href="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/monsis/css/circle.css') }}" rel="stylesheet">    
+    <link href="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">    
     {% block stylesheets %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('bundles/monsis/images/fonasalogo.png') }}" />
         <style type="text/css">
@@ -31,6 +32,11 @@
                 text-align: center;
                 /*font-size:13px;
                 font-family: Arial, Helvetica, sans-serif;*/
+            }
+            
+            .fillRate{
+                padding: 1em !important;
+                margin: 0px !important;                
             }
             
             /**
@@ -194,6 +200,8 @@
                 BACKGROUND-COLOR: #38A0DC;
                 TEXT-DECORATION: none
             }
+                                    
+            input.text { margin-bottom:12px; width:95%; padding: .4em; }            
            
         </style>
   </head>

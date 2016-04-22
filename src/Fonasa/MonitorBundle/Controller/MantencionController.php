@@ -51,18 +51,14 @@ class MantencionController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
                         
             $inicioProgramado=$request->request->get('mantencion')['inicioProgramado'];
+            $fechaInicio=$request->request->get('mantencion')['fechaInicio']['date'];                                                
             
             $fechaIngreso=new\DateTime('now');
             
-            if($inicioProgramado){
-                $nomEstado='En Cola';                            
-                $msg='La mantención está en cola y tiene un inicio programado para el '.$request->request->get('incidencia')['fechaInicio'].', fecha en la que será automáticamente asignada al área de desarrollo.';
-            }
-            else{ //Si no es inicio programado setear la fecha de inicio
-                $mantencion->setFechaInicio($fechaIngreso);
-                $nomEstado='En Desarrollo';
-                $msg='La mantención se ha iniciado y ha quedado asignada al área de desarrollo.';
-            }
+            if($inicioProgramado)
+                $nomEstado='En Cola';                                                        
+            else
+                $nomEstado='En Desarrollo';                
                                     
             $estado= $em->getRepository('MonitorBundle:EstadoMantencion')
                 ->createQueryBuilder('e')                                
@@ -92,6 +88,21 @@ class MantencionController extends Controller
             //$em = $this->getDoctrine()->getManager();
             $em->persist($mantencion);
             $em->flush();
+            
+            //echo '"'.$mantencion->getId().'"';
+            
+            if($inicioProgramado){
+                $msg='La mantención está en cola y tiene un inicio programado para el '.$mantencion->getfechaInicio()->format('d/m/Y H:i').', fecha en la que será automáticamente asignada al área de desarrollo.';
+                //Si es inicio programado crear el scheduledEvent en la BD
+                $connection = $em->getConnection();       
+                $query="CREATE DEFINER=`root`@`localhost` EVENT `scheduler_inicio_mantencion_".$mantencion->getId()."` ON SCHEDULE AT '".$mantencion->getfechaInicio()->format('Y-m-d H:i')."' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE mantencion set ID_ESTADO_MANTENCION=2,FECHA_INICIO_MANTENCION=SYSDATE() WHERE id=".$mantencion->getId()." AND ID_ESTADO_MANTENCION=1;";
+                $connection->exec($query);
+            }
+            else{
+                 //Si no es inicio programado setear la fecha de inicio
+                $mantencion->setFechaInicio($fechaIngreso);
+                $msg='La mantención se ha iniciado y ha quedado asignada al área de desarrollo.';                            
+            }
 
             if($idIncidencia == null){
                 $this->addFlash(
@@ -396,6 +407,23 @@ class MantencionController extends Controller
             
             $fila = array();  
             
+            $color='';
+            
+            $fillRatio = intval(100*$mantencion->getHhEfectivas()/$mantencion->getHhEstimadas());
+                        
+            if(80<$fillRatio && $fillRatio<=100)
+                $color='orange';
+            if($fillRatio>100)
+                $color='red';                                                    
+            if($mantencion->getEstadoMantencion()->getNombre()=='Cerrada')
+                $color='green';                            
+            
+            $html='<div class="c100 p'.min($fillRatio,100).' small '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
+            
+            //$html='<div class="progress"><div class="progress-bar '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
+            array_push($fila,$html);                                                
+            
+            array_push($fila,$mantencion->getIncidencia()==null?$mantencion->getNumeroRequerimiento():$mantencion->getIncidencia()->getNumeroTicket());
             array_push($fila,$mantencion->getCodigoInterno());
             array_push($fila,$mantencion->getFechaInicio()->format('d/m/Y H:i'));
             //array_push($fila,$servicio->getComponente()->getNombre());
@@ -404,26 +432,7 @@ class MantencionController extends Controller
             //array_push($fila,$mantencion->getHHEstimadas());            
             //array_push($fila,$mantencion->getHHEfectivas());
             //array_push($fila,$mantencion->getComponente()->getNombre());
-            //array_push($fila,$incidencia->getPrioridad()->getNombre());  
-            
-            $fillRatio = intval(100*$mantencion->getHhEfectivas()/$mantencion->getHhEstimadas());
-            
-            if($fillRatio<=80)
-                $color='progress-bar-active';
-            if(80<$fillRatio && $fillRatio<=100)
-                $color='progress-bar-warning';
-            if($fillRatio>100)
-                $color='progress-bar-danger';                
-            
-            $status='progress-bar-striped';
-            
-            if($mantencion->getEstadoMantencion()->getNombre()=='Cerrada'){
-                $status="";
-                $color='progress-bar-success';                
-            }
-            
-            $html='<div class="progress"><div class="progress-bar '.$status.' '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
-            array_push($fila,$html);
+            //array_push($fila,$incidencia->getPrioridad()->getNombre());                                                                                      
 
             //$html='<select class="mantencion_estadoMantencion" onchange="location = this.value;">';
             $html='<div class="dropdown" style="position:relative">';
@@ -431,7 +440,7 @@ class MantencionController extends Controller
             $html=$html.'<ul class="dropdown-menu">';            
             
             foreach($estados as $estado)                        
-            {                                             
+            {                                                          
                 $usuarios = $em->getRepository('MonitorBundle:Usuario')
                 ->createQueryBuilder('u')                                
                 ->join('u.estadoMantencion','em')
@@ -453,9 +462,12 @@ class MantencionController extends Controller
                     
                     foreach($usuarios as $usuario){     
                         $active2="";
-                        if($mantencion->getUsuario()->getUsername()==$usuario->getUsername())                            
-                            $active2="active";
-                        $html=$html.'<li class="'.$active2.'"><a href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => $usuario->getUsername())).'">'.$usuario->getUsername().'</a></li>';                            
+                            if($mantencion->getUsuario()!=null){
+                                if($mantencion->getUsuario()->getUsername()==$usuario->getUsername())                            
+                                    $active2="active";
+                            }
+                            $html=$html.'<li class="'.$active2.'"><a href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => $usuario->getUsername())).'">'.$usuario->getUsername().'</a></li>';                            
+                        
                     }
                     $html=$html.'</ul>';
                 }   
@@ -551,9 +563,10 @@ class MantencionController extends Controller
             case 'En Cola': // Si se deja en cola, la fecha de inicio salida se anulan
                 $mantencion[0]->setFechaInicio(null);
                 $mantencion[0]->setFechaSalida(null);
+                $mantencion[0]->setUsuario(null);
                 break;
             case 'En Desarrollo': // Si se deja en gestión FONASA, no se hace nada
-                $incidencia[0]->setFechaUltHH(new\DateTime('now'));
+                $mantencion[0]->setFechaUltHH(new\DateTime('now'));
                 $mantencion[0]->setFechaInicio(new\DateTime('now'));
                 $mantencion[0]->setFechaSalida(null);
                 break;            
@@ -563,6 +576,7 @@ class MantencionController extends Controller
                 break;        
             case 'Cerrada':
                 $mantencion[0]->setFechaSalida(new\DateTime('now'));
+                $mantencion[0]->setUsuario(null);
                 break;            
         }                
 

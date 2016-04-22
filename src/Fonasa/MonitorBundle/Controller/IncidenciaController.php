@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Fonasa\MonitorBundle\Entity\Incidencia;
 use Fonasa\MonitorBundle\Entity\HistorialIncidencia;
 use Fonasa\MonitorBundle\Entity\EstadoIncidencia;
+use Fonasa\MonitorBundle\Entity\ObservacionIncidencia;
 
 use Fonasa\MonitorBundle\Form\IncidenciaType;
 
@@ -47,11 +48,11 @@ class IncidenciaController extends Controller
             
             $fechaIngreso=new\DateTime('now');
                         
-            // Si es Incidencia, por defecto se crea con estado 'En Gestión FONASA'
+            // Si es Incidencia, por defecto se crea con estado 'Pendient MT'
             $estado= $em->getRepository('MonitorBundle:EstadoIncidencia')
                 ->createQueryBuilder('e')                                
                 ->where('e.nombre = ?1')
-                ->setParameter(1, 'En Cola')
+                ->setParameter(1, 'Pendiente MT')
                 ->getQuery()
                 ->getResult();                        
                                     
@@ -71,7 +72,7 @@ class IncidenciaController extends Controller
                     $incidencia->setFechaSalida(null);
                     break;            
                 case 'Pendiente MT': // Si se deja Pendiente MT se actualiza la fecha inicio
-                    //$incidencia[0]->setFechaInicio(new\DateTime('now'));
+                    $incidencia->setFechaInicio(new\DateTime('now'));
                     $incidencia->setFechaSalida(null);                    
                     $incidencia->setFechaUltHH(new\DateTime('now'));
                     break;        
@@ -166,7 +167,7 @@ class IncidenciaController extends Controller
      * Displays a form to edit an existing Servicio entity.
      *
      */
-    public function statusAction($id, $status)
+    public function statusAction($id, $status, $observacion)
     {                                            
         //$id= $request->request->get('id');
         //$status= $request->request->get('status');
@@ -200,17 +201,23 @@ class IncidenciaController extends Controller
                 $incidencia[0]->setFechaSalida(null);
                 break;            
             case 'Pendiente MT': // Si se deja Pendiente MT se actualiza la fecha inicio
-                //$incidencia[0]->setFechaInicio(new\DateTime('now'));
+                $incidencia[0]->setFechaInicio(new\DateTime('now'));
                 $incidencia[0]->setFechaSalida(null);
                 //$incidencia[0]->setHhEfectivas(0);
                 $incidencia[0]->setFechaUltHH(new\DateTime('now'));
                 break;        
             case 'Resuelta MT':
-                $incidencia[0]->setFechaSalida(new\DateTime('now'));
+                // Si se deja como resuelta, agregar observaciones...
+                $incidencia[0]->setFechaSalida(new\DateTime('now'));                
+                $observacionIncidencia= new ObservacionIncidencia();
+                $observacionIncidencia->setObservacion($observacion);
+                $observacionIncidencia->setIncidencia($incidencia[0]);
+                $observacionIncidencia->setIdIncidencia($incidencia[0]->getId());
+                $em->persist($observacionIncidencia);
+                $em->flush();                
                 break;            
         }
-
-        $em = $this->getDoctrine()->getManager();
+        
         $em->persist($incidencia[0]);
         $em->flush();
 
@@ -345,7 +352,7 @@ class IncidenciaController extends Controller
         $parameters[2] = $mes;
         
         if($estado == 1)
-            $parameters[3]=['En Cola','En Gestión FONASA','Pendiente MT'];
+            $parameters[3]=[/*'En Cola',*/'En Gestión FONASA','Pendiente MT'];
         else
             $parameters[3]=['Resuelta MT'];
     
@@ -392,8 +399,8 @@ class IncidenciaController extends Controller
         
         $estados = $em->getRepository('MonitorBundle:EstadoIncidencia')
                 ->createQueryBuilder('e')                                
-                //->where('e.nombre in (?1)')
-                //->setParameter(1, ['Desa','Test','PaP'])
+                ->where('e.nombre in (?1)')
+                ->setParameter(1, [/*'En Cola',*/'En Gestión FONASA','Pendiente MT','Resuelta MT'])
                 ->getQuery()
                 ->getResult();                                          
         
@@ -404,29 +411,29 @@ class IncidenciaController extends Controller
             
             $fila = array();  
             
+            $fillRatio = intval(100*$incidencia->getHhEfectivas()/$incidencia->getSeveridad()->getSla());                        
+            
+            $color='';
+                        
+            if(80<$fillRatio && $fillRatio<=100)
+                $color='orange';
+            if($fillRatio>100)
+                $color='red';                                                    
+            if($incidencia->getEstadoIncidencia()->getNombre()=='Resuelta MT')
+                $color='green';                            
+            
+            $html='<div class="c100 p'.min($fillRatio,100).' small '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
+            
+            //$html='<div class="progress"><div class="progress-bar '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
+            array_push($fila,$html);                                                
+            
             array_push($fila,$incidencia->getNumeroTicket());
-            array_push($fila,$incidencia->getFechaInicio()->format('d/m/Y H:i'));
+            array_push($fila,$incidencia->getFechaInicio()==null?'-':$incidencia->getFechaInicio()->format('d/m/Y H:i'));
             array_push($fila,$incidencia->getFechaSalida()==null?'-':$incidencia->getFechaSalida()->format('d/m/Y H:i'));            
             //array_push($fila,$servicio->getComponente()->getNombre());
             array_push($fila,$incidencia->getSeveridad()->getNombre());
             //array_push($fila,$servicio->getTipoServicio()->getTipo()->getNombre());            
-            //array_push($fila,$incidencia->getPrioridad()->getNombre());              
-            
-            $fillRatio = intval(100*$incidencia->getHhEfectivas()/$incidencia->getSeveridad()->getSla());
-            
-            if($fillRatio<=80)
-                $color='progress-bar-active progress-bar-striped active';
-            if(80<$fillRatio && $fillRatio<=100)
-                $color='progress-bar-warning progress-bar-striped active';
-            if($fillRatio>100)
-                $color='progress-bar-danger progress-bar-striped active';                                        
-            
-            if($incidencia->getEstadoIncidencia()->getNombre()=='Resuelta MT'){                
-                $color='progress-bar-success';                
-            }
-            
-            $html='<div class="progress"><div class="progress-bar '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
-            array_push($fila,$html);                                                
+            //array_push($fila,$incidencia->getPrioridad()->getNombre());                                      
             
             $html='<div class="dropdown" style="position:relative">';
             $html=$html.'<a href="#" class="dropdown-toggle" data-toggle="dropdown">'.$incidencia->getEstadoIncidencia()->getNombre().'<span class="caret"></span></a>';
@@ -452,7 +459,7 @@ class IncidenciaController extends Controller
                 
                 if($incidencia->getEstadoIncidencia()->getNombre()==$estado->getNombre())
                     $active="active";
-                $html=$html.'<li class="'.$active.'"><a href="'.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre())).'">'.$estado->getNombre().'</a></li>';                                        
+                $html=$html.'<li class="'.$active.'"><a class="estados" href="'.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre(), 'observacion' => 'null')).'">'.$estado->getNombre().'</a></li>';                                        
             }            
             //$html=$html.'</select>';    
             

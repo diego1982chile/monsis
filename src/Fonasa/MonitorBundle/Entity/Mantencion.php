@@ -813,6 +813,51 @@ class Mantencion
         
         return $this;
     }
+    
+    /**
+     * Get severidad
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Severidad
+     */
+    public function getSeveridad()
+    {
+        return $this->severidad;
+    }
+    
+    /**
+     * Set severidad
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Mantencion
+     */
+    public function setSeveridad(\Fonasa\MonitorBundle\Entity\Severidad $severidad = null)
+    {
+        $this->severidad=$severidad;
+        
+        return $this;
+    }  
+    
+    /**
+     * Get idSeveridad
+     *
+     * @return int
+     */
+    public function getIdSeveridad()
+    {
+        return $this->idSeveridad;
+    }
+    
+    /**
+    * Set idSeveridad
+    *
+    * @param int $idSeveridad
+    * @return Mantencion
+    */
+    public function setIdSeveridad($idSeveridad)
+    {
+        $this->idSeveridad = $idSeveridad;
+        
+        return $this;
+    }
    
 }
 

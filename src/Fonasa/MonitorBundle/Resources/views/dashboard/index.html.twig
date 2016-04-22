@@ -1,0 +1,570 @@
+{% extends 'base.html.twig' %}
+{% form_theme GlobalFilters 'bootstrap_3_layout.html.twig' %}
+{% block stylesheets %}    
+{% endblock %}
+{% block title %}Monitor Fonasa{% endblock %}
+{% block body %}
+    {% for flash_message in app.session.flashbag.get('notice') %}            
+    <div class="alert alert-info alert-dismissible" role="alert">                
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 style="margin:0px">
+            <img data-target="#panel" src="{{ asset('bundles/fonasa-monitor/images/circle_1.png') }}" data-toggle="collapse" style="height:24px;width:24px" />
+            &nbspOperación realizada con éxito
+        </h3>
+        <div>
+            <ul>
+                {% set foo = flash_message|split('|') %}
+                {% for var in foo %}                            
+                <li style="margin:10px">                    
+                    {{ var }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>                    
+    {% endfor %}
+    <h1>Tablero de Monitoreo</h1>    
+    
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#incidencias">Incidencias</a></li>
+      <li><a data-toggle="tab" href="#mantenciones">Mantenciones</a></li>      
+    </ul>
+    <div class="tab-content">      
+        <div id="incidencias" class="tab-pane fade in active">
+            <div class="col-md-6">                
+                <div class="hero-unit" style="padding:15px;margin-bottom:0px">                
+                    <div id="incidencias_componente" style="min-width: 310px; height: 400px; margin: 0 auto">
+                    </div>                
+                </div>					            
+            </div>
+            <div class="col-md-6">                    
+                <div class="hero-unit" style="padding:15px;margin-bottom:0px">                
+                    <div id="incidencias_estado" style="min-width: 310px; height: 400px; margin: 0 auto">
+                    </div>                
+                </div>                						            
+            </div>
+            <div class="col-md-12">                    
+                <div class="hero-unit" style="padding:15px;margin-bottom:10px">                
+                    <div id="hh_incidencias" style="min-width: 310px; height: 400px; margin: 0 auto">
+                    </div>                
+                </div>                
+            </div>            
+        </div>
+        <div id="mantenciones" class="tab-pane fade">
+            <div class="col-md-12">                
+                <div class="hero-unit" style="padding:15px;margin-bottom:0px">                
+                    <div id="hh_mantenciones" style="min-width: 310px; height: 400px; margin: 0 auto">
+                    </div>                
+                </div>					            
+            </div>
+            <div class="col-md-6">                
+                <div class="hero-unit" style="padding:15px;margin-bottom:0px">                
+                    <div id="mantenciones_estado" style="min-width: 310px; height: 400px; margin: 0 auto">
+                    </div>                
+                </div>					            
+            </div>
+            <div class="col-md-6">                
+                <div class="hero-unit" style="padding:15px;margin-bottom:0px">                
+                    <div id="mantenciones_componente" style="min-width: 310px; height: 400px; margin: 0 auto">
+                    </div>                
+                </div>					            
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+<script>    
+$(function () {    
+    
+    $( "#tabs" ).tabs();
+        
+        $('#incidencias_componente').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: {{ chartIncidenciasComponente.title|raw }}
+        },
+        xAxis: {
+            categories: {{ chartIncidenciasComponente.categories|raw }}
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: {{ chartIncidenciasComponente.yAxis|raw }}
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
+        },
+        legend: {
+            align: 'right',
+            x: -30,
+            verticalAlign: 'top',
+            y: 25,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+            borderColor: '#CCC',
+            borderWidth: 1,
+            shadow: false
+        },
+        tooltip: {
+            headerFormat: '<b>{point.x}</b><br/>',
+            pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: '0 0 3px black'
+                    }
+                }
+            }
+        },
+        series: {{ chartIncidenciasComponente.series|raw }}
+    });
+        
+    $('#incidencias_estado').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie',
+            options3d: {
+                enabled: true,
+                alpha: 45,
+                beta: 0
+            }
+        },
+        title: {
+            text: {{ chartIncidenciasEstado.title|raw }}   
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                depth: 35,
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: {{ chartIncidenciasEstado.series|raw }}
+    });
+        
+    $('#hh_incidencias').highcharts({
+        title: {
+            text: {{ chartHHIncidencias.title|raw }},
+            x: -20 //center
+        },
+        /*
+        subtitle: {
+            text: 'Source: WorldClimate.com',
+            x: -20
+        },
+        */
+        xAxis: {
+            categories: {{ chartHHIncidencias.categories|raw }}            
+        },
+        yAxis: {
+            title: {
+                text: {{ chartHHIncidencias.yAxis|raw }}
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: '°C'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: {{ chartHHIncidencias.series|raw }}
+    });
+        
+    $('#hh_mantenciones').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: {{ chartHHMantenciones.title|raw }}
+        },
+        /*
+        subtitle: {
+            text: 'Source: WorldClimate.com'
+        },
+        */
+        xAxis: {
+            categories: {{ chartHHMantenciones.categories|raw }},
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: {{ chartHHMantenciones.yAxis|raw }}
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: {{ chartHHMantenciones.series|raw }}
+    });   
+    
+    $('#mantenciones_estado').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: {{ chartMantencionesEstado.title|raw }}
+        },
+        /*
+        subtitle: {
+            text: 'Click the columns to view versions. Source: <a href="http://netmarketshare.com">netmarketshare.com</a>.'
+        },
+        */
+        xAxis: {
+            type: 'category'
+        },
+        yAxis: {
+            title: {
+                text: {{ chartMantencionesEstado.yAxis|raw }}
+            }
+
+        },
+        legend: {
+            enabled: false
+        },
+        plotOptions: {
+            series: {
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                    //format: '{point.y:.1d}'
+                }
+            }
+        },
+
+        tooltip: {
+            headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+            pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+        },
+
+        series: {{ chartMantencionesEstado.series|raw }}  
+        /*
+            [{
+            name: 'Brands',
+            colorByPoint: true,
+            data: [{
+                name: 'Microsoft Internet Explorer',
+                y: 56.33,
+                drilldown: 'Microsoft Internet Explorer'
+            }, {
+                name: 'Chrome',
+                y: 24.03,
+                drilldown: 'Chrome'
+            }, {
+                name: 'Firefox',
+                y: 10.38,
+                drilldown: 'Firefox'
+            }, {
+                name: 'Safari',
+                y: 4.77,
+                drilldown: 'Safari'
+            }, {
+                name: 'Opera',
+                y: 0.91,
+                drilldown: 'Opera'
+            }, {
+                name: 'Proprietary or Undetectable',
+                y: 0.2,
+                drilldown: null
+            }]
+        }]
+        */
+        ,
+        drilldown: {
+            series: [{
+                name: 'Microsoft Internet Explorer',
+                id: 'Microsoft Internet Explorer',
+                data: [
+                    [
+                        'v11.0',
+                        24.13
+                    ],
+                    [
+                        'v8.0',
+                        17.2
+                    ],
+                    [
+                        'v9.0',
+                        8.11
+                    ],
+                    [
+                        'v10.0',
+                        5.33
+                    ],
+                    [
+                        'v6.0',
+                        1.06
+                    ],
+                    [
+                        'v7.0',
+                        0.5
+                    ]
+                ]
+            }, {
+                name: 'Chrome',
+                id: 'Chrome',
+                data: [
+                    [
+                        'v40.0',
+                        5
+                    ],
+                    [
+                        'v41.0',
+                        4.32
+                    ],
+                    [
+                        'v42.0',
+                        3.68
+                    ],
+                    [
+                        'v39.0',
+                        2.96
+                    ],
+                    [
+                        'v36.0',
+                        2.53
+                    ],
+                    [
+                        'v43.0',
+                        1.45
+                    ],
+                    [
+                        'v31.0',
+                        1.24
+                    ],
+                    [
+                        'v35.0',
+                        0.85
+                    ],
+                    [
+                        'v38.0',
+                        0.6
+                    ],
+                    [
+                        'v32.0',
+                        0.55
+                    ],
+                    [
+                        'v37.0',
+                        0.38
+                    ],
+                    [
+                        'v33.0',
+                        0.19
+                    ],
+                    [
+                        'v34.0',
+                        0.14
+                    ],
+                    [
+                        'v30.0',
+                        0.14
+                    ]
+                ]
+            }, {
+                name: 'Firefox',
+                id: 'Firefox',
+                data: [
+                    [
+                        'v35',
+                        2.76
+                    ],
+                    [
+                        'v36',
+                        2.32
+                    ],
+                    [
+                        'v37',
+                        2.31
+                    ],
+                    [
+                        'v34',
+                        1.27
+                    ],
+                    [
+                        'v38',
+                        1.02
+                    ],
+                    [
+                        'v31',
+                        0.33
+                    ],
+                    [
+                        'v33',
+                        0.22
+                    ],
+                    [
+                        'v32',
+                        0.15
+                    ]
+                ]
+            }, {
+                name: 'Safari',
+                id: 'Safari',
+                data: [
+                    [
+                        'v8.0',
+                        2.56
+                    ],
+                    [
+                        'v7.1',
+                        0.77
+                    ],
+                    [
+                        'v5.1',
+                        0.42
+                    ],
+                    [
+                        'v5.0',
+                        0.3
+                    ],
+                    [
+                        'v6.1',
+                        0.29
+                    ],
+                    [
+                        'v7.0',
+                        0.26
+                    ],
+                    [
+                        'v6.2',
+                        0.17
+                    ]
+                ]
+            }, {
+                name: 'Opera',
+                id: 'Opera',
+                data: [
+                    [
+                        'v12.x',
+                        0.34
+                    ],
+                    [
+                        'v28',
+                        0.24
+                    ],
+                    [
+                        'v27',
+                        0.17
+                    ],
+                    [
+                        'v29',
+                        0.16
+                    ]
+                ]
+            }]
+        }
+    });    
+    
+    $('#mantenciones_componente').highcharts({
+        title: {
+            text: {{ chartMantencionesComponente.title|raw }},
+            x: -20 //center
+        },
+        /*
+        subtitle: {
+            text: 'Source: WorldClimate.com',
+            x: -20
+        }*/        
+        xAxis: {
+            categories: {{ chartMantencionesComponente.categories|raw }}
+        },
+        yAxis: {
+            title: {
+                text: 'Temperature (°C)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            //valueSuffix: '°C'
+        },
+        legend: {
+            layout: 'horizontal',
+            align: 'center',
+            verticalAlign: 'top',
+            borderWidth: 0,
+            y: 25            
+        },
+        series: {{ chartMantencionesComponente.series|raw }}
+        /*
+        [{
+            name: 'Tokyo',
+            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+        }, {
+            name: 'New York',
+            data: [-0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
+        }, {
+            name: 'Berlin',
+            data: [-0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0]
+        }, {
+            name: 'London',
+            data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+        }]
+        */
+    });
+});
+
+$( document ).ready(function() {
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var target = $(e.target).attr("href") // activated tab
+        
+        switch(target){
+            case '#incidencias':
+                break;
+            case '#mantenciones':                                   
+                $('#hh_mantenciones').highcharts().reflow();   
+                $('#mantenciones_estado').highcharts().reflow();
+                $('#mantenciones_componente').highcharts().reflow();
+                break;                
+        }
+    });
+});    
+</script>
+{% endblock %}

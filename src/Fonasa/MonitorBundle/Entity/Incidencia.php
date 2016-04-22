@@ -169,6 +169,12 @@ class Incidencia
      */
     protected $mantenciones;        
     
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="ObservacionIncidencia", mappedBy="incidencia")          
+     */
+    protected $observacionesIncidencia;        
+    
     /**
      * Get id
      *

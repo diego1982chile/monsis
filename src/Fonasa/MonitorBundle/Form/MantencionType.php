@@ -84,7 +84,22 @@ class MantencionType extends AbstractType
                       'label' => false                    
                       //'position' => array('after' => 'numeroRequerimiento'),
                       //'disabled' => true, 
-                ));                            
+                ))
+                ->add('severidad', EntityType::class, array(
+                  'class' => 'MonitorBundle:Severidad',
+                  'query_builder' => function (EntityRepository $er) use ($options) {
+                                     return $er->createQueryBuilder('s')
+                                               ->join('s.incidencias','i')
+                                               ->where('i.id = ?1')
+                                               ->setParameter(1, $options['idIncidencia'])
+                                               ->orderBy('s.nombre', 'ASC');
+                },
+                'choice_label' => 'nombre',
+                //'expanded' => true,
+                //'multiple' => false,
+                'position' => 'first',
+                //'attr' => array('class' => 'form-inline')
+                ));                                                                                                         
         }        
         else{
             $builder        
@@ -116,8 +131,20 @@ class MantencionType extends AbstractType
                 ->add('numeroRequerimiento', TextType::class, array(
                       'position' => array('after' => 'tipoRequerimiento'),
                       //'disabled' => true,
-                    ));                                               
-        }                        
+                    ))
+                ->add('severidad', EntityType::class, array(
+                  'class' => 'MonitorBundle:Severidad',
+                  'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('ei')
+                              ->orderBy('ei.nombre', 'ASC');
+                },
+                'choice_label' => 'nombre',
+                //'expanded' => true,
+                //'multiple' => false,
+                'position' => 'first',
+                //'attr' => array('class' => 'form-inline')
+                ));                                                                           
+            }                        
         
         $builder                 
             ->add('tipoMantencion', EntityType::class, array(
@@ -242,7 +269,7 @@ class MantencionType extends AbstractType
              */
             ->add('descripcion', TextareaType::class, array(
                 //'disabled' => true
-            ))                                
+            ))              
             ->add('usuario', EntityType::class, array(
                   'class' => 'MonitorBundle:Usuario',
                   'query_builder' => function (EntityRepository $er) {

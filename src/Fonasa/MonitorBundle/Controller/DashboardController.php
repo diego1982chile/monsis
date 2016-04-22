@@ -24,6 +24,7 @@ class DashboardController extends Controller
         ->orderBy('c.nombre')
         ->getQuery()
         ->getResult();   
+                        
         
         // Obtener stacks
         $estados = $em->getRepository('MonitorBundle:EstadoIncidencia')
@@ -31,7 +32,7 @@ class DashboardController extends Controller
         ->where('e.nombre in (?1)')
         ->setParameter(1, ['En Gestión FONASA','Pendiente MT','Resuelta MT'])
         ->getQuery()
-        ->getResult();   
+        ->getResult();                   
         
         // Obtener data
         $parameters = array();                
@@ -43,7 +44,7 @@ class DashboardController extends Controller
                 ->join('i.componente', 'c')
                 ->join('i.severidad', 'p')
                 //->join('i.origen', 'o')                
-                ->where('e.nombre in (?2)');
+                ->where('e.nombre in (?1)');
         
         $qb->groupBy('c.nombre');
         $qb->groupBy('e.nombre');                
@@ -53,6 +54,7 @@ class DashboardController extends Controller
         $incidencias= $qb->setParameters($parameters)
                     ->getQuery()    
                     ->getResult();                   
+                
         
         $incidencias_= array();
         
@@ -85,20 +87,15 @@ class DashboardController extends Controller
         //Obtener Data
         
         //Obtener total incidencias
-        $qb = $em->getRepository('MonitorBundle:Servicio')                
-                ->createQueryBuilder('s')                
-                ->select('count(s.id) as total')
-                ->join('s.tipoServicio', 'ts')
-                ->join('ts.tipo', 't')
-                ->join('s.estado', 'e')
-                ->join('s.componente', 'c')
-                ->join('s.prioridad', 'p')
-                ->join('s.origen', 'o')
-                ->where('t.nombre = ?1')                
-                ->andWhere('e.nombre in (?2)');
-        
-        $parameters[1] = 'Resolución Incidencia';       
-        $parameters[2] = ['En Gestión FONASA','Pendiente MT','Resuelta MT'];
+        $qb = $em->getRepository('MonitorBundle:Incidencia')                
+                ->createQueryBuilder('i')                
+                ->select('count(i.id) as total')                                
+                ->join('i.estadoIncidencia', 'e')
+                ->join('i.componente', 'c')
+                ->join('i.severidad', 's')                                              
+                ->where('e.nombre in (?1)');
+                
+        $parameters[1] = ['En Gestión FONASA','Pendiente MT','Resuelta MT'];
         
         $totals= $qb->setParameters($parameters)
                     ->getQuery()    
@@ -108,31 +105,25 @@ class DashboardController extends Controller
         
         $parameters = array();                
 
-        $qb = $em->getRepository('MonitorBundle:Servicio')                
-                ->createQueryBuilder('s')                
-                ->select('e.nombre estado, 100*(count(s.id)/?3) as porcentaje')
-                ->join('s.tipoServicio', 'ts')
-                ->join('ts.tipo', 't')
-                ->join('s.estado', 'e')
-                ->join('s.componente', 'c')
-                ->join('s.prioridad', 'p')
-                ->join('s.origen', 'o')
-                ->where('t.nombre = ?1')                
-                ->andWhere('e.nombre in (?2)');
+        $qb = $em->getRepository('MonitorBundle:Incidencia')                
+                ->createQueryBuilder('i')                
+                ->select('e.nombre estado, 100*(count(i.id)/?2) as porcentaje')                                
+                ->join('i.estadoIncidencia', 'e')
+                ->join('i.componente', 'c')
+                ->join('i.severidad', 's')                                              
+                ->where('e.nombre in (?1)');
                 
-        $qb->groupBy('e.nombre');
-        
-        $parameters[1] = 'Resolución Incidencia';                
+        $qb->groupBy('e.nombre');                
                 
-        $parameters[2] = ['En Gestión FONASA','Pendiente MT','Resuelta MT'];
+        $parameters[1] = ['En Gestión FONASA','Pendiente MT','Resuelta MT'];
         
-        $parameters[3] = $total;
+        $parameters[2] = $total;
                         
         $incidencias= $qb->setParameters($parameters)
                     ->getQuery()    
                     ->getResult();                   
         
-        $incidencias_= array();
+        $incidencias_= array();                
         
         foreach($incidencias as $incidencia)
             $incidencias_[$incidencia['estado']]=$incidencia['porcentaje'];
@@ -156,6 +147,7 @@ class DashboardController extends Controller
         }   
                 
         $series2['data'] = $data;
+                
         
         ///////////// 3er CHART: TIEMPOS DE RESOLUCIÓN DE INCIDENCIAS/////////////////
         
@@ -165,56 +157,45 @@ class DashboardController extends Controller
         array_unshift($categories2, 'Todos');
         
         // Obtener datos Todos
-        $qb = $em->getRepository('MonitorBundle:Servicio')                
-                ->createQueryBuilder('s')                
-                ->select('s.hhEfectivas as tiempo, count(s.id) as cantidad')
-                ->join('s.tipoServicio', 'ts')
-                ->join('ts.tipo', 't')
-                ->join('s.estado', 'e')
-                ->join('s.componente', 'c')
-                ->join('s.prioridad', 'p')
-                ->join('s.origen', 'o')
-                ->where('t.nombre = ?1')                
-                ->andWhere('e.nombre in (?2)');
+        $qb = $em->getRepository('MonitorBundle:Incidencia')                
+                ->createQueryBuilder('i')                
+                ->select('i.hhEfectivas as tiempo, count(i.id) as cantidad')                                
+                ->join('i.estadoIncidencia', 'e')
+                ->join('i.componente', 'c')
+                ->join('i.severidad', 's')                                              
+                ->where('e.nombre in (?1)');
                 
-        $qb->groupBy('s.hhEfectivas');
+        $qb->groupBy('i.hhEfectivas');
         
-        $parameters = array();
-        
-        $parameters[1] = 'Resolución Incidencia';                
+        $parameters = array();                
                 
-        $parameters[2] = ['Resuelta MT'];                
+        $parameters[1] = ['Resuelta MT'];                
                         
         $incidencias= $qb->setParameters($parameters)
                     ->getQuery()    
                     ->getResult();                   
         
-        $incidencias_= array();
+        $incidencias_= array();                
         
         foreach($incidencias as $incidencia)
             $incidencias_['Todos'][$incidencia['tiempo']]=$incidencia['cantidad'];
         
         // Obtener datos por componente
-        $qb = $em->getRepository('MonitorBundle:Servicio')                
-                ->createQueryBuilder('s')                
-                ->select('c.nombre componente, s.hhEfectivas as tiempo, count(s.id) as cantidad')
-                ->join('s.tipoServicio', 'ts')
-                ->join('ts.tipo', 't')
-                ->join('s.estado', 'e')
-                ->join('s.componente', 'c')
-                ->join('s.prioridad', 'p')
-                ->join('s.origen', 'o')
-                ->where('t.nombre = ?1')                
-                ->andWhere('e.nombre in (?2)');
+        $qb = $em->getRepository('MonitorBundle:Incidencia')                
+                ->createQueryBuilder('i')                
+                ->select('c.nombre componente, i.hhEfectivas as tiempo, count(i.id) as cantidad')                                
+                ->join('i.estadoIncidencia', 'e')
+                ->join('i.componente', 'c')
+                ->join('i.severidad', 's')                                              
+                ->where('e.nombre in (?1)');
                 
         $qb->groupBy('c.nombre');        
-        $qb->groupBy('s.hhEfectivas');        
-        
-        $parameters = array();
-        
-        $parameters[1] = 'Resolución Incidencia';                
+        $qb->groupBy('i.hhEfectivas');        
                 
-        $parameters[2] = ['Resuelta MT'];                
+        
+        $parameters = array();                
+                
+        $parameters[1] = ['Resuelta MT'];                
                         
         $incidencias= $qb->setParameters($parameters)
                     ->getQuery()    
@@ -245,22 +226,21 @@ class DashboardController extends Controller
                 }                
             }
             $series3[]=array('name' => $categoria, 'data' => $data_);
-        }       
+        }                       
         
         ////////////////////// 4o CHART: HH Mantenciones////////////////////////
                 
         // Obtener mantenciones del mes                 
-        $qb = $em->getRepository('MonitorBundle:Servicio')                
-                ->createQueryBuilder('s')                
-                ->select('s.codigoInterno as nombre, s.hhEstimadas as hhEstimadas, s.hhEfectivas as hhReales')
-                ->join('s.tipoServicio', 'ts')
-                ->join('ts.tipo', 't')
-                ->join('s.estado', 'e')
-                ->join('s.componente', 'c')
-                ->join('s.prioridad', 'p')
-                ->join('s.origen', 'o')
-                ->where('t.nombre in (?1)')                
+        $qb = $em->getRepository('MonitorBundle:Mantencion')                
+                ->createQueryBuilder('m')                
+                ->select('m.codigoInterno as nombre, m.hhEstimadas as hhEstimadas, m.hhEfectivas as hhReales')                                
+                ->join('m.estadoMantencion', 'e')
+                ->join('m.componente', 'c')
+                //->join('m.severidad', 's')
+                ->join('m.tipoMantencion', 'tm')
+                ->where('tm.nombre in (?1)')                
                 ->andWhere('e.nombre in (?2)');                        
+                
         
         $parameters = array();
         
@@ -296,28 +276,26 @@ class DashboardController extends Controller
         
         //Obtener Data
         // Obtener stacks
-        $estados = $em->getRepository('MonitorBundle:Estado')
+        $estados = $em->getRepository('MonitorBundle:EstadoMantencion')
         ->createQueryBuilder('e')                                
         ->where('e.nombre in (?1)')
-        ->setParameter(1, ['Desa','Test','PaP','Cerrada'])
+        ->setParameter(1, ['En Desarrollo','En Testing','Cerrada'])
         ->getQuery()
         ->getResult();   
         
         //Obtener total incidencias
-        $qb = $em->getRepository('MonitorBundle:Servicio')                
-                ->createQueryBuilder('s')                
-                ->select('count(s.id) as total')
-                ->join('s.tipoServicio', 'ts')
-                ->join('ts.tipo', 't')
-                ->join('s.estado', 'e')
-                ->join('s.componente', 'c')
-                ->join('s.prioridad', 'p')
-                ->join('s.origen', 'o')
-                ->where('t.nombre in (?1)')                
+        $qb = $em->getRepository('MonitorBundle:Mantencion')                
+                ->createQueryBuilder('m')                
+                ->select('count(m.id) as total')                
+                ->join('m.estadoMantencion', 'e')
+                ->join('m.componente', 'c')
+                //->join('m.severidad', 's')
+                ->join('m.tipoMantencion', 'tm')
+                ->where('tm.nombre in (?1)')                
                 ->andWhere('e.nombre in (?2)');
         
         $parameters[1] = ['Mantención Correctiva','Mantención Evolutiva'];        
-        $parameters[2] = ['Desa','Test','PaP','Cerrada'];
+        $parameters[2] = ['En Desarrollo','En Testing','Cerrada'];
         
         $totals= $qb->setParameters($parameters)
                     ->getQuery()    
@@ -327,23 +305,21 @@ class DashboardController extends Controller
         
         $parameters = array();                
 
-        $qb = $em->getRepository('MonitorBundle:Servicio')                
-                ->createQueryBuilder('s')                
-                ->select('e.nombre estado, count(s.id) as cantidad')
-                ->join('s.tipoServicio', 'ts')
-                ->join('ts.tipo', 't')
-                ->join('s.estado', 'e')
-                ->join('s.componente', 'c')
-                ->join('s.prioridad', 'p')
-                ->join('s.origen', 'o')
-                ->where('t.nombre in (?1)')                
+        $qb = $em->getRepository('MonitorBundle:Mantencion')                
+                ->createQueryBuilder('m')                
+                ->select('e.nombre estado, count(m.id) as cantidad')                                
+                ->join('m.estadoMantencion', 'e')
+                ->join('m.componente', 'c')
+                //->join('m.severidad', 's')
+                ->join('m.tipoMantencion', 'tm')
+                ->where('tm.nombre in (?1)')                
                 ->andWhere('e.nombre in (?2)');
                 
         $qb->groupBy('e.nombre');
         
         $parameters[1] = ['Mantención Correctiva','Mantención Evolutiva'];        
         
-        $parameters[2] = ['Desa','Test','PaP','Cerrada'];                
+        $parameters[2] = ['En Desarrollo','En Testing','Cerrada'];                
                         
         $mantenciones= $qb->setParameters($parameters)
                     ->getQuery()    
@@ -376,7 +352,7 @@ class DashboardController extends Controller
         //////////////////////////// 6o Chart: Mantenciones Correctivas por Componente a la fecha //////////////////////////////////
         
         // Obtener stacks
-        $tiposMantencion = $em->getRepository('MonitorBundle:Tipo')
+        $tiposMantencion = $em->getRepository('MonitorBundle:TipoMantencion')
         ->createQueryBuilder('t')                                
         ->where('t.nombre in (?1)')
         ->setParameter(1, ['Mantencion Correctiva','Mantencion Evolutiva'])
@@ -385,16 +361,14 @@ class DashboardController extends Controller
         
         $parameters = array();                
 
-        $qb = $em->getRepository('MonitorBundle:Servicio')                
-                ->createQueryBuilder('s')                
-                ->select('c.nombre componente, t.nombre tipo_mantencion, count(s.id) as cantidad')
-                ->join('s.tipoServicio', 'ts')
-                ->join('ts.tipo', 't')
-                ->join('s.estado', 'e')
-                ->join('s.componente', 'c')
-                ->join('s.prioridad', 'p')
-                ->join('s.origen', 'o')
-                ->where('t.nombre in (?1)')                
+        $qb = $em->getRepository('MonitorBundle:Mantencion')                
+                ->createQueryBuilder('m')                
+                ->select('c.nombre componente, tm.nombre tipo_mantencion, count(m.id) as cantidad')                                
+                ->join('m.estadoMantencion', 'e')
+                ->join('m.componente', 'c')
+                //->join('m.severidad', 's')
+                ->join('m.tipoMantencion', 'tm')
+                ->where('tm.nombre in (?1)')                
                 ->andWhere('e.nombre in (?2)');
                 
         $qb->groupBy('c.nombre');

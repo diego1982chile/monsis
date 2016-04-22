@@ -9,9 +9,7 @@
         <li class="active"> 
             <form id="filtros" action="" method="post" class="navbar-form navbar-left">                 
                 {{ form_start(GlobalFilters) }}        
-                {{ form_errors(GlobalFilters) }}                
-                {{ form_widget(GlobalFilters.Anio) }}                
-                {{ form_widget(GlobalFilters.Mes) }}                                                 
+                {{ form_errors(GlobalFilters) }}       
                 <div id="form_Estado" class="btn-group" data-toggle="buttons">
                 {% for child in GlobalFilters.Estado %}
                     {{ form_label(child) }} 
@@ -19,7 +17,10 @@
                     {{ form_widget(child) }}
                     </label>
                 {% endfor %}
-                </div>
+                </div>                
+                {{ form_widget(GlobalFilters.componente) }}   
+                {{ form_widget(GlobalFilters.Mes) }}   
+                {{ form_widget(GlobalFilters.Anio) }}                                                                                              
             </form>
         </li>
         <li class="divider-vertical"></li>                    
@@ -50,11 +51,11 @@
     <table id="incidencias" class="display table-striped" style="display:none" width="100%">
         <thead>
             <tr>                
+                <th width="3%">&nbsp;</th>
                 <th width="5%">N°Ticket</th>                                
                 <th width="10%">Fecha Inicio</th>             
                 <th width="10%">Fecha Salida</th>             
-                <th width="8%">Severidad</th>
-                <th width="10%">HH</th>                   
+                <th width="8%">Severidad</th>                       
                 <th width="12%">Estado</th>                
                 <th width="4%">Show/Edit</th>                
             </tr>
@@ -67,6 +68,10 @@
             <a href="{{ path('incidencia_new') }}">Create a new entry</a>
         </li>
     </ul>
+<div id="dialog-form" title="Agregar Observacion" style="padding:1em">     
+    <textarea id="observacion" class="form-control" style="padding:1em;margin:1em;width:95%" value="">                
+    </textarea>                  
+</div>            
 {% endblock %}
 {% block javascripts %}
 <script>
@@ -81,6 +86,27 @@
                          $anio.val());        
     }
     
+    var dialog = $( "#dialog-form" ).dialog({
+      autoOpen: false,
+      height: 250,
+      width: 400,
+      modal: true,
+      buttons: {
+        "Aceptar": addObservacion,
+        Cancel: function() {
+          dialog.dialog( "close" );          
+        }
+      },
+      close: function() {        
+      }
+    });
+    
+    function addObservacion() {
+        var link=$("#dialog-form").data('link');        
+        $(link).attr('href',$(link).attr('href').replace('null',$('#observacion').val()));      
+        $(link).click();        
+    }                
+    
     $(function() {
         $('#incidencias th').removeClass('ui-state-default');    
         $('#incidencias').show();                        
@@ -94,9 +120,15 @@
             sAjaxSource: '{{ path('incidencia_body') }}',
             sServerMethod: 'GET',
             bProcessing: true,
+            order: [[ 1, 'asc' ]],
             aoColumnDefs: [
                     {
-                    aTargets: [0,1,2,3,4,5,6],
+                    aTargets: [0],
+                    orderable: false,
+                    class: 'fillRate'   
+                    },       
+                    {
+                    aTargets: [1,2,3,4,5,6],
                     class: 'cols'                
                     }                
                 ],
@@ -130,7 +162,25 @@
                                 var root=$(this).closest('.dropdown');
                                 root.find('.left-caret').toggleClass('right-caret left-caret');
                                 root.find('.sub-menu:visible').hide();
-                            });                                                           
+                            });                                      
+                            
+                            $( "a.estados" ).on( "click", function(e) {                                                                                                   
+                                if($(this).parent().parent().prev().text()==$(this).text())
+                                    return false;
+                                if($(this).text()=='Resuelta MT'){
+                                    if($('#observacion').val().trim()==''){
+                                        dialog.data('link',$(this));
+                                        dialog.dialog( "open" );
+                                        return false;                 
+                                    }
+                                    else{                                        
+                                        dialog.dialog( "close" );
+                                        window.location=$(this).attr('href');                                                                                        
+                                    }
+                                }
+                                else
+                                    return true;
+                            });
 			});
                     }                    
                 });        
@@ -153,6 +203,6 @@
         setInterval( function () {
             oTable.fnDraw();
         }, 30000 );
-    
+        
 </script>
 {% endblock %}

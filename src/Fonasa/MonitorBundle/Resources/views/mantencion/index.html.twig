@@ -9,17 +9,11 @@
         <li class="active"> 
             <form id="filtros" action="" method="post" class="navbar-form navbar-left">                 
                 {{ form_start(GlobalFilters) }}        
-                {{ form_errors(GlobalFilters) }}                
-                {{ form_widget(GlobalFilters.Anio) }}                
-                {{ form_widget(GlobalFilters.Mes) }}                                                 
-                <div id="form_Estado" class="btn-group" data-toggle="buttons">
-                {% for child in GlobalFilters.Estado %}
-                    {{ form_label(child) }} 
-                    <label class="btn btn-sm btn-default {% if loop.index == 1 %}active{% endif %}">                                       
-                    {{ form_widget(child) }}
-                    </label>
-                {% endfor %}
-                </div>
+                {{ form_errors(GlobalFilters) }}                       
+                {{ form_widget(GlobalFilters.Estado) }}                                    
+                {{ form_widget(GlobalFilters.componente) }}   
+                {{ form_widget(GlobalFilters.Mes) }}   
+                {{ form_widget(GlobalFilters.Anio) }}                                                                                              
             </form>
         </li>
         <li class="divider-vertical"></li>                    
@@ -49,11 +43,12 @@
 
     <table id="mantenciones" class="display table-striped" style="display:none" width="100%">
         <thead>
-            <tr>                
+            <tr>
+                <th width="3%">&nbsp;</th>
+                <th width="5%">N°Req/Ticket</th>                                                
                 <th width="5%">N°Mantencion</th>                                
                 <th width="10%">Fecha inicio</th>                                
-                <th width="10%">Fecha término</th>
-                <th width="10%">HH Estimadas</th>                                               
+                <th width="10%">Fecha término</th>                
                 <th width="12%">Estado</th>                
                 <th width="4%">Show/Edit</th>                  
             </tr>
@@ -73,10 +68,12 @@
     var $anio = $('#form_Anio');
     var $mes = $('#form_Mes');
     var $estado = $('#form_Estado');
+    var $componente = $('#form_componente');
     
     function updateTitle(){
         $('#title').html("Mantenciones "+
-                         $estado.find(':checked').parent().text()+" "+
+                         $estado.find('option:selected').text()+" "+
+                         $componente.find('option:selected').text()+" "+
                          $mes.find('option:selected').text()+" "+
                          $anio.val());        
     }
@@ -100,6 +97,18 @@
                     class: 'cols'                
                     }                
                 ],
+            order: [[ 1, 'asc' ]],
+            aoColumnDefs: [
+                    {
+                    aTargets: [0],
+                    orderable: false,
+                    class: 'fillRate'   
+                    },       
+                    {
+                    aTargets: [1,2,3,4,5,6],
+                    class: 'cols'                
+                    }                
+                ],                        
             dom: 'frtip<"toolbar">',
             fnDrawCallback: function( oSettings ) {
                 $('#mantenciones th').removeClass('ui-state-default');                                                                 
@@ -108,7 +117,7 @@
 			/* Add some extra data to the sender */
 			aoData.push( { "name": "anio", "value": $anio.val() } );
                         aoData.push( { "name": "mes", "value": $mes.val() } );
-                        aoData.push( { "name": "estado", "value": $estado.find(':checked').val() } );
+                        aoData.push( { "name": "estado", "value": $estado.val() } );
                         
 			$.getJSON( sSource, aoData, function (json) { 
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                

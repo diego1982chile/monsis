@@ -144,7 +144,8 @@ class IncidenciaType extends AbstractType
                 //'multiple' => false,
                 'position' => 'first',
                 //'attr' => array('class' => 'form-inline')
-            ))                                  
+            ))
+            /*
             ->add('estadoIncidencia', EntityType::class, array(
                   'class' => 'MonitorBundle:EstadoIncidencia',
                   'query_builder' => function (EntityRepository $er) {
@@ -157,6 +158,7 @@ class IncidenciaType extends AbstractType
                 'position' => 'first',
                 //'attr' => array('class' => 'form-inline')
             ))                  
+            */
         ;
         
         if($options['assign']==true){

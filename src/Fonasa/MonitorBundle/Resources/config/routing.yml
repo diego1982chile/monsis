@@ -49,7 +49,7 @@ incidencia_body:
     methods:  [GET]    
     
 incidencia_status:    
-    path:   /incidencia/{id}/{status}/status
+    path:   /incidencia/{id}/{status}/{observacion}/status
     defaults: { _controller: "MonitorBundle:Incidencia:status" }
     methods:  [GET,POST]     
     

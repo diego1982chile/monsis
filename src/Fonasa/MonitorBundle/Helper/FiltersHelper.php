@@ -4,6 +4,9 @@ namespace Fonasa\MonitorBundle\Helper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
+use Doctrine\ORM\EntityManager;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -18,13 +21,16 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 class FiltersHelper {
     //put your code here
     protected $formFactory;
+    protected $em;
 
-    public function __construct(FormFactoryInterface $formFactory)
+    public function __construct(FormFactoryInterface $formFactory, EntityManager $em)
     {
         $this->formFactory = $formFactory;
+        $this->em = $em;
     }
         
     public function getDefaultFiltersForm(){
+                        
         $anyo = date("Y");
         $anyos = array();
         for($i=0;$i<10;++$i)
@@ -50,9 +56,20 @@ class FiltersHelper {
         );                
         
         return $form_filtros = $this->formFactory->createBuilder()
-            ->add('Anio', ChoiceType::class, array('choices' => $anyos, 'data' => intval(date("Y"))))
+            ->add('componente', EntityType::class, array(
+                  'class' => 'MonitorBundle:Componente',
+                  'choice_label' => 'nombre',                   
+                  'choice_attr' => function($val, $key, $index) {
+                             // adds a class like attending_yes, attending_no, etc
+                             if($val->getNombre()=='SIGGES')
+                                return ['selected' => true];
+                             else
+                                return ['selected' => false];
+                   }                                                                                       
+            ))
             ->add('Mes', ChoiceType::class, array('choices' => $meses, 'choices_as_values' => true, 'data' => intval(date("m"))))
-            ->add('Estado', ChoiceType::class, array('choices' => $estados, 'expanded' => true, 'data' => 1, 'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')))
+            ->add('Anio', ChoiceType::class, array('choices' => $anyos, 'data' => intval(date("Y"))))            
+            ->add('Estado', ChoiceType::class, array('choices' => $estados, 'expanded' => false, 'data' => 1, 'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')))
             ->getForm()->createView();                    
     }
 }
