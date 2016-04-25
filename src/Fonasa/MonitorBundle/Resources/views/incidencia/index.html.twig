@@ -100,12 +100,11 @@
     });     
     
     var oTable = $('#incidencias').dataTable({
-            //bPaginate: true,
+            bPaginate: false,
             //iDisplatLength: 5,
-            bJQueryUI: true,
+            bJQueryUI: false,
             bServerSide: true,
-            sAjaxSource: '{{ path('incidencia_body') }}',
-            bPaginate: true,
+            sAjaxSource: '{{ path('incidencia_body') }}',            
             sServerMethod: 'GET',
             bProcessing: true,
             order: [[ 1, 'asc' ]],
