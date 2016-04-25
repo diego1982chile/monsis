@@ -243,7 +243,12 @@ $(function () {
     
     $('#mantenciones_estado').highcharts({
         chart: {
-            type: 'column'
+            type: 'column',                                
+            options3d: {
+                enabled: true,
+                alpha: 7,
+                beta: 40   
+            }
         },
         title: {
             text: {{ chartMantencionesEstado.title|raw }}
@@ -514,7 +519,7 @@ $(function () {
         },
         yAxis: {
             title: {
-                text: 'Temperature (°C)'
+                text: 'Cantidad de Mantenciones'
             },
             plotLines: [{
                 value: 0,

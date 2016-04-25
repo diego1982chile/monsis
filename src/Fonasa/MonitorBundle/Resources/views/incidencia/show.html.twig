@@ -142,18 +142,20 @@
         <li>
             <a href="{{ path('incidencia_index') }}">Volver a la lista</a>
         </li>
-        <li>
-            <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Editar</a>
-        </li>
-        {% if incidencia.estadoIncidencia.nombre in ['Pendiente MT'] and incidencia.mantenciones|length == 0 %}
-        <li>
-            <a href="{{ path('incidencia_mantencion', { 'id': incidencia.id }) }}">Levantar Mantención</a>
-        </li>
+        {% if is_granted("ROLE_ADMIN") %}
+            <li>
+                <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Editar</a>
+            </li>
+            {% if incidencia.estadoIncidencia.nombre in ['Pendiente MT'] and incidencia.mantenciones|length == 0 %}
+            <li>
+                <a href="{{ path('incidencia_mantencion', { 'id': incidencia.id }) }}">Levantar Mantención</a>
+            </li>
+            {% endif %}
+            <li>
+                {{ form_start(delete_form) }}
+                    <input type="submit" value="Eliminar" class="btn btn-warning">
+                {{ form_end(delete_form) }}
+            </li>
         {% endif %}
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Eliminar" class="btn btn-warning">
-            {{ form_end(delete_form) }}
-        </li>
     </ul>
 {% endblock %}

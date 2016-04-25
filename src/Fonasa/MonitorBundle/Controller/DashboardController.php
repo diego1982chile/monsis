@@ -12,7 +12,8 @@ class DashboardController extends Controller
         //$anio= $request->query->get('anio');
         //$mes= $request->query->get('mes');
         //$estado= $request->query->get('estado');        
-        //////////////////                                        
+        //////////////////       
+        $fecha=new\DateTime('now');
         
         $em = $this->getDoctrine()->getManager();                
         
@@ -233,7 +234,7 @@ class DashboardController extends Controller
         // Obtener mantenciones del mes                 
         $qb = $em->getRepository('MonitorBundle:Mantencion')                
                 ->createQueryBuilder('m')                
-                ->select('m.codigoInterno as nombre, m.hhEstimadas as hhEstimadas, m.hhEfectivas as hhReales')                                
+                ->select('tm.nombre as tipo, m.codigoInterno as nombre, m.hhEstimadas as hhEstimadas, m.hhEfectivas as hhReales')                                
                 ->join('m.estadoMantencion', 'e')
                 ->join('m.componente', 'c')
                 //->join('m.severidad', 's')
@@ -254,8 +255,10 @@ class DashboardController extends Controller
         
         $mantenciones_ = array();
         
-        foreach($mantenciones as $mantencion)
-            $mantenciones_[$mantencion['nombre']]=[$mantencion['hhEstimadas'],$mantencion['hhReales']];                                        
+        foreach($mantenciones as $mantencion){
+            $tipo=$mantencion['tipo']=='Mantención Evolutiva'?'SIGG-ME':'SIGG-MC';
+            $mantenciones_[$tipo.$mantencion['nombre']]=[$mantencion['hhEstimadas'],$mantencion['hhReales']];                                        
+        }
                         
         // Preparar respuesta para HighCharts 
         $series4 = array();                       
@@ -409,19 +412,19 @@ class DashboardController extends Controller
                                                                 
         return $this->render('MonitorBundle:Dashboard:index.html.twig',
         array(
-            'chartIncidenciasComponente' => array('title'      => json_encode('Incidencias por Componente/Fecha de Hoy'),
+            'chartIncidenciasComponente' => array('title'      => json_encode('Incidencias por Componente: '.$fecha->format('d/m/Y')),
                                                   'yAxis'      => json_encode('Total Incidencias'),
                                                   'categories' => json_encode($categories1), 
                                                   'series'     => json_encode($series1)),
-            'chartIncidenciasEstado'     => array('title'      => json_encode('Incidencias por Estado/Semanal'),
+            'chartIncidenciasEstado'     => array('title'      => json_encode('Incidencias por Estado: '.ceil( date( 'j', $fecha->getTimestamp() ) / 7 ).'-'.$fecha->format('m/Y')),
                                                   //'yAxis'      => json_encode('Total Incidencias'),
                                                   //'categories' => json_encode($categories), 
                                                   'series'     => json_encode([$series2])),
-            'chartHHIncidencias'         => array('title' => json_encode('Tiempos de Resolución Incidencias/Semanal'),
+            'chartHHIncidencias'         => array('title' => json_encode('Tiempos de Resolución Incidencias: '.ceil( date( 'j', $fecha->getTimestamp() ) / 7 ).'-'.$fecha->format('m/Y')),
                                                   'yAxis'      => json_encode('Cantidad de Incidencias'),
                                                   'categories' => json_encode($categories3), 
                                                   'series'     => json_encode($series3)),
-            'chartHHMantenciones'        => array('title' => json_encode('HH Mantenciones/Mensual'),
+            'chartHHMantenciones'        => array('title' => json_encode('HH Mantenciones: '.$fecha->format('M-Y')),
                                                   'yAxis'      => json_encode('Cantidad de HHs'),
                                                   'categories' => json_encode($categories4), 
                                                   'series'     => json_encode($series4)),
@@ -429,7 +432,7 @@ class DashboardController extends Controller
                                                    'yAxis'     => json_encode('Cantidad de Mantenciones'),
                                                    //'categories' => json_encode($categories4), 
                                                    'series'    => json_encode([$series5])),                        
-            'chartMantencionesComponente' => array('title'     => json_encode('Mantenciones por Componente/Fecha de Hoy'),
+            'chartMantencionesComponente' => array('title'     => json_encode('Mantenciones por Componente: '.$fecha->format('d/m/Y')),
                                                   'yAxis'      => json_encode('Total Mantenciones'),
                                                   'categories' => json_encode($categories6), 
                                                   'series'     => json_encode($series6))

@@ -7,13 +7,8 @@
     <ul class="nav navbar-nav"> 
         <li class="divider-vertical"></li>
         <li class="active"> 
-            <form id="filtros" action="" method="post" class="navbar-form navbar-left">                 
-                {{ form_start(GlobalFilters) }}        
-                {{ form_errors(GlobalFilters) }}                       
-                {{ form_widget(GlobalFilters.Estado) }}                                    
-                {{ form_widget(GlobalFilters.componente) }}   
-                {{ form_widget(GlobalFilters.Mes) }}   
-                {{ form_widget(GlobalFilters.Anio) }}                                                                                              
+            <form id="filtros" action="" method="post">                 
+                {{ form(GlobalFilters) }}                                                                                                                    
             </form>
         </li>
         <li class="divider-vertical"></li>                    
@@ -56,12 +51,13 @@
         <tbody>        
         </tbody>
     </table>
-
+    {% if is_granted("ROLE_ADMIN") %}
     <ul>
         <li>
             <a href="{{ path('mantencion_new') }}">Create a new entry</a>
         </li>
     </ul>
+    {% endif %}
 {% endblock %}
 {% block javascripts %}
 <script>
@@ -90,14 +86,7 @@
             bServerSide: true,
             sAjaxSource: '{{ path('mantencion_body') }}',
             sServerMethod: 'GET',
-            bProcessing: true,
-            aoColumnDefs: [
-                    {
-                    aTargets: [0,1,2,3,4,5],
-                    class: 'cols'                
-                    }                
-                ],
-            order: [[ 1, 'asc' ]],
+            bProcessing: true,                        
             aoColumnDefs: [
                     {
                     aTargets: [0],
@@ -105,10 +94,11 @@
                     class: 'fillRate'   
                     },       
                     {
-                    aTargets: [1,2,3,4,5,6],
+                    aTargets: [1,2,3,4,5],
                     class: 'cols'                
-                    }                
-                ],                        
+                    }                             
+                ],            
+            order: [[ 1, 'asc' ]],                        
             dom: 'frtip<"toolbar">',
             fnDrawCallback: function( oSettings ) {
                 $('#mantenciones th').removeClass('ui-state-default');                                                                 
@@ -118,6 +108,7 @@
 			aoData.push( { "name": "anio", "value": $anio.val() } );
                         aoData.push( { "name": "mes", "value": $mes.val() } );
                         aoData.push( { "name": "estado", "value": $estado.val() } );
+                        aoData.push( { "name": "componente", "value": $componente.val() } );
                         
 			$.getJSON( sSource, aoData, function (json) { 
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                
@@ -140,7 +131,14 @@
                                 root.find('.left-caret').toggleClass('right-caret left-caret');
                                 root.find('.sub-menu:visible').hide();
                             });                                                           
-			} );
+                            
+                            $( "a.estados" ).on( "click", function(e) {                                                                                                   
+                                if($(this).parent().parent().prev().text()==$(this).text())
+                                    return false;
+                                else
+                                    return true;
+                            });
+			});
             }                    
         });        
         
@@ -155,6 +153,11 @@
         });
         
         $estado.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        $componente.change(function() {
             updateTitle();
             oTable.fnDraw();            
         });

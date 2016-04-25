@@ -328,9 +328,10 @@ class IncidenciaController extends Controller
         $sSortDir= $request->query->get('sSortDir_0');        
         
         //Obtener parámetros de filtros
+        $componente= $request->query->get('componente');
         $anio= $request->query->get('anio');
         $mes= $request->query->get('mes');
-        $estado= $request->query->get('estado');        
+        $estado= $request->query->get('estado');                
         //////////////////                
         
         $em = $this->getDoctrine()->getManager();                
@@ -341,32 +342,35 @@ class IncidenciaController extends Controller
                 ->createQueryBuilder('i')                
                 ->join('i.categoriaIncidencia', 'ci')
                 ->join('i.componente', 'c')
-                ->join('i.severidad', 'o')
+                ->join('i.severidad', 's')
                 ->join('i.estadoIncidencia', 'e')                                                
-                ->where('YEAR(i.fechaReporte) = ?1')
-                ->andWhere('MONTH(i.fechaReporte) = ?2')
-                ->andWhere('e.nombre in (?3)');
+                ->where('YEAR(i.fechaInicio) = ?1')
+                ->andWhere('MONTH(i.fechaInicio) = ?2')
+                ->andWhere('c.id = ?3')
+                ->andWhere('e.nombre in (?4)');
         
         $parameters[1] = $anio;
         
         $parameters[2] = $mes;
         
+        $parameters[3] = $componente;
+        
         if($estado == 1)
-            $parameters[3]=[/*'En Cola',*/'En Gestión FONASA','Pendiente MT'];
+            $parameters[4]=[/*'En Cola',*/'En Gestión FONASA','Pendiente MT'];
         else
-            $parameters[3]=['Resuelta MT'];
-    
+            $parameters[4]=['Resuelta MT'];
+                    
         if($sSearch != null){            
             $qb->andWhere(
             $qb->expr()->orx(
-            $qb->expr()->like('i.numeroTicket', '?4'),
-            $qb->expr()->like('ci.nombre', '?4'),
-            $qb->expr()->like('c.nombre', '?4'),
-            $qb->expr()->like('o.nombre', '?4'),            
-            $qb->expr()->like('e.nombre', '?4')
+            $qb->expr()->like('i.numeroTicket', '?5'),
+            $qb->expr()->like('ci.nombre', '?5'),
+            $qb->expr()->like('c.nombre', '?5'),
+            $qb->expr()->like('s.nombre', '?5'),            
+            $qb->expr()->like('e.nombre', '?5')
            ));
             
-           $parameters[4]='%'.$sSearch.'%'; 
+           $parameters[5]='%'.$sSearch.'%'; 
         }
         
         if($iSortCol != null){
@@ -376,20 +380,17 @@ class IncidenciaController extends Controller
                     $qb->orderBy('i.numeroTicket', $sSortDir);
                     break;
                 case '1':
-                    $qb->orderBy('i.fechaReporte', $sSortDir);
+                    $qb->orderBy('i.fechaInicio', $sSortDir);
                     break;                
                 case '2':
-                    $qb->orderBy('ci.nombre', $sSortDir);
-                    break;
+                    $qb->orderBy('i.fechaSalida', $sSortDir);
+                    break;  
                 case '3':
-                    $qb->orderBy('c.nombre', $sSortDir);
+                    $qb->orderBy('s.nombre', $sSortDir);
                     break;
                 case '4':
-                    $qb->orderBy('o.nombre', $sSortDir);
-                    break;
-                case '5':
                     $qb->orderBy('e.nombre', $sSortDir);
-                    break;
+                    break;                
             }
         }
                 
@@ -427,7 +428,7 @@ class IncidenciaController extends Controller
             //$html='<div class="progress"><div class="progress-bar '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
             array_push($fila,$html);                                                
             
-            array_push($fila,$incidencia->getNumeroTicket());
+            array_push($fila,'Ticket'.$incidencia->getNumeroTicket());
             array_push($fila,$incidencia->getFechaInicio()==null?'-':$incidencia->getFechaInicio()->format('d/m/Y H:i'));
             array_push($fila,$incidencia->getFechaSalida()==null?'-':$incidencia->getFechaSalida()->format('d/m/Y H:i'));            
             //array_push($fila,$servicio->getComponente()->getNombre());
@@ -437,33 +438,37 @@ class IncidenciaController extends Controller
             
             $html='<div class="dropdown" style="position:relative">';
             $html=$html.'<a href="#" class="dropdown-toggle" data-toggle="dropdown">'.$incidencia->getEstadoIncidencia()->getNombre().'<span class="caret"></span></a>';
-            $html=$html.'<ul class="dropdown-menu">';            
             
-            /*
-            $html='<select class="incidencia_estadoIncidencia" onchange="location = this.value;">';
-            $selected;
-            */
-            $active="";                                
+            if($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')){
             
-            foreach($estados as $estado)                        
-            {
+                $html=$html.'<ul class="dropdown-menu">';            
+
                 /*
-                if($estado->getNombre()==$incidencia->getEstadoIncidencia()->getNombre())
-                    $selected='selected';
-                else
-                    $selected=null;
-                
-                $html=$html.'<option value='.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre())).' '.$selected.'>'.$estado->getNombre().'</button>';
+                $html='<select class="incidencia_estadoIncidencia" onchange="location = this.value;">';
+                $selected;
                 */
-                $active="";  
-                
-                if($incidencia->getEstadoIncidencia()->getNombre()==$estado->getNombre())
-                    $active="active";
-                $html=$html.'<li class="'.$active.'"><a class="estados" href="'.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre(), 'observacion' => 'null')).'">'.$estado->getNombre().'</a></li>';                                        
-            }            
-            //$html=$html.'</select>';    
-            
-            $html=$html.'</ul>';                        
+                $active="";                                
+
+                foreach($estados as $estado)                        
+                {
+                    /*
+                    if($estado->getNombre()==$incidencia->getEstadoIncidencia()->getNombre())
+                        $selected='selected';
+                    else
+                        $selected=null;
+
+                    $html=$html.'<option value='.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre())).' '.$selected.'>'.$estado->getNombre().'</button>';
+                    */
+                    $active="";  
+
+                    if($incidencia->getEstadoIncidencia()->getNombre()==$estado->getNombre())
+                        $active="active";
+                    $html=$html.'<li class="'.$active.'"><a class="estados" href="'.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre(), 'observacion' => 'null')).'">'.$estado->getNombre().'</a></li>';                                        
+                }            
+                //$html=$html.'</select>';    
+
+                $html=$html.'</ul>';                        
+            }
             
             array_push($fila,$html);
             
@@ -486,7 +491,12 @@ class IncidenciaController extends Controller
             }              
             */                  
             
-            array_push($fila,'<ul><li><a href="'.$this->generateUrl('incidencia_show', array('id' => $incidencia->getId())).'">ver</a></li><li><a href="'.$this->generateUrl('incidencia_edit', array('id' => $incidencia->getId())).'">editar</a></li></ul>');
+            $html='<ul><li><a href="'.$this->generateUrl('incidencia_show', array('id' => $incidencia->getId())).'">ver</a></li>';
+            
+            if($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN'))                
+                $html=$html.'<li><a href="'.$this->generateUrl('incidencia_edit', array('id' => $incidencia->getId())).'">editar</a></li></ul>';            
+            
+            array_push($fila,$html);
             
             array_push($body, $fila);
             $cont++;

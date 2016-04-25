@@ -173,7 +173,9 @@ class MantencionController extends Controller
     public function editAction(Request $request, Mantencion $mantencion)
     {
         $deleteForm = $this->createDeleteForm($mantencion);
-        $editForm = $this->createForm('Fonasa\MonitorBundle\Form\MantencionType', $mantencion);
+        $editForm = $this->createForm('Fonasa\MonitorBundle\Form\MantencionType', $mantencion, array(
+                                      'idIncidencia' => $mantencion->getIdIncidencia()
+                                      ));
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
@@ -181,7 +183,8 @@ class MantencionController extends Controller
             $em->persist($mantencion);
             $em->flush();
 
-            return $this->redirectToRoute('mantencion_edit', array('id' => $mantencion->getId()));
+            //return $this->redirectToRoute('mantencion_edit', array('id' => $mantencion->getId()));
+            return $this->redirectToRoute('mantencion_show', array('id' => $mantencion->getId()));
         }
 
         return $this->render('MonitorBundle:mantencion:edit.html.twig', array(
@@ -319,6 +322,7 @@ class MantencionController extends Controller
         $sSortDir= $request->query->get('sSortDir_0');        
         
         //Obtener parámetros de filtros
+        $componente= $request->query->get('componente');
         $anio= $request->query->get('anio');
         $mes= $request->query->get('mes');
         $estado= $request->query->get('estado');        
@@ -338,28 +342,31 @@ class MantencionController extends Controller
                 ->join('m.estadoMantencion', 'em')                                                
                 ->where('YEAR(m.fechaIngreso) = ?1')
                 ->andWhere('MONTH(m.fechaIngreso) = ?2')
-                ->andWhere('e.nombre in (?3)');
+                ->andWhere('c.id = ?3')
+                ->andWhere('e.nombre in (?4)');
         
         $parameters[1] = $anio;
         
         $parameters[2] = $mes;
         
+        $parameters[3] = $componente;
+        
         if($estado == 1)
-            $parameters[3]=['En Cola','En Desarrollo','En Testing'];
+            $parameters[4]=['En Cola','En Desarrollo','En Testing'];
         else
-            $parameters[3]=['Cerrada'];
+            $parameters[4]=['Cerrada'];
     
         if($sSearch != null){            
             $qb->andWhere(
             $qb->expr()->orx(
-            $qb->expr()->like('m.codigoInterno', '?4'),
-            $qb->expr()->like('m.fechaIngreso', '?4'),
-            $qb->expr()->like('m.fechaSalida', '?4'),
-            $qb->expr()->like('c.nombre', '?4'),            
-            $qb->expr()->like('e.nombre', '?4')
+            $qb->expr()->like('m.codigoInterno', '?5'),
+            $qb->expr()->like('m.fechaIngreso', '?5'),
+            $qb->expr()->like('m.fechaSalida', '?5'),
+            $qb->expr()->like('c.nombre', '?5'),            
+            $qb->expr()->like('e.nombre', '?5')
            ));
             
-           $parameters[4]='%'.$sSearch.'%'; 
+           $parameters[5]='%'.$sSearch.'%'; 
         }
         
         if($iSortCol != null){
@@ -423,8 +430,8 @@ class MantencionController extends Controller
             //$html='<div class="progress"><div class="progress-bar '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
             array_push($fila,$html);                                                
             
-            array_push($fila,$mantencion->getIncidencia()==null?$mantencion->getNumeroRequerimiento():$mantencion->getIncidencia()->getNumeroTicket());
-            array_push($fila,$mantencion->getCodigoInterno());
+            array_push($fila,$mantencion->getIncidencia()==null?'Req'.$mantencion->getNumeroRequerimiento():'Ticket'.$mantencion->getIncidencia()->getNumeroTicket());            
+            array_push($fila,$mantencion->getTipoMantencion()->getNombre()=='Mantención Evolutiva'?'SIGG-ME'.$mantencion->getCodigoInterno():'SIGG-MC'.$mantencion->getCodigoInterno());
             array_push($fila,$mantencion->getFechaInicio()->format('d/m/Y H:i'));
             //array_push($fila,$servicio->getComponente()->getNombre());
             array_push($fila,$mantencion->getFechaSalida()==null?'-':$mantencion->getFechaSalida()->format('d/m/Y H:i'));
@@ -437,46 +444,49 @@ class MantencionController extends Controller
             //$html='<select class="mantencion_estadoMantencion" onchange="location = this.value;">';
             $html='<div class="dropdown" style="position:relative">';
             $html=$html.'<a href="#" class="dropdown-toggle" data-toggle="dropdown">'.$mantencion->getEstadoMantencion()->getNombre().'<span class="caret"></span></a>';
-            $html=$html.'<ul class="dropdown-menu">';            
             
-            foreach($estados as $estado)                        
-            {                                                          
-                $usuarios = $em->getRepository('MonitorBundle:Usuario')
-                ->createQueryBuilder('u')                                
-                ->join('u.estadoMantencion','em')
-                ->where('em.nombre = ?1')
-                ->setParameter(1, $estado->getNombre())
-                ->getQuery()
-                ->getResult();
+            if($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')){
                 
-                $active="";                    
-                
-                if(sizeof($usuarios)){                                        
-                    
-                    if($mantencion->getEstadoMantencion()->getNombre()==$estado->getNombre())
-                        $active="active";
-                    
-                    $html=$html.'<li class="'.$active.'">';   
-                    $html=$html.'<a class="trigger right-caret">'.$estado->getNombre().'</a>';
-                    $html=$html.'<ul class="dropdown-menu sub-menu">';
-                    
-                    foreach($usuarios as $usuario){     
-                        $active2="";
-                            if($mantencion->getUsuario()!=null){
-                                if($mantencion->getUsuario()->getUsername()==$usuario->getUsername())                            
-                                    $active2="active";
-                            }
-                            $html=$html.'<li class="'.$active2.'"><a href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => $usuario->getUsername())).'">'.$usuario->getUsername().'</a></li>';                            
-                        
+                $html=$html.'<ul class="dropdown-menu">';                                    
+            
+                foreach($estados as $estado)                        
+                {                                                          
+                    $usuarios = $em->getRepository('MonitorBundle:Usuario')
+                    ->createQueryBuilder('u')                                
+                    ->join('u.estadoMantencion','em')
+                    ->where('em.nombre = ?1')
+                    ->setParameter(1, $estado->getNombre())
+                    ->getQuery()
+                    ->getResult();
+
+                    $active="";                    
+
+                    if(sizeof($usuarios)){                                        
+
+                        if($mantencion->getEstadoMantencion()->getNombre()==$estado->getNombre())
+                            $active="active";
+
+                        $html=$html.'<li class="'.$active.'">';   
+                        $html=$html.'<a class="trigger right-caret">'.$estado->getNombre().'</a>';
+                        $html=$html.'<ul class="dropdown-menu sub-menu">';
+
+                        foreach($usuarios as $usuario){     
+                            $active2="";
+                                if($mantencion->getUsuario()!=null){
+                                    if($mantencion->getUsuario()->getUsername()==$usuario->getUsername())                            
+                                        $active2="active";
+                                }
+                                $html=$html.'<li class="'.$active2.'"><a href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => $usuario->getUsername())).'">'.$usuario->getUsername().'</a></li>';                            
+
+                        }
+                        $html=$html.'</ul>';
+                    }   
+                    else{                    
+                        if($mantencion->getEstadoMantencion()->getNombre()==$estado->getNombre())
+                            $active="active";
+                        $html=$html.'<li class="'.$active.'"><a class="estados" href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => 'null')).'">'.$estado->getNombre().'</a></li>';        
                     }
-                    $html=$html.'</ul>';
                 }   
-                else{                    
-                    if($mantencion->getEstadoMantencion()->getNombre()==$estado->getNombre())
-                        $active="active";
-                    $html=$html.'<li class="'.$active.'"><a href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => 'null')).'">'.$estado->getNombre().'</a></li>';        
-                }
-                                                                        
             }   
             $html=$html.'</ul>';
             
@@ -501,9 +511,14 @@ class MantencionController extends Controller
                     array_push($fila,'<a id="'.$incidencia->getId().'" href="'.$this->generateUrl('incidencia_init', array('id' => $incidencia->getId())).'" role="button" class="btn btn-default">Iniciar</button>');                                                            
                     break;
             }              
-            */                  
+            */   
             
-            array_push($fila,'<ul><li><a href="'.$this->generateUrl('mantencion_show', array('id' => $mantencion->getId())).'">ver</a></li><li><a href="'.$this->generateUrl('mantencion_edit', array('id' => $mantencion->getId())).'">editar</a></li></ul>');
+            $html='<ul><li><a href="'.$this->generateUrl('mantencion_show', array('id' => $mantencion->getId())).'">ver</a></li>';
+            
+            if($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN'))                
+                $html=$html.'<li><a href="'.$this->generateUrl('mantencion_edit', array('id' => $mantencion->getId())).'">editar</a></li></ul>';
+            
+            array_push($fila,$html);
             
             array_push($body, $fila);
             $cont++;

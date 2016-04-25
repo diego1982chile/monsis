@@ -67,9 +67,9 @@ class FiltersHelper {
                                 return ['selected' => false];
                    }                                                                                       
             ))
+            ->add('Estado', ChoiceType::class, array('choices' => $estados, 'expanded' => false, 'data' => 1, 'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')))                   
             ->add('Mes', ChoiceType::class, array('choices' => $meses, 'choices_as_values' => true, 'data' => intval(date("m"))))
-            ->add('Anio', ChoiceType::class, array('choices' => $anyos, 'data' => intval(date("Y"))))            
-            ->add('Estado', ChoiceType::class, array('choices' => $estados, 'expanded' => false, 'data' => 1, 'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')))
+            ->add('Anio', ChoiceType::class, array('choices' => $anyos, 'data' => intval(date("Y"))))                        
             ->getForm()->createView();                    
     }
 }

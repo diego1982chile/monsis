@@ -71,7 +71,7 @@ $componente.change(function() {
 $validar.click(function(){
     
   $(this).parent().children(':eq(0)')
-    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+          .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
   // ... retrieve the corresponding form.  
   // Simulate form data, but only include the selected sport value.
   var data = {};
@@ -127,7 +127,7 @@ $('#validate_form').click(function(){
             $field.focus();
             $field.qtip({ // Grab some elements to apply the tooltip to
                 content: {
-                    text: '<img alt="" style="width:20px;height:20px" src="{{ asset('bundles/monsis/images/exclamation_2.png') }}"> Completa este campo'
+                    text: '<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;Completa este campo'
                 },
                 show: {
                     ready: true,
@@ -158,7 +158,7 @@ $('#validate_form').click(function(){
           $('#incidencia_numeroTicket').focus();
           $('#incidencia_numeroTicket').qtip({ // Grab some elements to apply the tooltip to
                 content: {
-                    text: '<img alt="" style="width:20px;height:20px" src="{{ asset('bundles/monsis/images/exclamation_2.png') }}"> '+data.message
+                    text: '<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span>&nbsp;'+data.message
                 },
                 show: {
                     ready: true,

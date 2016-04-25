@@ -3,28 +3,10 @@
 {% block stylesheets %}    
 {% endblock %}
 {% block title %}Monsis{% endblock %}
-{% block filtro %}        
-    <ul class="nav navbar-nav"> 
-        <li class="divider-vertical"></li>
-        <li class="active"> 
-            <form id="filtros" action="" method="post" class="navbar-form navbar-left">                 
-                {{ form_start(GlobalFilters) }}        
-                {{ form_errors(GlobalFilters) }}       
-                <div id="form_Estado" class="btn-group" data-toggle="buttons">
-                {% for child in GlobalFilters.Estado %}
-                    {{ form_label(child) }} 
-                    <label class="btn btn-sm btn-default {% if loop.index == 1 %}active{% endif %}">                                       
-                    {{ form_widget(child) }}
-                    </label>
-                {% endfor %}
-                </div>                
-                {{ form_widget(GlobalFilters.componente) }}   
-                {{ form_widget(GlobalFilters.Mes) }}   
-                {{ form_widget(GlobalFilters.Anio) }}                                                                                              
-            </form>
-        </li>
-        <li class="divider-vertical"></li>                    
-    </ul>                 
+{% block filtro %}                
+    <form id="filtros" action="" method="post" style="float:left">                 
+        {{ form(GlobalFilters) }}                                                                                                                     
+    </form>    
 {% endblock %}
 {% block body %}
     {% for flash_message in app.session.flashbag.get('notice') %}            
@@ -62,12 +44,14 @@
         </thead>
         <tbody>        
         </tbody>
-    </table>        
+    </table>
+    {% if is_granted("ROLE_ADMIN") %}
     <ul>
         <li>
             <a href="{{ path('incidencia_new') }}">Create a new entry</a>
         </li>
     </ul>
+    {% endif %}
 <div id="dialog-form" title="Agregar Observacion" style="padding:1em">     
     <textarea id="observacion" class="form-control" style="padding:1em;margin:1em;width:95%" value="">                
     </textarea>                  
@@ -78,10 +62,12 @@
     var $anio = $('#form_Anio');
     var $mes = $('#form_Mes');
     var $estado = $('#form_Estado');
+    var $componente = $('#form_componente');
     
     function updateTitle(){
         $('#title').html("Incidencias "+
-                         $estado.find(':checked').parent().text()+" "+
+                         $estado.find('option:selected').text()+" "+
+                         $componente.find('option:selected').text()+" "+
                          $mes.find('option:selected').text()+" "+
                          $anio.val());        
     }
@@ -128,7 +114,7 @@
                     class: 'fillRate'   
                     },       
                     {
-                    aTargets: [1,2,3,4,5,6],
+                    aTargets: [1,2,3,4,5],
                     class: 'cols'                
                     }                
                 ],
@@ -140,7 +126,8 @@
 			/* Add some extra data to the sender */
 			aoData.push( { "name": "anio", "value": $anio.val() } );
                         aoData.push( { "name": "mes", "value": $mes.val() } );
-                        aoData.push( { "name": "estado", "value": $estado.find(':checked').val() } );
+                        aoData.push( { "name": "estado", "value": $estado.val() } );
+                        aoData.push( { "name": "componente", "value": $componente.val() } );
                         
 			$.getJSON( sSource, aoData, function (json) { 
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                
@@ -196,6 +183,11 @@
         });
         
         $estado.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        $componente.change(function() {
             updateTitle();
             oTable.fnDraw();            
         });

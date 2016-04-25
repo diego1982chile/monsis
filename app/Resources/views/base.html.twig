@@ -18,8 +18,8 @@
     <link href="{{ asset('bundles/monsis/css/jquery.qtip.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/jquery.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/dataTables.bootstrap.css') }}" rel="stylesheet">  
-    <link href="{{ asset('bundles/monsis/css/circle.css') }}" rel="stylesheet">    
-    <link href="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">    
+    <link href="{{ asset('bundles/monsis/css/circle.css') }}" rel="stylesheet">        
+    <link href="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">        
     {% block stylesheets %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('bundles/monsis/images/fonasalogo.png') }}" />
         <style type="text/css">
@@ -202,7 +202,6 @@
             }
                                     
             input.text { margin-bottom:12px; width:95%; padding: .4em; }            
-           
         </style>
   </head>
 
@@ -220,16 +219,16 @@
           <a class="navbar-brand" href="#">Fonasa-Monitor</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            {% if is_granted("ROLE_ADMIN") %}                
-                <li class="{% if app.session.get('active') == 'incidencia_index'%}active{% endif %}">
-                    <a href="{{ path('incidencia_index') }}">Incidencias</a></li>
-                <li class="{% if app.session.get('active') == 'mantencion_index'%}active{% endif %}">
-                    <a href="{{ path('mantencion_index') }}">Mantenciones</a></li>
-            {% endif %}
+          <ul class="nav navbar-nav">            
             {% if is_granted("ROLE_USER") and not is_granted("ROLE_ADMIN") %}
-                <li class="active"><a href="{{ path('dashboard_index') }}">Dashboard</a></li>                                
-            {% endif %}
+                <li class="{% if app.session.get('active') == 'dashboard_index'%}active{% endif %}">
+                    <a href="{{ path('dashboard_index') }}">Dashboard</a>
+                </li>                                
+            {% endif %}              
+            <li class="{% if app.session.get('active') == 'incidencia_index'%}active{% endif %}">
+                <a href="{{ path('incidencia_index') }}">Incidencias</a></li>
+            <li class="{% if app.session.get('active') == 'mantencion_index'%}active{% endif %}">
+                <a href="{{ path('mantencion_index') }}">Mantenciones</a></li>                        
           </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -240,20 +239,30 @@
                         <li><a href="{{ path('fos_user_security_logout') }}">{{ 'layout.logout'|trans({}, 'FOSUserBundle') }}</a></li>
                     </ul>
                 </li>
-            </ul>
-            {% if app.request.attributes.get('_route') in ['incidencia_index','mantencion_index'] %}            
-                  {% block filtro %}                      
-                  {% endblock %}            
-            {% endif %}                    
+            </ul>             
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-                   
+    {% set width=12 %}
     <div class="container">
-	<div class="row">                           
-            <div class="col-md-12">
-                  {% block body %}
-                  {% endblock %}
+	<div class="row">                                       
+            {% if app.request.attributes.get('_route') in ['incidencia_index','mantencion_index'] %}                                                     
+            {% set width=10 %}
+            <div id="sidebar" class="col-md-2 sidebar">
+                <ul class="nav nav-sidebar">                                
+                    <h3>
+                        <li class="nav-header">FILTROS</li>
+                    </h3>
+                    <li id="content">
+                        {% block filtro %}
+                        {% endblock %}                        
+                    </li>                                            
+                </ul>                            
+            </div>                        
+            {% endif %}   
+            <div class="col-md-{{width}}">
+                {% block body %}
+                {% endblock %}
             </div><!--/right-->
         </div><!--/row-->
     </div><!--/container-->
@@ -271,21 +280,9 @@
     <script src="{{ asset('bundles/monsis/js/highcharts.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/highcharts-3d.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/modules/exporting.js') }}"></script>
-    <script src="{{ asset('bundles/monsis/js/modules/drilldown.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/modules/drilldown.js') }}"></script>    
     {% block javascripts %}
-    <script>            
-    /*
-    $(function() {                        
-        $('.nav li').click(function(e) {            
-            $('.navbar li.active').removeClass('active');
-            var $this = $(this);
-            if (!$this.hasClass('active')) {
-                $this.addClass('active');
-            }
-            //e.preventDefault();
-        });        
-    });
-    */
+    <script>             
     </script>
     {% endblock %}
   

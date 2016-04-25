@@ -245,6 +245,19 @@ class Mantencion
     }
     
     /**
+     * Set id
+     * @param int $id
+     * @return Mantencion
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        
+        return $this;
+        
+    }    
+    
+    /**
      * Set numeroRequerimiento
      *
      * @param integer $numeroRequerimiento

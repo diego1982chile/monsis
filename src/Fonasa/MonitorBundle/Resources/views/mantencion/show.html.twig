@@ -115,8 +115,12 @@
                     Responsable:
                 </th>
                 <td width="80%">
-                    {{ mantencion.usuario.username }}        
-                </td>                            
+                    {% if mantencion.usuario is not null %}       
+                        {{ mantencion.usuario.username }}        
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>                                      
             </tr>
             <tr>
                 <th width="20%">
@@ -182,13 +186,15 @@
         <li>
             <a href="{{ path('mantencion_index') }}">Back to the list</a>
         </li>
-        <li>
-            <a href="{{ path('mantencion_edit', { 'id': mantencion.id }) }}">Edit</a>
-        </li>
-        <li>
-            {{ form_start(delete_form) }}
-                <input type="submit" value="Delete">
-            {{ form_end(delete_form) }}
-        </li>
+        {% if is_granted("ROLE_ADMIN") %}
+            <li>
+                <a href="{{ path('mantencion_edit', { 'id': mantencion.id }) }}">Edit</a>
+            </li>
+            <li>
+                {{ form_start(delete_form) }}
+                    <input type="submit" value="Delete" class="btn btn-warning">
+                {{ form_end(delete_form) }}
+            </li>
+        {% endif %}
     </ul>
 {% endblock %}

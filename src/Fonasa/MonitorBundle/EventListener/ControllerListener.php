@@ -50,6 +50,9 @@ class ControllerListener
         //$_SESSION['routes'][]=explode('/',$routeName)[1];          
         
         switch (explode('/',$routeName)[1]){
+            case 'dashboard':
+                $this->session->set('active', 'dashboard_index');
+                break;            
             case 'incidencia':
                 $this->session->set('active', 'incidencia_index');
                 break;            
