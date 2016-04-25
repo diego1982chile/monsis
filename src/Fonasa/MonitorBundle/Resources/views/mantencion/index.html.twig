@@ -81,7 +81,8 @@
     });     
     
     var oTable = $('#mantenciones').dataTable({
-            bPaginate: false,
+            //bPaginate: true,
+            //iDisplatLength: 5,            
             bJQueryUI: false,
             bServerSide: true,
             sAjaxSource: '{{ path('mantencion_body') }}',

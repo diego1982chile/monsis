@@ -100,10 +100,12 @@
     });     
     
     var oTable = $('#incidencias').dataTable({
-            bPaginate: false,
-            bJQueryUI: false,
+            //bPaginate: true,
+            //iDisplatLength: 5,
+            bJQueryUI: true,
             bServerSide: true,
             sAjaxSource: '{{ path('incidencia_body') }}',
+            bPaginate: true,
             sServerMethod: 'GET',
             bProcessing: true,
             order: [[ 1, 'asc' ]],
@@ -118,7 +120,7 @@
                     class: 'cols'                
                     }                
                 ],
-            dom: 'frtip<"toolbar">',
+            dom: 'frtip<"toolbar">',            
             fnDrawCallback: function( oSettings ) {
                 $('#incidencias th').removeClass('ui-state-default');                                                       
             },
@@ -191,10 +193,10 @@
             updateTitle();
             oTable.fnDraw();            
         });
-        
+        /*
         setInterval( function () {
             oTable.fnDraw();
         }, 30000 );
-        
+        */
 </script>
 {% endblock %}
