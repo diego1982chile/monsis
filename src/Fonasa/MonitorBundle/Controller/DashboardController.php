@@ -45,10 +45,9 @@ class DashboardController extends Controller
                 ->join('i.componente', 'c')
                 ->join('i.severidad', 'p')
                 //->join('i.origen', 'o')                
-                ->where('e.nombre in (?1)');
+                ->where('e.nombre in (?1)');                
         
-        $qb->groupBy('c.nombre');
-        $qb->groupBy('e.nombre');                
+        $qb->groupBy('c.nombre','e.nombre');                
                 
         $parameters[1] = ['En Gestión FONASA','Pendiente MT','Resuelta MT'];
         
@@ -60,7 +59,7 @@ class DashboardController extends Controller
         $incidencias_= array();
         
         foreach($incidencias as $incidencia)
-            $incidencias_[$incidencia['estado']][$incidencia['componente']]=$incidencia['cantidad'];                                   
+            $incidencias_[$incidencia['estado']][$incidencia['componente']]=$incidencia['cantidad'];                                                       
         
         // Preparar respuesta para HighCharts 
         $series1 = array();                       
@@ -190,9 +189,8 @@ class DashboardController extends Controller
                 ->join('i.severidad', 's')                                              
                 ->where('e.nombre in (?1)');
                 
-        $qb->groupBy('c.nombre');        
-        $qb->groupBy('i.hhEfectivas');        
-                
+        $qb->groupBy('c.nombre','i.hhEfectivas');        
+        //$qb->groupBy('i.hhEfectivas');                        
         
         $parameters = array();                
                 
@@ -358,7 +356,7 @@ class DashboardController extends Controller
         $tiposMantencion = $em->getRepository('MonitorBundle:TipoMantencion')
         ->createQueryBuilder('t')                                
         ->where('t.nombre in (?1)')
-        ->setParameter(1, ['Mantencion Correctiva','Mantencion Evolutiva'])
+        ->setParameter(1, ['Mantención Correctiva','Mantención Evolutiva'])
         ->getQuery()
         ->getResult();  
         
@@ -374,7 +372,7 @@ class DashboardController extends Controller
                 ->where('tm.nombre in (?1)')                
                 ->andWhere('e.nombre in (?2)');
                 
-        $qb->groupBy('c.nombre');
+        $qb->groupBy('c.nombre','tm.nombre');
         
         $parameters[1] = ['Mantención Correctiva','Mantención Evolutiva'];        
         
@@ -387,7 +385,7 @@ class DashboardController extends Controller
         $mantenciones_= array();
         
         foreach($mantenciones as $mantencion)
-            $mantenciones_[$mantencion['tipo_mantencion']][$mantencion['componente']]=$mantencion['cantidad'];                                   
+            $mantenciones_[$mantencion['tipo_mantencion']][$mantencion['componente']]=$mantencion['cantidad'];                                                       
         
         // Preparar respuesta para HighCharts 
         $series6 = array();                       
