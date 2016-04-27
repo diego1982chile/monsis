@@ -78,9 +78,11 @@ class MantencionController extends Controller
                     //$incidencia[0]->setFechaInicio(null);
                     //$incidencia[0]->setFechaSalida(null
                     $mantencion->setFechaSalida(null);
+                    $mantencion->setFechaUltHH(new\DateTime('now'));
                     break;
                 case 'En Desarrollo': // Si se deja en gestión FONASA, no se hace nada
                     $mantencion->setFechaSalida(null);
+                    $mantencion->setFechaInicio(new\DateTime('now'));
                     $mantencion->setFechaUltHH(new\DateTime('now'));
                     break;                            
             }
@@ -319,7 +321,10 @@ class MantencionController extends Controller
         //Obtener parámetros de DataTables
         $sSearch= $request->query->get('sSearch');
         $iSortCol= $request->query->get('iSortCol_0');
-        $sSortDir= $request->query->get('sSortDir_0');        
+        $sSortDir= $request->query->get('sSortDir_0');
+        $iDisplayStart= $request->query->get('iDisplayStart');      
+        $iDisplayLength= $request->query->get('iDisplayLength');              
+        //////////////////////////////////
         
         //Obtener parámetros de filtros
         $componente= $request->query->get('componente');
@@ -335,7 +340,7 @@ class MantencionController extends Controller
         $qb = $em->getRepository('MonitorBundle:Mantencion')
                 ->createQueryBuilder('m')                
                 ->leftJoin('m.tipoRequerimiento', 'tr')
-                //->leftJoin('m.incidencia', 'i')
+                ->leftJoin('m.incidencia', 'i')
                 ->join('m.componente', 'c')
                 ->join('m.estadoMantencion', 'e')
                 //->join('i.severidad', 'o')
@@ -360,6 +365,8 @@ class MantencionController extends Controller
             $qb->andWhere(
             $qb->expr()->orx(
             $qb->expr()->like('m.codigoInterno', '?5'),
+            $qb->expr()->like('m.numeroRequerimiento', '?5'),
+                    
             $qb->expr()->like('m.fechaIngreso', '?5'),
             $qb->expr()->like('m.fechaSalida', '?5'),
             $qb->expr()->like('c.nombre', '?5'),            
@@ -372,7 +379,7 @@ class MantencionController extends Controller
         if($iSortCol != null){
             
             switch($iSortCol){
-                case '0':
+                case '1':
                     $qb->orderBy('m.codigoInterno', $sSortDir);
                     break;
                 case '1':
@@ -407,10 +414,12 @@ class MantencionController extends Controller
                 ->getQuery()
                 ->getResult();                                          
         
-        $body = array();              
-        $cont = 0;                
+        $body = array();                      
         
-        foreach($mantenciones as $mantencion){                                                
+        foreach($mantenciones as $key => $mantencion){                                                
+            
+            if($key < $iDisplayStart || $key >= $iDisplayStart+$iDisplayLength)
+                continue;
             
             $fila = array();  
             
@@ -432,7 +441,7 @@ class MantencionController extends Controller
             
             array_push($fila,$mantencion->getIncidencia()==null?'Req'.$mantencion->getNumeroRequerimiento():'Ticket'.$mantencion->getIncidencia()->getNumeroTicket());            
             array_push($fila,$mantencion->getTipoMantencion()->getNombre()=='Mantención Evolutiva'?'SIGG-ME'.$mantencion->getCodigoInterno():'SIGG-MC'.$mantencion->getCodigoInterno());
-            array_push($fila,$mantencion->getFechaInicio()->format('d/m/Y H:i'));
+            array_push($fila,$mantencion->getFechaInicio()==null?'-':$mantencion->getFechaInicio()->format('d/m/Y H:i'));
             //array_push($fila,$servicio->getComponente()->getNombre());
             array_push($fila,$mantencion->getFechaSalida()==null?'-':$mantencion->getFechaSalida()->format('d/m/Y H:i'));
             //array_push($fila,$servicio->getTipoServicio()->getTipo()->getNombre());
@@ -520,14 +529,13 @@ class MantencionController extends Controller
             
             array_push($fila,$html);
             
-            array_push($body, $fila);
-            $cont++;
+            array_push($body, $fila);            
         }
                 
         $output= array(
           'sEcho' => intval($request->request->get('sEcho')),
-          'iTotalRecords' => $cont,
-          'iTotalDisplayRecords' => $cont,  
+          'iTotalRecords' => sizeof($mantenciones),
+          'iTotalDisplayRecords' => sizeof($mantenciones),  
           'aaData' => $body          
         );
         

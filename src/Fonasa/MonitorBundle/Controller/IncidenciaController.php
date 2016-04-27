@@ -325,7 +325,10 @@ class IncidenciaController extends Controller
         //Obtener parámetros de DataTables
         $sSearch= $request->query->get('sSearch');
         $iSortCol= $request->query->get('iSortCol_0');
-        $sSortDir= $request->query->get('sSortDir_0');        
+        $sSortDir= $request->query->get('sSortDir_0');      
+        $iDisplayStart= $request->query->get('iDisplayStart');      
+        $iDisplayLength= $request->query->get('iDisplayLength');      
+        ////////////////////////////////////
         
         //Obtener parámetros de filtros
         $componente= $request->query->get('componente');
@@ -363,7 +366,7 @@ class IncidenciaController extends Controller
         if($sSearch != null){            
             $qb->andWhere(
             $qb->expr()->orx(
-            $qb->expr()->like('i.numeroTicket', '?5'),
+            $qb->expr()->like('i.numeroTicket', '?5'),                    
             $qb->expr()->like('ci.nombre', '?5'),
             $qb->expr()->like('c.nombre', '?5'),
             $qb->expr()->like('s.nombre', '?5'),            
@@ -376,19 +379,19 @@ class IncidenciaController extends Controller
         if($iSortCol != null){
             
             switch($iSortCol){
-                case '0':
+                case '1':
                     $qb->orderBy('i.numeroTicket', $sSortDir);
                     break;
-                case '1':
+                case '2':                    
                     $qb->orderBy('i.fechaInicio', $sSortDir);
                     break;                
-                case '2':
+                case '3':
                     $qb->orderBy('i.fechaSalida', $sSortDir);
                     break;  
-                case '3':
+                case '4':
                     $qb->orderBy('s.nombre', $sSortDir);
                     break;
-                case '4':
+                case '5':
                     $qb->orderBy('e.nombre', $sSortDir);
                     break;                
             }
@@ -405,10 +408,12 @@ class IncidenciaController extends Controller
                 ->getQuery()
                 ->getResult();                                          
         
-        $body = array();              
-        $cont = 0;                
+        $body = array();                                      
         
-        foreach($incidencias as $incidencia){                        
+        foreach($incidencias as $key=>$incidencia){                        
+            
+            if($key < $iDisplayStart || $key >= $iDisplayStart+$iDisplayLength)
+                continue;
             
             $fila = array();  
             
@@ -498,14 +503,13 @@ class IncidenciaController extends Controller
             
             array_push($fila,$html);
             
-            array_push($body, $fila);
-            $cont++;
+            array_push($body, $fila);            
         }
                 
         $output= array(
           'sEcho' => intval($request->request->get('sEcho')),
-          'iTotalRecords' => $cont,
-          'iTotalDisplayRecords' => $cont,  
+          'iTotalRecords' => sizeof($incidencias),
+          'iTotalDisplayRecords' => sizeof($incidencias),  
           'aaData' => $body          
         );
         

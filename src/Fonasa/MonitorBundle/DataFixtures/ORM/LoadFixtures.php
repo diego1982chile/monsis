@@ -1372,7 +1372,7 @@ class LoadFixtures extends Controller implements FixtureInterface
                 $incidencia->setIdEstadoIncidencia($estadoIncidencia4->getId());
             }
             $incidencia->setFechaUltHh($fechaInicio);
-            $incidencia->setHhEfectivas(mt_rand()%5);
+            $incidencia->setHhEfectivas(mt_rand()%4);
                         
             $componente=$componentes[mt_rand()%4];
             
