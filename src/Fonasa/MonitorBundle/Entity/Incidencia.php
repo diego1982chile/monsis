@@ -38,7 +38,7 @@ class Incidencia
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="fecha_reporte", type="datetime")
+     * @ORM\Column(name="fecha_reporte", type="datetime", nullable=true)
      */
     private $fechaReporte;
 

@@ -125,11 +125,13 @@ class IncidenciaType extends AbstractType
             );            
         
         $builder                                                    
+            /*
             ->add('fechaReporte', DateTimeType::class, array(
                 'date_widget'=> 'single_text',
                 'date_format'=>'d/M/y',
                 //'disabled' => true
             ))
+            */
             ->add('descripcion', TextareaType::class, array(
                 //'disabled' => true
             ))    

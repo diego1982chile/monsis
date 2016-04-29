@@ -4,33 +4,36 @@
 {% form_theme form 'bootstrap_3_layout.html.twig' %}
 {% block body %}    
     <h1>Nueva Incidencia</h1>
-    <div style="width:60%">
-    {{ form_start(form) }}        
+    <div id="form" style="width:60%;display:none">
+        {{ form_start(form) }}        
         {{ form_errors(form) }}        
         {{ form_row(form.componente) }}
         {{ form_row(form.categoriaIncidencia) }}
         {{ form_label(form.numeroTicket) }}
         <div class="form-group input-group">        
-            {{ form_widget(form.numeroTicket) }}
-            <span class="input-group-btn">
-                <button id="validar" class="btn btn-secondary" type="button">Validar</button>
-            </span>
-        </div>        
-        {{ form_row(form.fechaReporte) }}
+            <span class="input-group-addon" id="basic-addon2">Ticket#</span>
+            {{ form_widget(form.numeroTicket) }}            
+        </div>                
         {{ form_row(form.descripcion) }}
         {{ form_row(form.severidad) }}        
         <input type="submit" class='btn btn-primary' style="display:none" value="Create" />
-        <button id="validate_form" class="btn btn-primary" type="button">Create</button>
+        <button id="validate_form" class="btn btn-primary" type="button">Crear</button>
     {{ form_end(form) }}
     </div>
+    <br>
     <ul>
         <li>
-            <a href="{{ path('incidencia_index') }}">Back to the list</a>
+            <a href="{{ path('incidencia_index') }}">Volver</a>
         </li>
     </ul>
 {% endblock %}
 {% block javascripts %}
 <script>
+
+$( window ).load(function() {
+   $('#form').show();
+});
+    
 $(function() {
     $( "#incidencia_fechaReporte_date" ).datepicker();    
 });  
@@ -42,6 +45,18 @@ var $validar= $('#validar');
 // When sport gets selected ...
 
 var $componente = $('#incidencia_componente');
+
+var loader = new Image();
+loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+loader.className = 'loader';
+
+var save = new Image();
+save.src = '{{ asset('bundles/monsis/images/save_2.png') }}';
+save.className = 'save';
+
+$validateForm=$('#validate_form');
+$validateForm.append(save);
+
 // When sport gets selected ...
 $componente.change(function() {
   $('#incidencia_categoriaIncidencia').parent().children(':eq(0)')
@@ -51,7 +66,7 @@ $componente.change(function() {
   // Simulate form data, but only include the selected sport value.
   var data = {};
   data[$componente.attr('name')] = $componente.val(); 
-  // Submit data via AJAX to the form's action path.
+  // Submit data via AJAX to the form's action path.    
   $.ajax({
     url : $form.attr('action'),
     type: $form.attr('method'),
@@ -113,7 +128,11 @@ $validar.click(function(){
   });    
 });
 
-$('#validate_form').click(function(){ 
+$validateForm.click(function(){ 
+
+  $(save).replaceWith(loader);    
+  $(this).attr('disabled',true);
+    
   var error = false;
   var data = {};
   data['numeroTicket'] = $('#incidencia_numeroTicket').val(); 
@@ -150,8 +169,11 @@ $('#validate_form').click(function(){
        }
   });
   
-  if(error)
+  if(error){
+    $(loader).replaceWith(save);
+    $validateForm.attr('disabled',false);
     return false;
+  }
   
   $.post("{{ path('incidencia_check') }}",data,function(data){
       if(data.error){          
@@ -173,7 +195,9 @@ $('#validate_form').click(function(){
                         at: 'bottom center', // at the bottom right of...
                         target: $('#incidencia_numeroTicket') // my target
                     }                
-            });          
+            });       
+            $(loader).replaceWith(save);
+            $validateForm.attr('disabled',false);
       } 
       else{        
         $('form[name="incidencia"]').submit();

@@ -51,7 +51,7 @@ class MantencionController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
                         
             $inicioProgramado=$request->request->get('mantencion')['inicioProgramado'];
-            $fechaInicio=$request->request->get('mantencion')['fechaInicio']['date'];                                                
+            //$fechaInicio=$request->request->get('mantencion')['fechaInicio']['date'];                                                
             
             $fechaIngreso=new\DateTime('now');
             
@@ -184,6 +184,11 @@ class MantencionController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($mantencion);
             $em->flush();
+            
+            $this->addFlash(
+                'notice',
+                'Se ha modificado la mantención N°'.$mantencion->getCodigoInterno().'.'
+            );
 
             //return $this->redirectToRoute('mantencion_edit', array('id' => $mantencion->getId()));
             return $this->redirectToRoute('mantencion_show', array('id' => $mantencion->getId()));
@@ -209,6 +214,11 @@ class MantencionController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->remove($mantencion);
             $em->flush();
+            
+            $this->addFlash(
+                'notice',
+                'Se ha eliminado la mantención N°'.$mantencion->getCodigoInterno().'.'
+            );
         }
 
         return $this->redirectToRoute('mantencion_index');
@@ -238,10 +248,25 @@ class MantencionController extends Controller
         $error = false;
         $message = "N°Req válido";        
         
-        if (!is_numeric($numeroRequerimiento)){
+        if (!is_numeric($numeroRequerimiento)){            
             $error = true;
             $message = 'N°Req no válido';            
         }             
+        // Si es numerico, validar que sea entero
+        if (floor($numeroRequerimiento)!=$numeroRequerimiento){            
+            $error = true;
+            $message = 'N°Req no válido';            
+        }
+        // Si es entero, validar que no empiece con 0
+        if(substr($numeroRequerimiento, 0, 1) == '0'){
+            $error = true;
+            $message = 'N°Req no válido';
+        }        
+        // Si es numerico, validar que sea entero positivo menor a un maximo
+        if($numeroRequerimiento<=0 || $numeroRequerimiento>999999999){
+            $error = true;
+            $message = 'N°Req no válido';                        
+        }
         
         if(!$error){
             $em = $this->getDoctrine()->getManager();                    
@@ -250,7 +275,7 @@ class MantencionController extends Controller
                 $incidencia= $em->getRepository('MonitorBundle:Mantencion')
                 ->createQueryBuilder('i')                                
                 ->where('i.numeroRequerimiento = ?1')
-                ->andWhere('s.id <> ?2')
+                ->andWhere('i.id <> ?2')
                 ->setParameter(1, $numeroRequerimiento)
                 ->setParameter(2, $id)                        
                 ->getQuery()
@@ -279,12 +304,28 @@ class MantencionController extends Controller
         $id= $request->request->get('id');
         
         $error = false;
-        $message = "N°Mantención válido";        
+        $message = "N°Mantención válido";                        
         
         if (!is_numeric($numeroMantencion)){
             $error = true;
             $message = 'N°Mantención no válido';            
         }             
+        
+        // Si es numerico, validar que sea entero
+        if (floor($numeroMantencion)!=$numeroMantencion){            
+            $error = true;
+            $message = 'N°Mantención no válido';            
+        }
+        // Si es entero, validar que no empiece con 0
+        if(substr($numeroMantencion, 0, 1) == '0'){
+            $error = true;
+            $message = 'N°Mantención no válido';
+        }        
+        // Si es numerico, validar que sea entero positivo menor a un maximo
+        if($numeroMantencion<=0 || $numeroMantencion>999999999){
+            $error = true;
+            $message = 'N°Mantención no válido';                        
+        }
         
         if(!$error){
             $em = $this->getDoctrine()->getManager();                    
@@ -293,7 +334,7 @@ class MantencionController extends Controller
                 $mantencion= $em->getRepository('MonitorBundle:Mantencion')
                 ->createQueryBuilder('i')                                
                 ->where('i.codigoInterno = ?1')
-                ->andWhere('s.id <> ?2')
+                ->andWhere('i.id <> ?2')
                 ->setParameter(1, $numeroMantencion)
                 ->setParameter(2, $id)                        
                 ->getQuery()
@@ -313,6 +354,37 @@ class MantencionController extends Controller
                 $message = 'N°Mantencion ya existe';                
             }                    
         }        
+        return new JsonResponse(array('error' => $error, 'message' => $message));                
+    }
+    
+    public function check3Action(Request $request){
+                
+        $hhEstimadas= $request->request->get('hhEstimadas');      
+        
+        $error = false;
+        $message = "N°válido";                        
+        
+        if (!is_numeric($hhEstimadas)){
+            $error = true;
+            $message = 'N°no válido';            
+        }             
+        
+        // Si es numerico, validar que sea entero
+        if (floor($hhEstimadas)!=$hhEstimadas){            
+            $error = true;
+            $message = 'N°no válido';            
+        }
+        // Si es entero, validar que no empiece con 0
+        if(substr($hhEstimadas, 0, 1) == '0'){
+            $error = true;
+            $message = 'N°no válido';
+        }        
+        // Si es numerico, validar que sea entero positivo menor a un maximo
+        if($hhEstimadas<=0 || $hhEstimadas>999999999){
+            $error = true;
+            $message = 'N°no válido';                        
+        }
+                
         return new JsonResponse(array('error' => $error, 'message' => $message));                
     }
     

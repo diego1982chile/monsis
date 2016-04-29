@@ -31,7 +31,7 @@ class ObservacionIncidencia
     /**
      * @var \Incidencia
      *
-     * @ORM\ManyToOne(targetEntity="Incidencia", inversedBy="historialesIncidencia")
+     * @ORM\ManyToOne(targetEntity="Incidencia", inversedBy="observacionesIncidencia")
      * @ORM\JoinColumns{(
      *    @ORM\JoinColumn(name="ID_INCIDENCIA", referencedColumnName="id", onDelete="CASCADE")
      * })

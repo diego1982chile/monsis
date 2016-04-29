@@ -98,6 +98,11 @@ mantencion_check2:
     defaults: { _controller: "MonitorBundle:Mantencion:check2" }
     methods:  [POST]        
     
+mantencion_check3:
+    path:     /mantencion/check3
+    defaults: { _controller: "MonitorBundle:Mantencion:check3" }
+    methods:  [POST]      
+    
 mantencion_status:    
     path:   /mantencion/{id}/{status}/{usuario}/status
     defaults: { _controller: "MonitorBundle:Mantencion:status" }

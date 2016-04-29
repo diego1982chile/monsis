@@ -4,8 +4,20 @@
 {% endblock %}
 {% block title %}Monsis{% endblock %}
 {% block filtro %}                
-    <form id="filtros" action="" method="post" style="float:left">                 
-        {{ form(GlobalFilters) }}                                                                                                                     
+    <form id="filtros" action="" method="post" style="display:none">   
+        {{ form_start(GlobalFilters) }}        
+        {{ form_errors(GlobalFilters) }}         
+        {{ form_row(GlobalFilters.Componente) }}         
+        {{ form_row(GlobalFilters.Estado) }}         
+        {{ form_row(GlobalFilters.Mes) }}            
+        {{ form_row(GlobalFilters.Anio) }} 
+        <div class="form-group">        
+            {{ form_label(GlobalFilters.Reset) }}         
+            <label id="form_Reset" class="btn btn-warning active form-control">                
+                {{ form_widget(GlobalFilters.Reset) }}        
+            </label>             
+        </div>
+        {{ form_end(GlobalFilters) }}                        
     </form>    
 {% endblock %}
 {% block body %}
@@ -62,7 +74,22 @@
     var $anio = $('#form_Anio');
     var $mes = $('#form_Mes');
     var $estado = $('#form_Estado');
-    var $componente = $('#form_componente');
+    var $componente = $('#form_Componente');        
+    var $resetFiltros = $('#form_Reset');
+    
+    var loader = new Image();
+    loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+    loader.className = 'loader';
+
+    var reset = new Image();
+    reset.src = '{{ asset('bundles/monsis/images/reset_1.png') }}';
+    reset.className = 'save';
+    
+    $resetFiltros.children(':eq(0)').append(reset);
+    
+    $( window ).load(function() {
+        $('#filtros').show();
+    });
     
     function updateTitle(){
         $('#title').html("Incidencias "+
@@ -102,7 +129,7 @@
     var oTable = $('#incidencias').dataTable({
             bPagination: true,                        
             //"pagingType": "full_numbers",
-            iDisplayLength: 5,
+            iDisplayLength: 4,
             bJQueryUI: false,
             bServerSide: true,
             sAjaxSource: '{{ path('incidencia_body') }}',            
@@ -132,6 +159,7 @@
                         aoData.push( { "name": "mes", "value": $mes.val() } );
                         aoData.push( { "name": "estado", "value": $estado.val() } );
                         aoData.push( { "name": "componente", "value": $componente.val() } );
+                        aoData.push( { "name": "resetFiltros", "value": $resetFiltros.find(':checked').val() } );                                                
                         
 			$.getJSON( sSource, aoData, function (json) { 
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                
@@ -172,6 +200,12 @@
                                 else
                                     return true;
                             });
+                            
+                            $(loader).parent().children(':eq(1)').replaceWith(reset);    
+                            $resetFiltros.attr('disabled',false);   
+                            
+                            if($resetFiltros.find(':checked').val())
+                                window.location=$(this).attr('href');
 			});
                     }                    
                 });        
@@ -192,6 +226,13 @@
         });
         
         $componente.change(function() {
+            updateTitle();
+            oTable.fnDraw();            
+        });
+        
+        $resetFiltros.click(function() {
+            $(reset).parent().children(':eq(1)').replaceWith(loader);    
+            $(this).attr('disabled',true);            
             updateTitle();
             oTable.fnDraw();            
         });

@@ -1314,7 +1314,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->flush();                    
         
         //------------------------------POBLAR INCIDENCIAS-----------------------------------------------
-        
+        /*
         $descripcionesIncidencia=[
             'Crear a un nuevo Medico en sistema',
             'Ticket con problemas enfocados en el cumplimientos de garantías',
@@ -1476,7 +1476,7 @@ class LoadFixtures extends Controller implements FixtureInterface
             $manager->persist($mantencion);
             $manager->flush();    
         }
-        
+        */
     }        
 }
 

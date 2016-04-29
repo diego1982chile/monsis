@@ -14,6 +14,8 @@
     <!-- Bootstrap core CSS -->
     <link href="{{ asset('bundles/monsis/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/simple-sidebar.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/monsis/css/font-awesome.min.css') }}" rel="stylesheet">
+    
     <!-- Jquery-ui core CSS -->    
     <link href="{{ asset('bundles/monsis/css/jquery.qtip.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/jquery.dataTables.min.css') }}" rel="stylesheet">
@@ -202,6 +204,61 @@
             }
                                     
             input.text { margin-bottom:12px; width:95%; padding: .4em; }            
+            
+            .fa-spin-custom, .glyphicon-spin {
+                -webkit-animation: spin 1000ms infinite linear;
+                animation: spin 1000ms infinite linear;
+            }
+
+            .spin{
+                -webkit-transform-origin: 50% 58%;
+                transform-origin:50% 58%;
+                -ms-transform-origin:50% 58%; /* IE 9 */
+                -webkit-animation: spin .2s infinite linear;
+                -moz-animation: spin .2s infinite linear;
+                -o-animation: spin .2s infinite linear;
+                animation: spin .2s infinite linear;
+           }
+           
+           @-webkit-keyframes spin {
+                0% {
+                    -webkit-transform: rotate(0deg);
+                    transform: rotate(0deg);
+                }
+                100% {
+                    -webkit-transform: rotate(359deg);
+                    transform: rotate(359deg);
+                }
+            }
+            @keyframes spin {
+                0% {
+                    -webkit-transform: rotate(0deg);
+                    transform: rotate(0deg);
+                }
+                100% {
+                    -webkit-transform: rotate(359deg);
+                    transform: rotate(359deg);
+                }
+            }
+            
+            .loader {
+                margin-left:8px;
+            }
+            
+            .save {
+                margin-left:8px;
+                width: 15px;
+                height: 15px;
+            }
+            
+            .checkbox {
+                margin: 0px !important;                
+                padding: 0px !important;                
+            }
+            
+            .checkbox label{                               
+                padding: 0px !important;                
+            }
         </style>
   </head>
 

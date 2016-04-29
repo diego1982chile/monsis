@@ -28,6 +28,7 @@
             <file>file:/C:/xampp/htdocs/monsis/web/app.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/dashboard/index.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Controller/IncidenciaController.php</file>
+            <file>file:/C:/xampp/htdocs/monsis/app/autoload.php</file>
             <file>file:/C:/xampp/htdocs/monsis/composer.json</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Tests/Controller/IncidenciaControllerTest.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/mantencion/new.html.twig</file>
@@ -50,6 +51,7 @@
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/mantencion/show.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/HistorialMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/ObservacionIncidencia.php</file>
+            <file>file:/C:/xampp/htdocs/monsis/app/AppCache.php</file>
             <file>file:/C:/xampp/htdocs/monsis/web/app_dev.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/config/services.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/app/Resources/FOSUserBundle/views/layout.html.twig</file>

@@ -24,7 +24,7 @@ services:
              - { name: kernel.event_listener, event: kernel.controller, method: onKernelController  }		                    
     monsis.helper.filters:
         class:  Fonasa\MonitorBundle\Helper\FiltersHelper
-        arguments: ["@form.factory", "@doctrine.orm.entity_manager","@service_container"]
+        arguments: ["@form.factory", "@doctrine.orm.entity_manager", "@session", "@service_container"]
     monsis.twig.GlobalFiltersExtension:
         class: Fonasa\MonitorBundle\Twig\GlobalFiltersExtension
         arguments:  ["@service_container"]

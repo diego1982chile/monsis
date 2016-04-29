@@ -33,6 +33,6 @@ class ResponseListener
             $response->headers->addCacheControlDirective('no-store', true);
             $response->headers->addCacheControlDirective('no-cache', true);
             $response->headers->addCacheControlDirective('max-age', 0);                  
-        //}
+        //}        
     }
 }

@@ -2,7 +2,7 @@
 {% block stylesheets %}
 {% endblock %}
 {% block body %}
-        {% for flash_message in app.session.flashbag.get('notice') %}            
+    {% for flash_message in app.session.flashbag.get('notice') %}            
     <div class="alert alert-info alert-dismissible" role="alert">                
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h3 style="margin:0px">
@@ -22,7 +22,7 @@
     </div>                    
     {% endfor %}
     <h1>Incidencia</h1>    
-    <div style="width:100%">
+    <div id="form" style="width:100%">
     <fieldset class="scheduler-border" >
     <legend class="scheduler-border">Datos de la Incidencia</legend>
     <div class="control-group">
@@ -93,15 +93,7 @@
     <fieldset class="scheduler-border">
         <legend class="scheduler-border">Eventos</legend>
             <div class="control-group">
-                <table width="100%" class="table" border="0">
-                    <tr>
-                        <th width="20%">
-                            Fecha Reporte:
-                        </th>
-                        <td width="80%">
-                            {% if incidencia.fechaReporte %}{{ incidencia.fechaReporte|date('Y-m-d H:i') }}{% endif %}                
-                        </td>                     
-                    </tr>               
+                <table width="100%" class="table" border="0">                           
                     <tr>
                         <th width="20%">
                             Fecha Ingreso:
@@ -135,27 +127,57 @@
                         </td>                     
                     </tr>                                        
                 </table>
-            </div>
-    </fieldset>                    
-    </div>
-    <ul>
-        <li>
-            <a href="{{ path('incidencia_index') }}">Volver a la lista</a>
-        </li>
-        {% if is_granted("ROLE_ADMIN") %}
+            </div>    
+    </fieldset>   
+    <button id="delete" class="btn btn-warning" type="button" style="float:right">Eliminar</button>                                                
+    </div>        
+    <div>
+        <ul>
             <li>
-                <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Editar</a>
+                <a href="{{ path('incidencia_index') }}">Volver</a>
             </li>
-            {% if incidencia.estadoIncidencia.nombre in ['Pendiente MT'] and incidencia.mantenciones|length == 0 %}
-            <li>
-                <a href="{{ path('incidencia_mantencion', { 'id': incidencia.id }) }}">Levantar Mantención</a>
-            </li>
+            {% if is_granted("ROLE_ADMIN") %}
+                <li>
+                    <a href="{{ path('incidencia_edit', { 'id': incidencia.id }) }}">Editar</a>
+                </li>
+                {% if incidencia.estadoIncidencia.nombre in ['Pendiente MT'] and incidencia.mantenciones|length == 0 %}
+                <li>
+                    <a href="{{ path('incidencia_mantencion', { 'id': incidencia.id }) }}">Levantar Mantención</a>
+                </li>
+                {% endif %}                            
             {% endif %}
-            <li>
-                {{ form_start(delete_form) }}
-                    <input type="submit" value="Eliminar" class="btn btn-warning">
-                {{ form_end(delete_form) }}
-            </li>
-        {% endif %}
-    </ul>
+        </ul>
+    </div>
+    {{ form_start(delete_form) }}
+        <input type="submit" style="display:none" value="Eliminar" class="btn btn-warning">
+    {{ form_end(delete_form) }}                    
+{% endblock %}
+{% block javascripts %}
+<script>
+    
+$( window ).load(function() {
+   $('#form').show();
+});    
+
+var loader = new Image();
+loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+loader.className = 'loader';
+
+var del = new Image();
+del.src = '{{ asset('bundles/monsis/images/delete_3.png') }}';
+del.className = 'save';
+
+$deleteForm=$('#delete');
+$deleteForm.append(del);
+
+$deleteForm.click(function(){
+
+    if(confirm("¿Está seguro que desea eliminar esta incidencia?")){
+        $(del).replaceWith(loader);    
+        $(this).attr('disabled',true);
+
+        $('form[name="form"]').submit();
+    }
+});
+</script>    
 {% endblock %}

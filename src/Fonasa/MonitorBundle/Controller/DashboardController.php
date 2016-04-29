@@ -408,7 +408,7 @@ class DashboardController extends Controller
             $series6[]=array('name' => $tipoMantencion->getNombre(), 'data' => $data_);
         }            
                                                                 
-        return $this->render('MonitorBundle:Dashboard:index.html.twig',
+        return $this->render('MonitorBundle:dashboard:index.html.twig',
         array(
             'chartIncidenciasComponente' => array('title'      => json_encode('Incidencias por Componente: '.$fecha->format('d/m/Y')),
                                                   'yAxis'      => json_encode('Total Incidencias'),

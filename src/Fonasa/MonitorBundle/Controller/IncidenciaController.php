@@ -256,6 +256,11 @@ class IncidenciaController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->remove($incidencia);
             $em->flush();
+
+            $this->addFlash(
+                'notice',
+                'Se ha eliminado la incidencia N°Ticket '.$incidencia->getNumeroTicket().'.'
+            );
         }
 
         return $this->redirectToRoute('incidencia_index');
@@ -288,7 +293,22 @@ class IncidenciaController extends Controller
         if (!is_numeric($numeroTicket)){             
             $error = true;
             $message = 'N°Ticket de formato no válido';            
-        }             
+        }                     
+        // Si es numerico, validar que sea entero
+        if (floor($numeroTicket)!=$numeroTicket){            
+            $error = true;
+            $message = 'N°Ticket no válido';            
+        }
+        // Si es entero, validar que no empiece con 0
+        if(substr($numeroTicket, 0, 1) == '0'){
+            $error = true;
+            $message = 'N°Ticket no válido';
+        }        
+        // Si es numerico, validar que sea entero positivo menor a un maximo
+        if($numeroTicket<=0 || $numeroTicket>999999999){
+            $error = true;
+            $message = 'N°Ticket no válido';                        
+        }
         
         if(!$error){
             $em = $this->getDoctrine()->getManager();                    
@@ -297,7 +317,7 @@ class IncidenciaController extends Controller
                 $incidencia= $em->getRepository('MonitorBundle:Incidencia')
                 ->createQueryBuilder('i')                                
                 ->where('i.numeroTicket = ?1')
-                ->andWhere('s.id <> ?2')
+                ->andWhere('i.id <> ?2')
                 ->setParameter(1, $numeroTicket)
                 ->setParameter(2, $id)                        
                 ->getQuery()
@@ -320,7 +340,7 @@ class IncidenciaController extends Controller
         return new JsonResponse(array('error' => $error, 'message' => $message));                
     }        
     
-    public function bodyAction(Request $request){
+    public function bodyAction(Request $request){                
         
         //Obtener parámetros de DataTables
         $sSearch= $request->query->get('sSearch');
@@ -335,7 +355,24 @@ class IncidenciaController extends Controller
         $anio= $request->query->get('anio');
         $mes= $request->query->get('mes');
         $estado= $request->query->get('estado');                
+        $resetFiltros = $request->query->get('resetFiltros');                
         //////////////////                
+        
+        //Setear filtros en la sesion        
+        // Si se estan reseteando los filtros limpiar las variables de la sesion
+        if($resetFiltros){
+            $this->get('session')->set('filtroComponente',null);        
+            $this->get('session')->set('filtroAnio',null);
+            $this->get('session')->set('filtroMes',null);
+            $this->get('session')->set('filtroEstado',null);        
+        }
+        else{
+            $this->get('session')->set('filtroComponente',$componente);        
+            $this->get('session')->set('filtroAnio',$anio);
+            $this->get('session')->set('filtroMes',$mes);
+            $this->get('session')->set('filtroEstado',$estado);        
+        }
+        ////////////////////////////
         
         $em = $this->getDoctrine()->getManager();                
         

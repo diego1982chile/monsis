@@ -181,20 +181,49 @@
                     </tr>                                        
                 </table>
             </div>
-    </fieldset>                        
+    </fieldset>   
+    <button id="delete" class="btn btn-warning" type="button" style="float:right">Eliminar</button>
     <ul>
         <li>
-            <a href="{{ path('mantencion_index') }}">Back to the list</a>
+            <a href="{{ path('mantencion_index') }}">Volver</a>
         </li>
         {% if is_granted("ROLE_ADMIN") %}
             <li>
-                <a href="{{ path('mantencion_edit', { 'id': mantencion.id }) }}">Edit</a>
-            </li>
-            <li>
-                {{ form_start(delete_form) }}
-                    <input type="submit" value="Delete" class="btn btn-warning">
-                {{ form_end(delete_form) }}
-            </li>
+                <a href="{{ path('mantencion_edit', { 'id': mantencion.id }) }}">Editar</a>
+            </li>                        
         {% endif %}
     </ul>
+    {{ form_start(delete_form) }}
+        <input type="submit" style="display:none" value="Delete" class="btn btn-warning">
+    {{ form_end(delete_form) }}                    
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    
+$( window ).load(function() {
+   $('#form').show();
+});    
+
+var loader = new Image();
+loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+loader.className = 'loader';
+
+var del = new Image();
+del.src = '{{ asset('bundles/monsis/images/delete_3.png') }}';
+del.className = 'save';
+
+$deleteForm=$('#delete');
+$deleteForm.append(del);
+
+$deleteForm.click(function(){
+
+    if(confirm("¿Está seguro que desea eliminar esta mantención?")){
+        $(del).replaceWith(loader);    
+        $(this).attr('disabled',true);
+
+        $('form[name="form"]').submit();
+    }
+});
+</script>    
 {% endblock %}
