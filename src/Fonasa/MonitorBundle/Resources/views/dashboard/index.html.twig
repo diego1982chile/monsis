@@ -2,7 +2,6 @@
 {% form_theme GlobalFilters 'bootstrap_3_layout.html.twig' %}
 {% block stylesheets %}    
 {% endblock %}
-{% block title %}Monitor Fonasa{% endblock %}
 {% block body %}
     {% for flash_message in app.session.flashbag.get('notice') %}            
     <div class="alert alert-info alert-dismissible" role="alert">                
