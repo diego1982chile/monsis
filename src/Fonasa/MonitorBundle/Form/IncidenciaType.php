@@ -72,20 +72,25 @@ class IncidenciaType extends AbstractType
             $categorias = null === $componente ? array() : $componente->getCategoriasIncidencia();             
             
             $placeHolder= 'No hay opciones';
-            $disabled = false;                        
+            $disabled = false;    
+            $idComponente= null;
             
-            if($componente!=null){                
+            if($componente!=null){  
+                $idComponente= $componente->getId();
                 $disabled = false;
                 $placeHolder= 'Seleccione una opción...';
             }
 
             $form->add('categoriaIncidencia', EntityType::class, array(
                        'class'       => 'MonitorBundle:CategoriaIncidencia',
-                       'choices'     => $categorias,
-                       'choice_label' => function($categoria, $key, $index) {
-                            /** @var Category $category */
-                            return $categoria->getNombre();
-                        },
+                        'query_builder' => function (EntityRepository $er) use ($idComponente) {
+                          return $er->createQueryBuilder('c')
+                                    ->where('c.componente = ?1')
+                                    ->setParameter(1, $idComponente)                                       
+                                    ->orderBy('c.nombre', 'ASC');
+                        },                
+                       //'choices'     => $categorias,
+                       'choice_label' => 'nombre',
                        'choices_as_values' => true,
                        /*
                        'choice_attr' => function($val, $key, $index) {

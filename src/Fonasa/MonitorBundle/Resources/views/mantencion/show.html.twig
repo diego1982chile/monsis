@@ -182,7 +182,7 @@
                 </table>
             </div>
     </fieldset>   
-    <button id="delete" class="btn btn-warning" type="button" style="float:right">Eliminar</button>
+    <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>
     <ul>
         <li>
             <a href="{{ path('mantencion_index') }}">Volver</a>
@@ -194,7 +194,7 @@
         {% endif %}
     </ul>
     {{ form_start(delete_form) }}
-        <input type="submit" style="display:none" value="Delete" class="btn btn-warning">
+        <input type="submit" style="display:none" value="Delete" class="btn btn-warning active">
     {{ form_end(delete_form) }}                    
 {% endblock %}
 

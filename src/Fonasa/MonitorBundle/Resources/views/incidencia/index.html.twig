@@ -39,9 +39,9 @@
             </ul>
         </div>
     </div>                    
-    {% endfor %}
-    <h1 id="title"></h1>
-
+    {% endfor %}    
+    <h2 id="title" ></h2>        
+    <br>
     <table id="incidencias" class="display table-striped" style="display:none" width="100%">
         <thead>
             <tr>                
@@ -60,11 +60,11 @@
     {% if is_granted("ROLE_ADMIN") %}
     <ul>
         <li>
-            <a href="{{ path('incidencia_new') }}">Create a new entry</a>
+            <a href="{{ path('incidencia_new') }}">Nueva Incidencia</a>
         </li>
     </ul>
     {% endif %}
-<div id="dialog-form" title="Agregar Observacion" style="padding:1em">     
+<div id="dialog-form" title="Agregar Observacion" style="padding:1em;display:none">     
     <textarea id="observacion" class="form-control" style="padding:1em;margin:1em;width:95%" value="">                
     </textarea>                  
 </div>            
@@ -126,16 +126,18 @@
         updateTitle();
     });     
     
-    var oTable = $('#incidencias').dataTable({
+    var oTable = $('#incidencias').dataTable({            
             bPagination: true,                        
             //"pagingType": "full_numbers",
-            iDisplayLength: 4,
-            bJQueryUI: false,
+            //iDisplayLength: 4,
+            lengthMenu: [[4, 25, 50, -1], [4, 25, 50, "Todos"]],            
+            pageLength: 4,
+            bJQueryUI: false,            
             bServerSide: true,
             sAjaxSource: '{{ path('incidencia_body') }}',            
             sServerMethod: 'GET',
             bProcessing: true,
-            order: [[ 1, 'asc' ]],
+            order: [[ 1, 'desc' ]],
             aoColumnDefs: [
                     {
                     aTargets: [0],
@@ -147,7 +149,20 @@
                     class: 'cols'                
                     }                
                 ],
-            dom: 'frtip<"toolbar">',            
+            //lengthChange: true,
+            dom: 'Blfrtip',                      
+            buttons: [
+                //'copy', 'csv', 'excel', 'pdf', 'print'
+                'excel'
+            ],
+            language: {
+                lengthMenu: " _MENU_ registros por página",
+                //zeroRecords: "Nothing found - sorry",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "No records available",
+                infoFiltered: "(filtered from _MAX_ total records)",
+                sSearch: "Buscar:"
+            },                    
             fnDrawCallback: function( oSettings ) {
                 $('#incidencias th').removeClass('ui-state-default');                  
                 $('.dataTables_paginate').removeClass('ui-buttonset');                  
@@ -158,14 +173,14 @@
 			aoData.push( { "name": "anio", "value": $anio.val() } );
                         aoData.push( { "name": "mes", "value": $mes.val() } );
                         aoData.push( { "name": "estado", "value": $estado.val() } );
-                        aoData.push( { "name": "componente", "value": $componente.val() } );
+                        aoData.push( { "name": "componente", "value": $componente.val() } );                        
                         aoData.push( { "name": "resetFiltros", "value": $resetFiltros.find(':checked').val() } );                                                
                         
 			$.getJSON( sSource, aoData, function (json) { 
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                
                             //$('div.toolbar').html(json.pap);
                             fnCallback(json)
-                            
+                                                        
                             $(".dropdown-menu > li > a.trigger").on("click",function(e){                                                    
                                 var current=$(this).next();
                                 var grandparent=$(this).parent().parent();
@@ -199,16 +214,14 @@
                                 }
                                 else
                                     return true;
-                            });
-                            
-                            $(loader).parent().children(':eq(1)').replaceWith(reset);    
-                            $resetFiltros.attr('disabled',false);   
-                            
-                            if($resetFiltros.find(':checked').val())
-                                window.location=$(this).attr('href');
+                            });                                                           
+                                                        
+                            if($resetFiltros.find(':checked').val()){                                                                                                    
+                                location.reload();  
+                            }                            
 			});
                     }                    
-                });        
+                });                                                                          
         
         $anio.change(function() {
             updateTitle();

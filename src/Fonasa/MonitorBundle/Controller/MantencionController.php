@@ -402,8 +402,25 @@ class MantencionController extends Controller
         $componente= $request->query->get('componente');
         $anio= $request->query->get('anio');
         $mes= $request->query->get('mes');
-        $estado= $request->query->get('estado');        
-        //////////////////                
+        $estado= $request->query->get('estado');   
+        $resetFiltros = $request->query->get('resetFiltros');  
+        //////////////////           
+        
+        //Setear filtros en la sesion        
+        // Si se estan reseteando los filtros limpiar las variables de la sesion
+        if($resetFiltros){
+            $this->get('session')->set('filtroComponente',null);        
+            $this->get('session')->set('filtroAnio',null);
+            $this->get('session')->set('filtroMes',null);
+            $this->get('session')->set('filtroEstado',null);        
+        }
+        else{
+            $this->get('session')->set('filtroComponente',$componente);        
+            $this->get('session')->set('filtroAnio',$anio);
+            $this->get('session')->set('filtroMes',$mes);
+            $this->get('session')->set('filtroEstado',$estado);        
+        }
+        ////////////////////////////        
         
         $em = $this->getDoctrine()->getManager();                
         
@@ -418,20 +435,29 @@ class MantencionController extends Controller
                 //->join('i.severidad', 'o')
                 ->join('m.estadoMantencion', 'em')                                                
                 ->where('YEAR(m.fechaIngreso) = ?1')
-                ->andWhere('MONTH(m.fechaIngreso) = ?2')
-                ->andWhere('c.id = ?3')
-                ->andWhere('e.nombre in (?4)');
+                ->andWhere('MONTH(m.fechaIngreso) = ?2');                
         
         $parameters[1] = $anio;
         
         $parameters[2] = $mes;
         
-        $parameters[3] = $componente;
+        if($componente != -1){
+            $qb->andWhere('c.id = ?3');
+            $parameters[3] = $componente;
+        }
         
-        if($estado == 1)
-            $parameters[4]=['En Cola','En Desarrollo','En Testing'];
-        else
-            $parameters[4]=['Cerrada'];
+        if($estado != -1){
+            $qb->andWhere('e.nombre in (?4)');                
+        }
+        
+        switch($estado){
+            case 1:
+                $parameters[4]=['En Cola','En Desarrollo','En Certificación','En Testing'];
+                break;
+            case 2:
+                $parameters[4]=['Cerrada'];
+                break;
+        } 
     
         if($sSearch != null){            
             $qb->andWhere(
@@ -452,24 +478,22 @@ class MantencionController extends Controller
             
             switch($iSortCol){
                 case '1':
-                    $qb->orderBy('m.codigoInterno', $sSortDir);
+                    $qb->orderBy('m.numeroRequerimiento', $sSortDir);
+                    $qb->addOrderBy('i.numeroTicket', $sSortDir);                     
                     break;
-                case '1':
-                    $qb->orderBy('m.fechaIngreso', $sSortDir);
+                case '2':
+                    $qb->orderBy('m.codigoInterno', $sSortDir);
                     break;                
                 case '2':
+                    $qb->orderBy('m.fechaInicio', $sSortDir);
+                    break;                
+                case '3':
                     $qb->orderBy('m.fechaSalida', $sSortDir);
                     break;
-                case '3':
-                    $qb->orderBy('m.hhEstimadas', $sSortDir);
-                    break;
                 case '4':
-                    $qb->orderBy('m.hhEfectias', $sSortDir);
-                    break;
+                    $qb->orderBy('s.nombre', $sSortDir);
+                    break;                
                 case '5':
-                    $qb->orderBy('c.nombre', $sSortDir);
-                    break;
-                case '6':
                     $qb->orderBy('e.nombre', $sSortDir);
                     break;
             }
@@ -482,16 +506,20 @@ class MantencionController extends Controller
         $estados = $em->getRepository('MonitorBundle:EstadoMantencion')
                 ->createQueryBuilder('e')                                
                 ->where('e.nombre in (?1)')
-                ->setParameter(1, ['En Cola','En Desarrollo','En Testing','Cerrada'])
+                ->setParameter(1, ['En Cola','En Desarrollo','En Testing','En Certificación','Cerrada'])
                 ->getQuery()
                 ->getResult();                                          
         
-        $body = array();                      
+        $body = array();        
+        
+        $hayPaP = false;
         
         foreach($mantenciones as $key => $mantencion){                                                
             
-            if($key < $iDisplayStart || $key >= $iDisplayStart+$iDisplayLength)
-                continue;
+            if($iDisplayLength != -1){
+                if($key < $iDisplayStart || $key >= $iDisplayStart+$iDisplayLength)
+                    continue;
+            }
             
             $fila = array();  
             
@@ -512,7 +540,22 @@ class MantencionController extends Controller
             array_push($fila,$html);                                                
             
             array_push($fila,$mantencion->getIncidencia()==null?'Req'.$mantencion->getNumeroRequerimiento():'Ticket'.$mantencion->getIncidencia()->getNumeroTicket());            
-            array_push($fila,$mantencion->getTipoMantencion()->getNombre()=='Mantención Evolutiva'?'SIGG-ME'.$mantencion->getCodigoInterno():'SIGG-MC'.$mantencion->getCodigoInterno());
+            $prefix;
+            switch ($mantencion->getComponente()->getNombre()){
+                case 'SIGGES':
+                    $prefix='SIGG';
+                    break;
+                case 'GGPF':
+                    $prefix='GGPF';
+                    break;                
+                case 'PM':  
+                    $prefix='PM';
+                    break;                
+                case 'BGI / DataWareHouse':
+                    $prefix='DWH';
+                    break;                
+            }
+            array_push($fila,$mantencion->getTipoMantencion()->getNombre()=='Mantención Evolutiva'?$prefix.'-ME'.$mantencion->getCodigoInterno():$prefix.'-MC'.$mantencion->getCodigoInterno());
             array_push($fila,$mantencion->getFechaInicio()==null?'-':$mantencion->getFechaInicio()->format('d/m/Y H:i'));
             //array_push($fila,$servicio->getComponente()->getNombre());
             array_push($fila,$mantencion->getFechaSalida()==null?'-':$mantencion->getFechaSalida()->format('d/m/Y H:i'));
@@ -575,6 +618,9 @@ class MantencionController extends Controller
             
             array_push($fila,$html);
             
+            if($mantencion->getEstadoMantencion()->getNombre()=='En Certificación')
+                $hayPaP=true;
+            
             /*
             switch($incidencia->getEstadoIncidencia()->getNombre()){
 
@@ -603,12 +649,21 @@ class MantencionController extends Controller
             
             array_push($body, $fila);            
         }
+        
+        $pap = null;
+            
+        if($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')){
+            if($hayPaP)
+                $pap = '<a id="cerrar" href="'.$this->generateUrl('mantencion_cerrar', array('componente' => 'null_1', 'mes' => 'null_2', 'anio' => 'null_3')).'" role="button" class="btn btn-link">Cerrar Mantenciones en Certificación</button>';
+                //$html= '<a href="'.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre(), 'observacion' => 'null')).'">'.$estado->getNombre().'</a></li>';                                        
+        }        
                 
         $output= array(
           'sEcho' => intval($request->request->get('sEcho')),
           'iTotalRecords' => sizeof($mantenciones),
           'iTotalDisplayRecords' => sizeof($mantenciones),  
-          'aaData' => $body          
+          'aaData' => $body,
+          'pap' => $pap
         );
         
         return new JsonResponse($output);
@@ -692,12 +747,97 @@ class MantencionController extends Controller
         $em = $this->getDoctrine()->getManager();
         $em->persist($historial);
         $em->flush();
+        
+        if($mantencion[0]->getIncidencia() == null ){
+            $this->addFlash(
+            'notice',
+            'La mantencion asociada al n°Requerimiento:'.$mantencion[0]->getNumeroRequerimiento().' ha cambiado al estado '.$estado[0]->getNombre().'.'
+            );              
+        }       
+        else{
+            $this->addFlash(
+            'notice',
+            'La mantencion asociada al n°Ticket:'.$mantencion[0]->getIncidencia()->getNumeroTicket().' ha cambiado al estado '.$estado[0]->getNombre().'.'
+            );              
+        }
+                                        
+        return $this->redirectToRoute('mantencion_index');
+    } 
+    
+    /**
+     * Displays a form to edit an existing Servicio entity.
+     *
+     */
+    public function cerrarAction($componente, $mes, $anio)
+    {                                           
+        
+        $em = $this->getDoctrine()->getManager();
+        
+        $fechaTerminado=new\DateTime('now');      
+        
+        $parameters = array();                
+
+        $qb = $em->getRepository('MonitorBundle:Mantencion')
+                ->createQueryBuilder('m')                
+                //->join('i.severidad', 'o')
+                ->join('m.componente', 'c')                                                                
+                ->join('m.estadoMantencion', 'em')                                                                
+                ->where('em.nombre in (?1)');
+        
+        $parameters[1] = 'En Certificación';                                                
+    
+        if($componente != -1){            
+            $qb->andWhere('c.id = ?2');                                                           
+            $parameters[2] = $componente;
+        }   
+        
+        $qb->andWhere('MONTH(m.fechaIngreso) = ?3');                
+        $parameters[3] = $mes;
+        
+        $qb->andWhere('YEAR(m.fechaIngreso) = ?4');                
+        $parameters[4] = $anio;                
+                
+        $mantenciones= $qb->setParameters($parameters)
+                         ->getQuery()
+                         ->getResult();                                          
+                
+        $estado= $em->getRepository('MonitorBundle:EstadoMantencion')
+            ->createQueryBuilder('e')                                
+            ->where('e.nombre = ?1')
+            ->setParameter(1, 'Cerrada')
+            ->getQuery()
+            ->getResult();        
+        
+        foreach($mantenciones as $mantencion){
+            $mantencion->setEstadoMantencion($estado[0]);
+            $mantencion->setIdEstadoMantencion($estado[0]->getId());                
+            $mantencion->setFechaSalida($fechaTerminado);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($mantencion);
+            $em->flush();
+
+            // Guardar el historial del cambio de estado               
+            $fechaInicio=new\DateTime('now');            
+            $historial = new HistorialMantencion();
+
+            $historial->setMantencion($mantencion);                     
+            $historial->setIdMantencion($mantencion->getId());
+            $historial->setEstadoMantencion($estado[0]);
+            $historial->setIdEstadoMantencion($estado[0]->getId());            
+            $historial->setInicio($fechaInicio);                   
+
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($historial);
+            $em->flush();    
+        }        
  
         $this->addFlash(
             'notice',
-            'La mantencion asociada al n°Requerimiento:'.$mantencion[0]->getNumeroRequerimiento().' ha cambiado al estado '.$estado[0]->getNombre().'.'
+            'Todas las mantenciones en certificación han sido cerradas.| Estas pueden ser visualizadas mediante el filtro resueltas en el panel principal.'
         );   
-                                        
+                
+        //return $this->render('MonitorBundle:servicio:index.html.twig');                         
         return $this->redirectToRoute('mantencion_index');
-    }    
+    }            
 }

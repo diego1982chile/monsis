@@ -16,9 +16,9 @@
         </div>                
         {{ form_row(edit_form.descripcion) }}
         {{ form_row(edit_form.severidad) }}        
-        <input type="submit" value="Editar" style="display:none" class="btn btn-primary" />        
-        <button id="validate_form" class="btn btn-primary" type="button">Modificar</button>        
-        <button id="delete" class="btn btn-warning" type="button" style="float:right">Eliminar</button>
+        <input type="submit" value="Editar" style="display:none" class="btn btn-primary active" />        
+        <button id="validate_form" class="btn btn-primary active" type="button">Modificar</button>        
+        <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>
     {{ form_end(edit_form) }}
     </div>
     <br>
@@ -34,7 +34,7 @@
     </ul>
     <div class="form" style="width:60%;display:none">
         {{ form_start(delete_form) }}
-            <input type="submit" style="display:none" value="Eliminar" class="btn btn-warning">                
+            <input type="submit" style="display:none" value="Eliminar" class="btn btn-warning active">                
         {{ form_end(delete_form) }}
     </div>          
 {% endblock %}

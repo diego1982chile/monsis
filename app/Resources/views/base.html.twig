@@ -19,6 +19,7 @@
     <!-- Jquery-ui core CSS -->    
     <link href="{{ asset('bundles/monsis/css/jquery.qtip.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/jquery.dataTables.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/monsis/css/buttons.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/dataTables.bootstrap.css') }}" rel="stylesheet">  
     <link href="{{ asset('bundles/monsis/css/circle.css') }}" rel="stylesheet">        
     <link href="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">        
@@ -259,6 +260,22 @@
             .checkbox label{                               
                 padding: 0px !important;                
             }
+            
+            /*
+            .dataTables_info{
+                clear: none !important;
+                padding-top: 4px !important;                
+                margin-right: 3% !important;
+                margin-left: 3% !important;
+            }
+            */
+            
+            .dataTables_paginate{
+                padding-top: 0px !important;
+                margin-top: 0px !important;
+                float: right !important;
+            }
+            
         </style>
   </head>
 
@@ -308,7 +325,7 @@
             <div id="sidebar" class="col-md-2 sidebar">
                 <ul class="nav nav-sidebar">                                
                     <h3>
-                        <li class="nav-header">FILTROS</li>
+                        <li class="nav-header">Filtros</li>
                     </h3>
                     <li id="content">
                         {% block filtro %}
@@ -328,12 +345,19 @@
     <script src="{{ asset('bundles/monsis/js/jquery-1.12.1.min.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/monsis/js/datepicker-es.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/datepicker-es.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/jquery.qtip.min.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/imagesloaded.pkg.min.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/dataTables.jqueryui.min.js') }}"></script>
-    <script src="{{ asset('bundles/monsis/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/dataTables.bootstrap.min.js') }}"></script>    
+    <script src="{{ asset('bundles/monsis/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/buttons.flash.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/jszip.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/pdfmake.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/vfs_fonts.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/buttons.html5.min.js') }}"></script>
+    <script src="{{ asset('bundles/monsis/js/buttons.print.min.js') }}"></script>        
     <script src="{{ asset('bundles/monsis/js/highcharts.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/highcharts-3d.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/modules/exporting.js') }}"></script>

@@ -55,9 +55,21 @@ class ControllerListener
                 break;            
             case 'incidencia':
                 $this->session->set('active', 'incidencia_index');
+                /*
+                $this->session->set('filtroComponente',null);        
+                $this->session->set('filtroAnio',null);
+                $this->session->set('filtroMes',null);
+                $this->session->set('filtroEstado',null);                 
+                 */
                 break;            
             case 'mantencion':                
                 $this->session->set('active', 'mantencion_index');
+                /*
+                $this->session->set('filtroComponente',null);        
+                $this->session->set('filtroAnio',null);
+                $this->session->set('filtroMes',null);
+                $this->session->set('filtroEstado',null);                  
+                 */
                 break;            
         }
         

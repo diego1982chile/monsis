@@ -113,8 +113,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->flush();                                               
         
         $estadoMantencion5 = new EstadoMantencion();              
-        $estadoMantencion5->setNombre("PaP");
-        $estadoMantencion5->setDescripcion("Pendiente PaP");                
+        $estadoMantencion5->setNombre("En Certificación");
+        $estadoMantencion5->setDescripcion("En Certificación");                
         
         $manager->persist($estadoMantencion5);
         $manager->flush();  
@@ -441,11 +441,13 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance1->setComponente($componente1);
         $tipoAlcance1->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[0]=$tipoAlcance1;
+        //$categoriasIncidenciasSigges[0]=$tipoAlcance1;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance1); 
         
         $manager->persist($tipoAlcance1);
         $manager->flush();                         
         
+        /*
         $tipoAlcance2 = new CategoriaIncidencia();   
         $tipoAlcance2->setNombre("Solicitud Clave");
         $tipoAlcance2->setDescripcion("Solicitud Clave");                
@@ -455,7 +457,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $categoriasIncidenciasSigges[1]=$tipoAlcance2;
         
         $manager->persist($tipoAlcance2);
-        $manager->flush();                          
+        $manager->flush();            
+        */
         
         $tipoAlcance3 = new CategoriaIncidencia();   
         $tipoAlcance3->setNombre("Actualizar Prevision");
@@ -463,7 +466,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance3->setComponente($componente1);
         $tipoAlcance3->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[2]=$tipoAlcance3;
+        //$categoriasIncidenciasSigges[2]=$tipoAlcance3;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance3); 
         
         $manager->persist($tipoAlcance3);
         $manager->flush();                                  
@@ -474,7 +478,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance4->setComponente($componente1);
         $tipoAlcance4->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[3]=$tipoAlcance4;
+        //$categoriasIncidenciasSigges[3]=$tipoAlcance4;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance4); 
         
         $manager->persist($tipoAlcance4);
         $manager->flush();                          
@@ -485,7 +490,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance5->setComponente($componente1);
         $tipoAlcance5->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[4]=$tipoAlcance5;
+        //$categoriasIncidenciasSigges[4]=$tipoAlcance5;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance5); 
         
         $manager->persist($tipoAlcance5);
         $manager->flush();                                  
@@ -496,7 +502,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance6->setComponente($componente1);
         $tipoAlcance6->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[5]=$tipoAlcance6;
+        //$categoriasIncidenciasSigges[5]=$tipoAlcance6;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance6); 
        
         $manager->persist($tipoAlcance6);
         $manager->flush();                          
@@ -507,7 +514,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance7->setComponente($componente1);
         $tipoAlcance7->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[6]=$tipoAlcance7;
+        //$categoriasIncidenciasSigges[6]=$tipoAlcance7;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance7); 
         
         $manager->persist($tipoAlcance7);
         $manager->flush();                                  
@@ -518,7 +526,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance8->setComponente($componente1);
         $tipoAlcance8->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[7]=$tipoAlcance8;
+        //$categoriasIncidenciasSigges[7]=$tipoAlcance8;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance8); 
         
         $manager->persist($tipoAlcance8);
         $manager->flush();                          
@@ -529,7 +538,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance9->setComponente($componente1);
         $tipoAlcance9->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[8]=$tipoAlcance9;
+        //$categoriasIncidenciasSigges[8]=$tipoAlcance9;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance9); 
         
         $manager->persist($tipoAlcance9);
         $manager->flush();                                          
@@ -540,7 +550,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance10->setComponente($componente1);
         $tipoAlcance10->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[9]=$tipoAlcance10;
+        //$categoriasIncidenciasSigges[9]=$tipoAlcance10;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance10); 
         
         $manager->persist($tipoAlcance10);
         $manager->flush();        
@@ -551,7 +562,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance11->setComponente($componente1);
         $tipoAlcance11->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[10]=$tipoAlcance11;
+        //$categoriasIncidenciasSigges[10]=$tipoAlcance11;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance11); 
         
         $manager->persist($tipoAlcance11);
         $manager->flush();      
@@ -562,7 +574,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance12->setComponente($componente1);
         $tipoAlcance12->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[11]=$tipoAlcance12;
+        //$categoriasIncidenciasSigges[11]=$tipoAlcance12;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance12); 
         
         $manager->persist($tipoAlcance12);
         $manager->flush();           
@@ -573,7 +586,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance13->setComponente($componente1);
         $tipoAlcance13->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[12]=$tipoAlcance13;
+        //$categoriasIncidenciasSigges[12]=$tipoAlcance13;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance13); 
         
         $manager->persist($tipoAlcance13);
         $manager->flush();       
@@ -584,7 +598,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance14->setComponente($componente1);
         $tipoAlcance14->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[13]=$tipoAlcance14;
+        //$categoriasIncidenciasSigges[13]=$tipoAlcance14;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance14); 
         
         $manager->persist($tipoAlcance14);
         $manager->flush();              
@@ -595,7 +610,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance15->setComponente($componente1);
         $tipoAlcance15->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[14]=$tipoAlcance15;
+        //$categoriasIncidenciasSigges[14]=$tipoAlcance15;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance15); 
         
         $manager->persist($tipoAlcance15);
         $manager->flush();          
@@ -606,7 +622,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance16->setComponente($componente1);
         $tipoAlcance16->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[15]=$tipoAlcance16;
+        //$categoriasIncidenciasSigges[15]=$tipoAlcance16;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance16); 
         
         $manager->persist($tipoAlcance16);
         $manager->flush(); 
@@ -617,7 +634,8 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoAlcance17->setComponente($componente1);
         $tipoAlcance17->setIdComponente($componente1->getId());
         
-        $categoriasIncidenciasSigges[16]=$tipoAlcance17;
+        //$categoriasIncidenciasSigges[16]=$tipoAlcance17;
+        array_push($categoriasIncidenciasSigges,$tipoAlcance17); 
         
         $manager->persist($tipoAlcance17);
         $manager->flush();         
@@ -1314,7 +1332,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         $manager->flush();                    
         
         //------------------------------POBLAR INCIDENCIAS-----------------------------------------------
-        /*
+        
         $descripcionesIncidencia=[
             'Crear a un nuevo Medico en sistema',
             'Ticket con problemas enfocados en el cumplimientos de garantías',
@@ -1413,7 +1431,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         }
         
         
-        $estadosMantencion=[$estadoMantencion1 ,$estadoMantencion2, $estadoMantencion3, $estadoMantencion6];        
+        $estadosMantencion=[$estadoMantencion1 ,$estadoMantencion2, $estadoMantencion3, $estadoMantencion5, $estadoMantencion6];        
         
         $connection->exec("ALTER TABLE mantencion AUTO_INCREMENT = 1;");       
             
@@ -1476,7 +1494,7 @@ class LoadFixtures extends Controller implements FixtureInterface
             $manager->persist($mantencion);
             $manager->flush();    
         }
-        */
+        
     }        
 }
 

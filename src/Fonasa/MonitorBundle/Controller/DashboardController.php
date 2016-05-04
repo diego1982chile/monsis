@@ -154,7 +154,7 @@ class DashboardController extends Controller
         $categories2 = $categories1;
         
         // Categorias
-        array_unshift($categories2, 'Todos');
+        //array_unshift($categories2, 'Todos');
         
         // Obtener datos Todos
         $qb = $em->getRepository('MonitorBundle:Incidencia')                
@@ -232,7 +232,7 @@ class DashboardController extends Controller
         // Obtener mantenciones del mes                 
         $qb = $em->getRepository('MonitorBundle:Mantencion')                
                 ->createQueryBuilder('m')                
-                ->select('tm.nombre as tipo, m.codigoInterno as nombre, m.hhEstimadas as hhEstimadas, m.hhEfectivas as hhReales')                                
+                ->select('c.nombre as componente, tm.nombre as tipo, m.codigoInterno as nombre, m.hhEstimadas as hhEstimadas, m.hhEfectivas as hhReales')                                
                 ->join('m.estadoMantencion', 'e')
                 ->join('m.componente', 'c')
                 //->join('m.severidad', 's')
@@ -254,7 +254,22 @@ class DashboardController extends Controller
         $mantenciones_ = array();
         
         foreach($mantenciones as $mantencion){
-            $tipo=$mantencion['tipo']=='Mantención Evolutiva'?'SIGG-ME':'SIGG-MC';
+            $prefix;
+            switch ($mantencion['componente']){
+                case 'SIGGES':
+                    $prefix='SIGG';
+                    break;
+                case 'GGPF':
+                    $prefix='GGPF';
+                    break;                
+                case 'PM':  
+                    $prefix='PM';
+                    break;                
+                case 'BGI / DataWareHouse':
+                    $prefix='DWH';
+                    break;                
+            }
+            $tipo=$mantencion['tipo']=='Mantención Evolutiva'?$prefix.'-ME':$prefix.'-MC';
             $mantenciones_[$tipo.$mantencion['nombre']]=[$mantencion['hhEstimadas'],$mantencion['hhReales']];                                        
         }
                         
@@ -280,7 +295,7 @@ class DashboardController extends Controller
         $estados = $em->getRepository('MonitorBundle:EstadoMantencion')
         ->createQueryBuilder('e')                                
         ->where('e.nombre in (?1)')
-        ->setParameter(1, ['En Desarrollo','En Testing','Cerrada'])
+        ->setParameter(1, ['En Desarrollo','En Testing','En Certificación','Cerrada'])
         ->getQuery()
         ->getResult();   
         
@@ -320,7 +335,7 @@ class DashboardController extends Controller
         
         $parameters[1] = ['Mantención Correctiva','Mantención Evolutiva'];        
         
-        $parameters[2] = ['En Desarrollo','En Testing','Cerrada'];                
+        $parameters[2] = ['En Desarrollo','En Testing','En Certificación','Cerrada'];                
                         
         $mantenciones= $qb->setParameters($parameters)
                     ->getQuery()    

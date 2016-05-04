@@ -48,9 +48,9 @@
         {% if edit_form.fechaInicio is defined %}
             {{ form_row(edit_form.fechaInicio) }}        
         {% endif %}
-        <input type="submit" value="Editar" class="btn btn-primary" style="display:none" />
-        <button id="validate_form" class="btn btn-primary" type="button">Modificar</button>
-        <button id="delete" class="btn btn-warning" type="button" style="float:right">Eliminar</button>
+        <input type="submit" value="Editar" class="btn btn-primary active" style="display:none" />
+        <button id="validate_form" class="btn btn-primary active" type="button">Modificar</button>
+        <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>
     {{ form_end(edit_form) }}
     </div>
     <ul>
@@ -59,7 +59,7 @@
         </li>                
     </ul>
     {{ form_start(delete_form) }}
-        <input type="submit" style="display:none" value="Eliminar" class="btn btn-warning">                
+        <input type="submit" style="display:none" value="Eliminar" class="btn btn-warning active">                
     {{ form_end(delete_form) }}                    
 {% endblock %}
 
@@ -330,7 +330,14 @@ $validateForm.click(function(){
     }
     
     // Si se pasan las validaciones por campos incompletos, se valida formato y duplicados de campos especificos    
-    validarNumeroReq();        
+    switch($origenMantencion.find(':selected').text()){
+        case 'Requerimiento':
+            validarNumeroReq();
+            break;
+        case 'Incidencia':
+            validarNumeroMantencion();
+            break;
+    }  
 });
 
 $deleteForm.click(function(){

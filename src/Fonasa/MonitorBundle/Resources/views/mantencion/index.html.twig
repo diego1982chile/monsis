@@ -7,9 +7,21 @@
     <ul class="nav navbar-nav"> 
         <li class="divider-vertical"></li>
         <li class="active"> 
-            <form id="filtros" action="" method="post">                 
-                {{ form(GlobalFilters) }}                                                                                                                    
-            </form>
+            <form id="filtros" action="" method="post" style="display:none">   
+                {{ form_start(GlobalFilters) }}        
+                {{ form_errors(GlobalFilters) }}         
+                {{ form_row(GlobalFilters.Componente) }}         
+                {{ form_row(GlobalFilters.Estado) }}         
+                {{ form_row(GlobalFilters.Mes) }}            
+                {{ form_row(GlobalFilters.Anio) }} 
+                <div class="form-group">        
+                    {{ form_label(GlobalFilters.Reset) }}         
+                    <label id="form_Reset" class="btn btn-warning active form-control">                
+                        {{ form_widget(GlobalFilters.Reset) }}        
+                    </label>             
+                </div>
+                {{ form_end(GlobalFilters) }}                        
+            </form>  
         </li>
         <li class="divider-vertical"></li>                    
     </ul>                 
@@ -34,8 +46,8 @@
         </div>
     </div>                    
     {% endfor %}
-    <h1 id="title"></h1>
-
+    <h2 id="title"></h2>
+    <br>
     <table id="mantenciones" class="display table-striped" style="display:none" width="100%">
         <thead>
             <tr>
@@ -54,9 +66,11 @@
     {% if is_granted("ROLE_ADMIN") %}
     <ul>
         <li>
-            <a href="{{ path('mantencion_new') }}">Create a new entry</a>
-        </li>
-    </ul>
+            <a href="{{ path('mantencion_new') }}">Nueva Mantención</a>
+            <div class="toolbar" style="float:right">
+            </div>
+        </li>        
+    </ul>    
     {% endif %}
 {% endblock %}
 {% block javascripts %}
@@ -64,7 +78,23 @@
     var $anio = $('#form_Anio');
     var $mes = $('#form_Mes');
     var $estado = $('#form_Estado');
-    var $componente = $('#form_componente');
+    var $componente = $('#form_Componente');
+    var $resetFiltros = $('#form_Reset');
+    
+    var loader = new Image();
+    loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+    loader.className = 'loader';
+
+    var reset = new Image();
+    reset.src = '{{ asset('bundles/monsis/images/reset_1.png') }}';
+    reset.className = 'save';
+    
+    $resetFiltros.children(':eq(0)').append(reset);
+    
+    $( window ).load(function() {
+        $('#filtros').show();
+    });
+    
     
     function updateTitle(){
         $('#title').html("Mantenciones "+
@@ -84,6 +114,7 @@
             bPagination: true,                        
             //"pagingType": "full_numbers",
             iDisplayLength: 4,
+            lengthMenu: [[4, 25, 50, -1], [4, 25, 50, "Todos"]],
             bJQueryUI: false,
             bServerSide: true,
             sAjaxSource: '{{ path('mantencion_body') }}',
@@ -100,8 +131,20 @@
                     class: 'cols'                
                     }                             
                 ],            
-            order: [[ 1, 'asc' ]],                        
-            dom: 'frtip<"toolbar">',
+            order: [[ 1, 'desc' ]],                                    
+            dom: 'Blfrtip',                         
+            buttons: [
+                //'copy', 'csv', 'excel', 'pdf', 'print'
+                'excel'
+            ],
+            language: {
+                lengthMenu: " _MENU_ registros por página",
+                //zeroRecords: "Nothing found - sorry",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "No records available",
+                infoFiltered: "(filtered from _MAX_ total records)",
+                sSearch: "Buscar:"
+            },                     
             fnDrawCallback: function( oSettings ) {
                 $('#mantenciones th').removeClass('ui-state-default');                                                                 
                 $('.dataTables_paginate').removeClass('ui-buttonset');                  
@@ -113,6 +156,7 @@
                         aoData.push( { "name": "mes", "value": $mes.val() } );
                         aoData.push( { "name": "estado", "value": $estado.val() } );
                         aoData.push( { "name": "componente", "value": $componente.val() } );
+                        aoData.push( { "name": "resetFiltros", "value": $resetFiltros.find(':checked').val() } );
                         
 			$.getJSON( sSource, aoData, function (json) { 
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                
@@ -142,33 +186,71 @@
                                 else
                                     return true;
                             });
+                            
+                            $('div.toolbar').html(json.pap);
+                            
+                            /*
+                            $( "a.estados" ).on( "click", function(e) {                                                                                                                                   
+                                if($(this).text()=='Cerrada'){
+                                    alert('No se puede');
+                                    return false;
+                                }
+                                else
+                                    return true;
+                            });     
+                            */
+                            
+                            $("#cerrar").on( "click", function(e) {                                  
+                                $(this).attr('href',$(this).attr('href').replace('null_1',$componente.val()));      
+                                $(this).attr('href',$(this).attr('href').replace('null_2',$mes.val()));      
+                                $(this).attr('href',$(this).attr('href').replace('null_3',$anio.val()));                                      
+                                //window.location=$(this).attr('href');                                 
+                                return true;
+                            }); 
 			});
+                        
+                        if($resetFiltros.find(':checked').val()){                                                                    
+                                //$(loader).parent().children(':eq(1)').replaceWith(reset);    
+                                //$resetFiltros.attr('disabled',false);
+                                location.reload();  
+                        }       
             }                    
-        });        
+        });   
         
-        $anio.change(function() {
-            updateTitle();
-            oTable.fnDraw();            
-        });
-        
-        $mes.change(function() {
-            updateTitle();
-            oTable.fnDraw();            
-        });
-        
-        $estado.change(function() {
-            updateTitle();
-            oTable.fnDraw();            
-        });
-        
-        $componente.change(function() {
-            updateTitle();
-            oTable.fnDraw();            
-        });
-        
-        setInterval( function () {
-            oTable.fnDraw(false);
-        }, 30000 );
+    oTable.on( 'buttons-action', function ( e, buttonApi, dataTable, node, config ) {
+        console.log( 'Button '+buttonApi.text()+' was activated' );
+    } );
+
+    $anio.change(function() {
+        updateTitle();
+        oTable.fnDraw();            
+    });
+
+    $mes.change(function() {
+        updateTitle();
+        oTable.fnDraw();            
+    });
+
+    $estado.change(function() {
+        updateTitle();
+        oTable.fnDraw();            
+    });
+
+    $componente.change(function() {
+        updateTitle();
+        oTable.fnDraw();            
+    });
+
+    $resetFiltros.click(function() {
+        $(reset).parent().children(':eq(1)').replaceWith(loader);    
+        $(this).attr('disabled',true);            
+        updateTitle();
+        oTable.fnDraw();            
+    });        
+
+    setInterval( function () {
+        oTable.fnDraw(false);
+    }, 30000 );
     
 </script>
 {% endblock %}

@@ -46,8 +46,8 @@
         {% if form.fechaInicio is defined %}
             {{ form_row(form.fechaInicio) }}        
         {% endif %}
-        <input type="submit" class='btn btn-primary' style="display:none" value="Create" />
-        <button id="validate_form" class="btn btn-primary" type="button">Grabar</button>
+        <input type="submit" class='btn btn-primary active' style="display:none" value="Create" />
+        <button id="validate_form" class="btn btn-primary active" type="button">Grabar</button>
     {{ form_end(form) }}
     </div>    
     <ul>
@@ -77,6 +77,8 @@ var $validar= $('#validar');
 var $inicioProgramado = $('#form_inicioProgramado');
 
 var $tipoMantencion = $('#form_tipoMantencion');
+
+var $origenMantencion = $('#mantencion_origenMantencion');
 
 $validateForm=$('#validate_form');
 
@@ -158,8 +160,8 @@ $componente.change(function() {
 
 function validarNumeroReq(){
     var data = {};
-    data['numeroRequerimiento'] = $numeroReq.val(); 
-    data['id'] = $('#mantencion_id').val();
+    data['numeroRequerimiento'] = $numeroReq.val();     
+    data['id'] = $('#mantencion_id').val();    
 
     $.post("{{ path('mantencion_check') }}",data,function(data){
         if(data.error){          
@@ -309,7 +311,14 @@ $validateForm.click(function(){
     }
     
     // Si se pasan las validaciones por campos incompletos, se valida formato y duplicados de campos especificos    
-    validarNumeroReq();
+    switch($origenMantencion.find(':selected').text()){
+        case 'Requerimiento':
+            validarNumeroReq();
+            break;
+        case 'Incidencia':
+            validarNumeroMantencion();
+            break;
+    }                
         
 });
 

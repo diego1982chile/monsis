@@ -366,7 +366,7 @@ class IncidenciaController extends Controller
             $this->get('session')->set('filtroMes',null);
             $this->get('session')->set('filtroEstado',null);        
         }
-        else{
+        else{            
             $this->get('session')->set('filtroComponente',$componente);        
             $this->get('session')->set('filtroAnio',$anio);
             $this->get('session')->set('filtroMes',$mes);
@@ -385,20 +385,29 @@ class IncidenciaController extends Controller
                 ->join('i.severidad', 's')
                 ->join('i.estadoIncidencia', 'e')                                                
                 ->where('YEAR(i.fechaInicio) = ?1')
-                ->andWhere('MONTH(i.fechaInicio) = ?2')
-                ->andWhere('c.id = ?3')
-                ->andWhere('e.nombre in (?4)');
+                ->andWhere('MONTH(i.fechaInicio) = ?2');
         
         $parameters[1] = $anio;
         
         $parameters[2] = $mes;
+                
+        if($componente != -1){
+            $qb->andWhere('c.id = ?3');
+            $parameters[3] = $componente;
+        }
         
-        $parameters[3] = $componente;
-        
-        if($estado == 1)
-            $parameters[4]=[/*'En Cola',*/'En Gestión FONASA','Pendiente MT'];
-        else
-            $parameters[4]=['Resuelta MT'];
+        if($estado != -1){
+            $qb->andWhere('e.nombre in (?4)');                
+        }
+                        
+        switch($estado){
+            case 1:
+                $parameters[4]=[/*'En Cola',*/'En Gestión FONASA','Pendiente MT'];
+                break;
+            case 2:
+                $parameters[4]=['Resuelta MT'];
+                break;
+        }                            
                     
         if($sSearch != null){            
             $qb->andWhere(
@@ -448,9 +457,11 @@ class IncidenciaController extends Controller
         $body = array();                                      
         
         foreach($incidencias as $key=>$incidencia){                        
-            
-            if($key < $iDisplayStart || $key >= $iDisplayStart+$iDisplayLength)
-                continue;
+                        
+            if($iDisplayLength != -1){
+                if($key < $iDisplayStart || $key >= $iDisplayStart+$iDisplayLength)
+                    continue;
+            }
             
             $fila = array();  
             

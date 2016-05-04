@@ -106,7 +106,12 @@ mantencion_check3:
 mantencion_status:    
     path:   /mantencion/{id}/{status}/{usuario}/status
     defaults: { _controller: "MonitorBundle:Mantencion:status" }
-    methods:  [GET,POST]    
+    methods:  [GET,POST]      
+
+mantencion_cerrar:    
+    path:   /mantencion/{componente}/{mes}/{anio}/cerrar
+    defaults: { _controller: "MonitorBundle:Mantencion:cerrar" }
+    methods:  [GET,POST]      
     
 dashboard_index:
     path:  /dashboard

@@ -8,6 +8,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+use Fonasa\MonitorBundle\Entity\Componente;
+
 use Doctrine\ORM\EntityManager;
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -56,25 +58,49 @@ class FiltersHelper {
         
         $estados = array(            
                     'Activas' => 1,
-                    'Resueltas' => 2                    
-        );                
+                    'Resueltas' => 2,
+                    'Todas' => -1
+        );  
+        
+        $componentes = $this->em->getRepository('MonitorBundle:Componente')
+        ->createQueryBuilder('c')                                        
+        ->orderBy('c.nombre')
+        ->getQuery()
+        ->getResult(); 
+        
+        foreach($componentes as $componente){
+            $choices_componente[$componente->getNombre()]= $componente->getId();
+        }
+        
+        $choices_componente['Todos']= -1;
+          
+        /*
+        $componente = new Componente();
+        $componente->setId(4);
+        $componente->setNombre('Todos');
+        
+        array_push($componentes,$componente);
+        */
         
         return $form_filtros = $this->formFactory->createBuilder()
-            ->add('Componente', EntityType::class, array(
-                  'class' => 'MonitorBundle:Componente',
-                  'choice_label' => 'nombre',                   
+            ->add('Componente', ChoiceType::class, array(
+                  //'class' => 'MonitorBundle:Componente',                    
+                  'choices' => $choices_componente,
+                  //'choice_label' => 'nombre',                   
                   'choice_attr' => function($val, $key, $index) {
                              // adds a class like attending_yes, attending_no, etc                             
-                             //Obtener filtros desde la sesión
+                             //Obtener filtros desde la sesión                             
                              if($this->session->get('filtroComponente') != null){                                                                  
-                                 //echo 'key='.$key;                             
-                                  if($val->getId()==$this->session->get('filtroComponente'))                                      
+                                  //echo $this->session->get('filtroComponente').' ';
+                                  //echo $val.'\n';
+                                  //echo $key;
+                                  if($val==$this->session->get('filtroComponente'))                                      
                                       return ['selected' => true];
                                   else
                                       return ['selected' => false];
                              }                             
                              else{
-                                if($val->getNombre()=='SIGGES')
+                                if($key=='SIGGES')
                                    return ['selected' => true];
                                 else
                                    return ['selected' => false];
