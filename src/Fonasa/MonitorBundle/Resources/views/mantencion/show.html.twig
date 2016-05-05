@@ -75,7 +75,7 @@
                     N°Ticket:
                 </th>
                 <td width="80%">
-                    {{ mantencion.incidencia.numeroTicket }}        
+                    <a href="{{ path('incidencia_show', { 'id': mantencion.incidencia.id }) }}">{{ mantencion.incidencia.numeroTicket }}</a>                        
                 </td>                     
             </tr>
             {% endif %}                        

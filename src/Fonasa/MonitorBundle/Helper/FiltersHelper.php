@@ -90,7 +90,7 @@ class FiltersHelper {
                   'choice_attr' => function($val, $key, $index) {
                              // adds a class like attending_yes, attending_no, etc                             
                              //Obtener filtros desde la sesión                             
-                             if($this->session->get('filtroComponente') != null){                                                                  
+                             if($this->session->get('filtroComponente') != null){                                  
                                   //echo $this->session->get('filtroComponente').' ';
                                   //echo $val.'\n';
                                   //echo $key;

@@ -73,7 +73,7 @@
                 </th>
                 <td width="80%">
                     {% if incidencia.mantenciones|length > 0 %}
-                        {{ incidencia.mantenciones[0].codigoInterno }}
+                        <a href="{{ path('mantencion_show', { 'id': incidencia.mantenciones[0].id }) }}">{{ incidencia.mantenciones[0].codigoInterno }}</a>
                     {% else %}
                         -
                     {% endif %}                          

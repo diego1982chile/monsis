@@ -28,7 +28,7 @@
         </div>    
         {{ form_label(form.codigoInterno) }}
         <div class="form-group input-group">
-            <span class="input-group-addon" id="basic-addon2">SIGG-M?</span>
+            <span class="input-group-addon" id="basic-addon2">-</span>
             {{ form_widget(form.codigoInterno) }}
         </div>                    
         {{ form_row(form.descripcion) }}
@@ -92,6 +92,8 @@ save.className = 'save';
 
 $validateForm.append(save);
 
+var prefix;
+
 $inicioProgramado.change(function() {  
   $inicioProgramado.append(loader);    
   // ... retrieve the corresponding form.
@@ -123,18 +125,36 @@ $prefijoCodigo = $('#basic-addon2');
 $tipoMantencion.change(function() {      
     switch($(this).find(':checked').val()){
         case '1':
-            $prefijoCodigo.html('SIGG-MC');
+            $prefijoCodigo.html(prefix+'-MC');
             break;
         case '2':
-            $prefijoCodigo.html('SIGG-ME');
+            $prefijoCodigo.html(prefix+'-ME');
             break;
     }
 });
 
 var $componente = $('#mantencion_componente');
 // When sport gets selected ...
-$componente.change(function() {
+$componente.change(function() {    
   $('#mantencion_tipoRequerimiento').parent().children(':eq(0)').append(loader);    
+  
+    switch($componente.find(':selected').text()){
+        case 'SIGGES':
+            prefix='SIGG';
+            break;
+        case 'GGPF':
+            prefix='GGPF';
+            break;
+        case 'PM':
+            prefix='PM';
+            break;
+        case 'BGI / DataWareHouse':
+            prefix='DWH';
+            break;      
+    }
+    
+    $prefijoCodigo.html(prefix);
+  
   // ... retrieve the corresponding form.
   var $form = $(this).closest('form');
   // Simulate form data, but only include the selected sport value.
