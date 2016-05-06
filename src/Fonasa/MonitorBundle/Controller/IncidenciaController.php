@@ -61,6 +61,7 @@ class IncidenciaController extends Controller
             //$incidencia->setNumeroTicket($numeroTicket);
             $incidencia->setFechaIngreso($fechaIngreso);
             $incidencia->setHhEfectivas(0);
+            $incidencia->setTocada($fechaIngreso);
             
             switch ($incidencia->getEstadoIncidencia()->getNombre()){
                 case 'En Cola': // Si se deja en cola, la fecha de inicio salida se anulan
@@ -142,6 +143,9 @@ class IncidenciaController extends Controller
         $editForm->handleRequest($request);
                 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
+            
+            $incidencia->setTocada(new\DateTime('now'));
+            
             $em = $this->getDoctrine()->getManager();
             $em->persist($incidencia);
             $em->flush();
@@ -190,6 +194,8 @@ class IncidenciaController extends Controller
 
         $incidencia[0]->setEstadoIncidencia($estado[0]);
         $incidencia[0]->setIdEstadoIncidencia($estado[0]->getId());                
+        
+        $incidencia[0]->setTocada(new\DateTime('now'));                
         
         switch ($status){
             case 'En Cola': // Si se deja en cola, la fecha de inicio salida se anulan
@@ -356,23 +362,7 @@ class IncidenciaController extends Controller
         $mes= $request->query->get('mes');
         $estado= $request->query->get('estado');                
         $resetFiltros = $request->query->get('resetFiltros');                
-        //////////////////                
-        
-        //Setear filtros en la sesion        
-        // Si se estan reseteando los filtros limpiar las variables de la sesion
-        if($resetFiltros){
-            $this->get('session')->set('filtroComponente',null);        
-            $this->get('session')->set('filtroAnio',null);
-            $this->get('session')->set('filtroMes',null);
-            $this->get('session')->set('filtroEstado',null);        
-        }
-        else{            
-            $this->get('session')->set('filtroComponente',$componente);        
-            $this->get('session')->set('filtroAnio',$anio);
-            $this->get('session')->set('filtroMes',$mes);
-            $this->get('session')->set('filtroEstado',$estado);        
-        }
-        ////////////////////////////
+        //////////////////                                
         
         $em = $this->getDoctrine()->getManager();                
         
@@ -425,6 +415,9 @@ class IncidenciaController extends Controller
         if($iSortCol != null){
             
             switch($iSortCol){
+                case '7':
+                    $qb->orderBy('i.tocada', 'DESC');
+                    break;
                 case '1':
                     $qb->orderBy('i.numeroTicket', $sSortDir);
                     break;
@@ -441,7 +434,7 @@ class IncidenciaController extends Controller
                     $qb->orderBy('e.nombre', $sSortDir);
                     break;                
             }
-        }
+        }        
                 
         $incidencias= $qb->setParameters($parameters)
                          ->getQuery()
@@ -550,6 +543,9 @@ class IncidenciaController extends Controller
                 $html=$html.'<li><a href="'.$this->generateUrl('incidencia_edit', array('id' => $incidencia->getId())).'">editar</a></li></ul>';            
             
             array_push($fila,$html);
+            
+            //Se añade campo tocada
+            array_push($fila, $incidencia->getTocada());
             
             array_push($body, $fila);            
         }

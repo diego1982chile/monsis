@@ -51,6 +51,7 @@
                 <th width="8%">Severidad</th>                       
                 <th width="12%">Estado</th>                
                 <th width="4%">Show/Edit</th>                
+                <th width="4%">Tocada</th>         
             </tr>
         </thead>
         <tbody>        
@@ -136,13 +137,18 @@
             sAjaxSource: '{{ path('incidencia_body') }}',            
             sServerMethod: 'GET',
             bProcessing: true,
-            order: [[ 1, 'desc' ]],
+            order: [[ 7, 'desc' ]],
             aoColumnDefs: [
                     {
                     aTargets: [0],
-                    orderable: false,
+                    orderable: false,                    
                     class: 'fillRate'   
-                    },       
+                    },                    
+                    {
+                    aTargets: [7],
+                    visible: false,
+                    searchable: false  
+                    },                              
                     {
                     aTargets: [1,2,3,4,5],
                     class: 'cols'                
@@ -156,16 +162,21 @@
             ],
             language: {
                 lengthMenu: " _MENU_ registros por página",
-                //zeroRecords: "Nothing found - sorry",
+                zeroRecords: "No se encontraron registros",
                 info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                infoEmpty: "No records available",
+                infoEmpty: "No hay registros disponibles",
                 infoFiltered: "(filtered from _MAX_ total records)",
-                sSearch: "Buscar:"
+                sSearch: "Buscar:",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                    sPrevious: "<",
+                    sNext: ">",                    
+                }
             },                    
             fnDrawCallback: function( oSettings ) {
                 $('#incidencias th').removeClass('ui-state-default');                  
                 $('.dataTables_paginate').removeClass('ui-buttonset');                  
-                $('.fg-button').removeClass('ui-state-default');                  
+                $('.fg-button').removeClass('ui-state-default');                       
             },
             fnServerData: function ( sSource, aoData, fnCallback ) {
 			/* Add some extra data to the sender */

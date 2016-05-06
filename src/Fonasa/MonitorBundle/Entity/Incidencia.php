@@ -76,6 +76,13 @@ class Incidencia
      * @ORM\Column(name="fecha_ult_hh", type="datetime", nullable=true)
      */
     private $fechaUltHh;
+    
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="tocada", type="datetime", nullable=true)
+     */
+    private $tocada;
         
     /**
      * @var \Componente
@@ -364,6 +371,30 @@ class Incidencia
     public function getFechaUltHh()
     {
         return $this->fechaUltHh;
+    }
+    
+    /**
+     * Set tocada
+     *
+     * @param \DateTime $tocada
+     *
+     * @return Incidencia
+     */
+    public function setTocada($tocada)
+    {
+        $this->tocada = $tocada;
+
+        return $this;
+    }
+
+    /**
+     * Get tocada
+     *
+     * @return \DateTime
+     */
+    public function getTocada()
+    {
+        return $this->tocada;
     }
     
     /**

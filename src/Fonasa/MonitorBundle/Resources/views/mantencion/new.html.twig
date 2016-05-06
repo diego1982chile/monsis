@@ -9,7 +9,7 @@
         {{ form_row(form.componente) }}
         {% if form.tipoRequerimiento is defined %}
             {{ form_row(form.tipoRequerimiento) }}
-        {% endif %}
+        {% endif %} 
         {% if form.numeroRequerimiento is defined %}
             {{ form_label(form.numeroRequerimiento) }}        
             <div class="form-group input-group">        
@@ -51,9 +51,15 @@
     {{ form_end(form) }}
     </div>    
     <ul>
+        {% if form.tipoRequerimiento is defined %}
         <li>
             <a href="{{ path('mantencion_index') }}">Volver</a>
         </li>
+        {% else %}
+        <li>
+            <a href="{{ path('incidencia_index') }}">Volver</a>
+        </li>
+        {% endif %}
     </ul>
 {% endblock %}
 
@@ -93,6 +99,33 @@ save.className = 'save';
 $validateForm.append(save);
 
 var prefix;
+
+$(function() {
+    
+    switch($componente.val()){
+        case '1':
+            prefix='SIGG';            
+            break;
+        case '2':
+            prefix='GGPF';            
+            break;
+        case '3':
+            prefix='PM';            
+            break;
+        case '4':
+            prefix='DWH';            
+            break;        
+    }    
+
+    switch($tipoMantencion.find(':checked').val()){
+        case '1':
+            $prefijoCodigo.html(prefix+'-MC');
+            break;
+        case '2':
+            $prefijoCodigo.html(prefix+'-ME');
+            break;
+    }   
+}); 
 
 $inicioProgramado.change(function() {  
   $inicioProgramado.append(loader);    

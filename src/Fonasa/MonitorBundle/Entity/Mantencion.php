@@ -78,6 +78,13 @@ class Mantencion
     private $fechaUltHh;
     
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="tocada", type="datetime", nullable=true)
+     */
+    private $tocada;
+    
+    /**
      * @var float
      *
      * @ORM\Column(name="hh_estimadas", type="float", nullable=true)
@@ -450,6 +457,30 @@ class Mantencion
     {
         return $this->fechaUltHh;
     }
+    
+/**
+     * Set tocada
+     *
+     * @param \DateTime $tocada
+     *
+     * @return Incidencia
+     */
+    public function setTocada($tocada)
+    {
+        $this->tocada = $tocada;
+
+        return $this;
+    }
+
+    /**
+     * Get tocada
+     *
+     * @return \DateTime
+     */
+    public function getTocada()
+    {
+        return $this->tocada;
+    }    
     
     /**
      * Set hhEstimadas

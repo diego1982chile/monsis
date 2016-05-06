@@ -47,29 +47,44 @@ class ControllerListener
         }
         */        
         
-        //$_SESSION['routes'][]=explode('/',$routeName)[1];                   
+        //$_SESSION['routes'][]=explode('/',$routeName)[1];  
         
-        switch (explode('/',$routeName)[1]){
+        $tokens=explode('/',$routeName);
+        $route=end($tokens);
+        
+        switch ($route){
+            case 'body':                
+                //Obtener parámetros de filtros
+                $componente= $request->query->get('componente');
+                $anio= $request->query->get('anio');
+                $mes= $request->query->get('mes');
+                $estado= $request->query->get('estado');                
+                $resetFiltros = $request->query->get('resetFiltros');                
+                //////////////////  
+                //Setear filtros en la sesion        
+                // Si se estan reseteando los filtros limpiar las variables de la sesion                               
+                if($resetFiltros){
+                    $this->session->set('filtroComponente',null);        
+                    $this->session->set('filtroAnio',null);
+                    $this->session->set('filtroMes',null);
+                    $this->session->set('filtroEstado',null);        
+                }
+                else{            
+                    $this->session->set('filtroComponente',$componente);        
+                    $this->session->set('filtroAnio',$anio);
+                    $this->session->set('filtroMes',$mes);
+                    $this->session->set('filtroEstado',$estado);        
+                }
+                ////////////////////////////
+                break;
             case 'dashboard':
                 $this->session->set('active', 'dashboard_index');
                 break;            
             case 'incidencia':
-                $this->session->set('active', 'incidencia_index');
-                /*
-                $this->session->set('filtroComponente',null);        
-                $this->session->set('filtroAnio',null);
-                $this->session->set('filtroMes',null);
-                $this->session->set('filtroEstado',null);                 
-                 */
+                $this->session->set('active', 'incidencia_index');                                                                                    
                 break;            
             case 'mantencion':                
-                $this->session->set('active', 'mantencion_index');
-                /*
-                $this->session->set('filtroComponente',null);        
-                $this->session->set('filtroAnio',null);
-                $this->session->set('filtroMes',null);
-                $this->session->set('filtroEstado',null);                  
-                 */
+                $this->session->set('active', 'mantencion_index');                                
                 break;            
         }
         

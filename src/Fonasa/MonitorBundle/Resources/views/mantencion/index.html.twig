@@ -56,7 +56,8 @@
                 <th width="10%">Fecha inicio</th>                                
                 <th width="10%">Fecha término</th>                
                 <th width="12%">Estado</th>                
-                <th width="4%">Show/Edit</th>                  
+                <th width="4%">Show/Edit</th>    
+                <th width="4%">Tocada</th>     
             </tr>
         </thead>
         <tbody>        
@@ -124,13 +125,18 @@
                     aTargets: [0],
                     orderable: false,
                     class: 'fillRate'   
-                    },       
+                    },
+                    {
+                    aTargets: [7],
+                    visible: false,
+                    searchable: false  
+                    },                    
                     {
                     aTargets: [1,2,3,4,5],
                     class: 'cols'                
                     }                             
                 ],            
-            order: [[ 1, 'desc' ]],                                    
+            order: [[ 7, 'desc' ]],                               
             dom: 'Blfrtip',                         
             buttons: [
                 //'copy', 'csv', 'excel', 'pdf', 'print'
@@ -138,11 +144,16 @@
             ],
             language: {
                 lengthMenu: " _MENU_ registros por página",
-                //zeroRecords: "Nothing found - sorry",
+                zeroRecords: "No se encontraron registros",
                 info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                infoEmpty: "No records available",
+                infoEmpty: "No hay registros disponibles",
                 infoFiltered: "(filtered from _MAX_ total records)",
-                sSearch: "Buscar:"
+                sSearch: "Buscar:",
+                sProcessing: "Procesando...",
+                oPaginate: {
+                    sPrevious: "<",
+                    sNext: ">",                    
+                }
             },                     
             fnDrawCallback: function( oSettings ) {
                 $('#mantenciones th').removeClass('ui-state-default');                                                                 

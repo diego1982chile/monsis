@@ -71,6 +71,7 @@ class MantencionController extends Controller
             $mantencion->setIdEstadoMantencion($estado[0]->getId());            
             //$incidencia->setNumeroTicket($numeroTicket);
             $mantencion->setFechaIngreso($fechaIngreso);
+            $mantencion->setTocada($fechaIngreso);
             $mantencion->setHhEfectivas(0);
             
             switch ($mantencion->getEstadoMantencion()->getNombre()){
@@ -182,6 +183,9 @@ class MantencionController extends Controller
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $em = $this->getDoctrine()->getManager();
+            
+            $mantencion->setTocada(new\DateTime('now'));
+            
             $em->persist($mantencion);
             $em->flush();
             
@@ -404,23 +408,7 @@ class MantencionController extends Controller
         $mes= $request->query->get('mes');
         $estado= $request->query->get('estado');   
         $resetFiltros = $request->query->get('resetFiltros');  
-        //////////////////           
-        
-        //Setear filtros en la sesion        
-        // Si se estan reseteando los filtros limpiar las variables de la sesion
-        if($resetFiltros){
-            $this->get('session')->set('filtroComponente',null);        
-            $this->get('session')->set('filtroAnio',null);
-            $this->get('session')->set('filtroMes',null);
-            $this->get('session')->set('filtroEstado',null);        
-        }
-        else{
-            $this->get('session')->set('filtroComponente',$componente);        
-            $this->get('session')->set('filtroAnio',$anio);
-            $this->get('session')->set('filtroMes',$mes);
-            $this->get('session')->set('filtroEstado',$estado);        
-        }
-        ////////////////////////////        
+        //////////////////                           
         
         $em = $this->getDoctrine()->getManager();                
         
@@ -433,9 +421,9 @@ class MantencionController extends Controller
                 ->join('m.componente', 'c')
                 ->join('m.estadoMantencion', 'e')
                 //->join('i.severidad', 'o')
-                ->join('m.estadoMantencion', 'em')                                                
-                ->where('YEAR(m.fechaIngreso) = ?1')
-                ->andWhere('MONTH(m.fechaIngreso) = ?2');                
+                ->join('m.estadoMantencion', 'em')                                                                
+                ->where('YEAR(m.fechaInicio) = ?1')
+                ->andWhere('MONTH(m.fechaInicio) = ?2');                
         
         $parameters[1] = $anio;
         
@@ -477,6 +465,9 @@ class MantencionController extends Controller
         if($iSortCol != null){
             
             switch($iSortCol){
+                case '7':
+                    $qb->orderBy('m.tocada', 'DESC');
+                    break;
                 case '1':
                     $qb->orderBy('m.numeroRequerimiento', $sSortDir);
                     $qb->addOrderBy('i.numeroTicket', $sSortDir);                     
@@ -647,6 +638,9 @@ class MantencionController extends Controller
             
             array_push($fila,$html);
             
+            //Se añade campo tocada
+            array_push($fila, $mantencion->getTocada());
+            
             array_push($body, $fila);            
         }
         
@@ -703,6 +697,7 @@ class MantencionController extends Controller
 
         $mantencion[0]->setEstadoMantencion($estado[0]);
         $mantencion[0]->setIdEstadoMantencion($estado[0]->getId());                                                
+        $mantencion[0]->setTocada(new\DateTime('now'));                
         
         if(sizeof($usuarios)){                        
             $mantencion[0]->setUsuario($usuarios[0]);
@@ -802,16 +797,17 @@ class MantencionController extends Controller
                          ->getResult();                                          
                 
         $estado= $em->getRepository('MonitorBundle:EstadoMantencion')
-            ->createQueryBuilder('e')                                
-            ->where('e.nombre = ?1')
-            ->setParameter(1, 'Cerrada')
-            ->getQuery()
-            ->getResult();        
+                    ->createQueryBuilder('e')                                
+                    ->where('e.nombre = ?1')
+                    ->setParameter(1, 'Cerrada')
+                    ->getQuery()
+                    ->getResult();        
         
         foreach($mantenciones as $mantencion){
             $mantencion->setEstadoMantencion($estado[0]);
             $mantencion->setIdEstadoMantencion($estado[0]->getId());                
             $mantencion->setFechaSalida($fechaTerminado);
+            $mantencion->setTocada(new\DateTime('now'));                
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($mantencion);

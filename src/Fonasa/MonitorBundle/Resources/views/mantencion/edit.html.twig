@@ -69,13 +69,31 @@ $( window ).load(function() {
     $('#form').show();
 }); 
 
+var prefix;
+
 $(function() {
-    switch($tipoMantencion.find(':checked').val()){
+    
+    switch($componente.val()){
         case '1':
-            $prefijoCodigo.html('SIGG-MC');
+            prefix='SIGG';            
             break;
         case '2':
-            $prefijoCodigo.html('SIGG-ME');
+            prefix='GGPF';            
+            break;
+        case '3':
+            prefix='PM';            
+            break;
+        case '4':
+            prefix='DWH';            
+            break;        
+    }    
+
+    switch($tipoMantencion.find(':checked').val()){
+        case '1':
+            $prefijoCodigo.html(prefix+'-MC');
+            break;
+        case '2':
+            $prefijoCodigo.html(prefix+'-ME');
             break;
     }   
 }); 
