@@ -1,3 +1,4 @@
+delimiter //
 CREATE DEFINER=`root`@`localhost` PROCEDURE IF NOT EXISTS `round_robin_incidencias`()
     NO SQL
 BEGIN	
@@ -30,4 +31,5 @@ BEGIN
              
 
         END IF;		
-END
+END;//
+delimiter ;

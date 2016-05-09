@@ -1,3 +1,4 @@
+delimiter //
 CREATE DEFINER=`root`@`localhost` PROCEDURE IF NOT EXISTS `round_robin_mantenciones`()
     NO SQL
 BEGIN	
@@ -24,4 +25,5 @@ BEGIN
         set fecha_ult_hh = SYSDATE()
         WHERE ID_ESTADO_MANTENCION in (2,3);       
         		
-END
+END;//
+delimiter ;
