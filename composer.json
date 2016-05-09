@@ -34,7 +34,8 @@
         "stof/doctrine-extensions-bundle": "^1.2",
         "oro/doctrine-extensions": "^1.0",
         "jms/security-extra-bundle": "^1.6",
-        "friendsofsymfony/jsrouting-bundle": "^1.6"  
+        "friendsofsymfony/jsrouting-bundle": "^1.6",
+        "symfony/property-access": "^3.0"  
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

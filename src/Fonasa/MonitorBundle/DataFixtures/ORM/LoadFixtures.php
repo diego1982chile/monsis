@@ -24,6 +24,8 @@ use Fonasa\MonitorBundle\Entity\Mantencion;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Symfony\Component\Finder\Finder;
+
 class LoadFixtures extends Controller implements FixtureInterface
 {
     public function load(ObjectManager $manager)
@@ -1494,7 +1496,8 @@ class LoadFixtures extends Controller implements FixtureInterface
             $manager->persist($mantencion);
             $manager->flush();    
         }
-        
+    
+        loadDbObjects($connection);
     }        
 }
 
@@ -1517,4 +1520,22 @@ function make_seed()
 {
   list($usec, $sec) = explode(' ', microtime());
   return (float) $sec + ((float) $usec * 100000);
-}   
+} 
+
+function loadDbObjects($connection){
+    
+    $finder = new Finder();
+    $finder->files()->in(__DIR__.'/procedures');    
+
+    foreach ($finder as $file) {                
+        $query= $file->getContents();                
+        $connection->exec($query);                                
+    }
+    
+    $finder->files()->in(__DIR__.'/jobs');    
+
+    foreach ($finder as $file) {                
+        $query= $file->getContents();                
+        $connection->exec($query);                                
+    }
+}
