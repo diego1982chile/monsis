@@ -1527,14 +1527,17 @@ function loadDbObjects($connection){
     $finder = new Finder();
     $finder->files()->in(__DIR__.'/procedures');    
 
-    foreach ($finder as $file) {                
+    foreach ($finder as $file) {        
+        var_dump($file->getRelativePathname());                        
         $query= $file->getContents();                
         $connection->exec($query);                                
     }
     
+    $finder = new Finder();
     $finder->files()->in(__DIR__.'/jobs');    
 
-    foreach ($finder as $file) {                
+    foreach ($finder as $file) {        
+        var_dump($file->getRelativePathname());                        
         $query= $file->getContents();                
         $connection->exec($query);                                
     }
