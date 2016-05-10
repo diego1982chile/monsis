@@ -30,6 +30,10 @@ class LoadFixtures extends Controller implements FixtureInterface
 {
     public function load(ObjectManager $manager)
     {
+        
+        echo "  > iniciando LoadFixtures\n";                
+        echo "  > cargando Datos Estaticos...\r";
+        
         $em = $this->getDoctrine()->getManager();
         $connection = $em->getConnection();
         
@@ -1331,9 +1335,14 @@ class LoadFixtures extends Controller implements FixtureInterface
         array_push($tiposRequerimiento,$tipoAlcance27);        
         
         $manager->persist($tipoAlcance27);
-        $manager->flush();                    
+        $manager->flush();              
+        
+        echo "  > cargando Datos Estaticos OK\n";
+        
         
         //------------------------------POBLAR INCIDENCIAS-----------------------------------------------
+        
+        echo "  > cargando Data Transaccional...\r";
         
         $descripcionesIncidencia=[
             'Crear a un nuevo Medico en sistema',
@@ -1495,9 +1504,13 @@ class LoadFixtures extends Controller implements FixtureInterface
                                                                                                 
             $manager->persist($mantencion);
             $manager->flush();    
-        }
+        }        
+        echo "  > cargando Data Transaccional OK\n";
     
+        echo "  > cargando Objetos BD...\r";
         loadDbObjects($connection);
+        echo "  > cargando Objetos BD OK\n";
+        echo "  > LoadFixtures Completado";
     }        
 }
 
@@ -1528,7 +1541,7 @@ function loadDbObjects($connection){
     $finder->files()->in(__DIR__.'/procedures');    
 
     foreach ($finder as $file) {        
-        var_dump($file->getRelativePathname());                        
+        //var_dump($file->getRelativePathname());                        
         $query= $file->getContents();                
         $connection->exec($query);                                
     }
@@ -1537,7 +1550,7 @@ function loadDbObjects($connection){
     $finder->files()->in(__DIR__.'/jobs');    
 
     foreach ($finder as $file) {        
-        var_dump($file->getRelativePathname());                        
+        //var_dump($file->getRelativePathname());                        
         $query= $file->getContents();                
         $connection->exec($query);                                
     }
