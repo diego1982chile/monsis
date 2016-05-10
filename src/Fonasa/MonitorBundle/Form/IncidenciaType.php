@@ -13,6 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -21,6 +23,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 use Fonasa\MonitorBundle\Entity\OrigenIncidencia;
 use Fonasa\MonitorBundle\Entity\Componente;
+use Fonasa\MonitorBundle\Entity\DocumentoIncidencia;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -151,7 +154,15 @@ class IncidenciaType extends AbstractType
                 //'multiple' => false,
                 'position' => 'first',
                 //'attr' => array('class' => 'form-inline')
+            ))            
+            ->add('documentosIncidencia', CollectionType::class, array(
+                  'entry_type' => DocumentoIncidenciaType::class,
+                  'by_reference' => false,
+                  'allow_add'    => true,
+                  'allow_delete' => true,
+                  'label' => false     
             ))
+            
             /*
             ->add('estadoIncidencia', EntityType::class, array(
                   'class' => 'MonitorBundle:EstadoIncidencia',

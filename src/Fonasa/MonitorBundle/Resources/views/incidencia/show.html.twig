@@ -129,6 +129,22 @@
                 </table>
             </div>    
     </fieldset>   
+    {% if incidencia.documentosIncidencia|length > 0 %}
+        <fieldset class="scheduler-border">
+            <legend class="scheduler-border">Adjuntos</legend>
+                <div class="control-group">
+                    <table width="100%" class="table" border="0">
+                    {% for var in incidencia.documentosIncidencia %}   
+                        <tr>
+                            <td>
+                                {{ var.nombre }}
+                            </td>
+                        </tr>    
+                    {% endfor %}
+                    </table>
+                </div>
+        </fieldset>
+    {% endif %}
     <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>                                                
     </div>        
     <div>

@@ -14,13 +14,28 @@
             <span class="input-group-addon" id="basic-addon2">Ticket#</span>
             {{ form_widget(form.numeroTicket) }}            
         </div>                
-        {{ form_row(form.descripcion) }}
-        {{ form_row(form.severidad) }}        
+        {{ form_row(form.descripcion) }}        
+        {{ form_row(form.severidad) }}  
+        <div class="form-group input-group" style="width:100%">    
+            <ul class="tags" data-prototype="{{ form_widget(form.documentosIncidencia.vars.prototype)|e }}">
+                {# iterate over each existing tag and render its only field: name #}
+                {% for doc in form.documentosIncidencia %}
+                    <li>{{ form_widget(doc.nombre) }}</li>
+                {% endfor %}
+            </ul>   
+            <a href="#" id="adjuntarDocumento" class="add_tag_link btn active btn-info" role="button" style="display:none">                            
+            <span class="glyphicon glyphicon-paperclip">                       
+            </span>
+        </a>
+        </div>
         <input type="submit" class='btn btn-primary form-control active' style="display:none" value="Create" />
         <button id="validate_form" class="btn btn-primary active" type="button">Crear</button>
+        <a href="#" id="adjuntarDocumento2" class="add_tag_link btn active btn-info" role="button" style="float:right">                            
+            <span class="glyphicon glyphicon-paperclip">                       
+            </span>
+        </a>
     {{ form_end(form) }}
-    </div>
-    <br>
+    </div>    
     <ul>
         <li>
             <a href="{{ path('incidencia_index') }}">Volver</a>
@@ -29,13 +44,51 @@
 {% endblock %}
 {% block javascripts %}
 <script>
+var $collectionHolder;
+
+// setup an "add a tag" link
+//var $addTagLink = $('<a href="#" class="add_tag_link">Add a tag</a>');
+var $addTagLink = $('#adjuntarDocumento');
+var $newLinkLi = $('').append($addTagLink);
 
 $( window ).load(function() {
    $('#form').show();
 });
+
+$('#adjuntarDocumento2').click(function(){
+   $( "#adjuntarDocumento" ).trigger( "click" ); 
+});
     
 $(function() {
-    $( "#incidencia_fechaReporte_date" ).datepicker();    
+    $( "#incidencia_fechaReporte_date" ).datepicker();
+    
+    // Get the ul that holds the collection of tags
+    $collectionHolder = $('ul.tags');
+
+    // add a delete link to all of the existing tag form li elements
+    $collectionHolder.find('li').each(function() {
+        addTagFormDeleteLink($(this));
+    });
+    
+    //////////////////////////////////////////////////
+    // Get the ul that holds the collection of tags
+    $collectionHolder = $('ul.tags');
+
+    // add the "add a tag" anchor and li to the tags ul
+    $collectionHolder.append($newLinkLi);
+
+    // count the current form inputs we have (e.g. 2), use that as the new
+    // index when inserting a new item (e.g. 2)
+    $collectionHolder.data('index', $collectionHolder.find(':input').length);
+
+    $addTagLink.on('click', function(e) {
+        // prevent the link from creating a "#" on the URL        
+        e.preventDefault();
+
+        // add a new tag form (see next code block)
+        addTagForm($collectionHolder, $addTagLink);
+    });
+    ////////////////////////////////////////////////////////////////
 });  
 
 var $origen = $('#incidencia_origenIncidencia');
@@ -205,5 +258,40 @@ $validateForm.click(function(){
       // Position field now displays the appropriate positions.      
   });    
 });
+
+function addTagForm($collectionHolder, $newLinkLi) {
+    // Get the data-prototype explained earlier
+    var prototype = $collectionHolder.data('prototype');
+
+    // get the new index
+    var index = $collectionHolder.data('index');
+
+    // Replace '__name__' in the prototype's HTML to
+    // instead be a number based on how many items we have
+    var newForm = prototype.replace(/__name__/g, index);
+
+    // increase the index with one for the next item
+    $collectionHolder.data('index', index + 1);
+
+    // Display the form in the page in an li, before the "Add a tag" link li
+    var $newFormLi = $('<div class="input-group file-field">').append(newForm);
+    $newLinkLi.before($newFormLi);
+    
+    // add a delete link to the new form
+    addTagFormDeleteLink($newFormLi);
+}
+
+function addTagFormDeleteLink($tagFormLi) {
+    var $removeFormA = $('<span class="input-group-btn"><a role="button" class="btn elim-doc" href="#"><span class="glyphicon glyphicon-remove"></span></a></span></div>');
+    $tagFormLi.append($removeFormA);
+
+    $removeFormA.on('click', function(e) {
+        // prevent the link from creating a "#" on the URL
+        e.preventDefault();
+
+        // remove the li for the tag form
+        $tagFormLi.remove();
+    });
+}
 </script>
 {% endblock %}

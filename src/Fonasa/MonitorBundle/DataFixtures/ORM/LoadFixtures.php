@@ -1510,7 +1510,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         echo "  > cargando Objetos BD...\r";
         loadDbObjects($connection);
         echo "  > cargando Objetos BD OK\n";
-        echo "  > LoadFixtures Completado";
+        echo "  > LoadFixtures Completado\n";
     }        
 }
 

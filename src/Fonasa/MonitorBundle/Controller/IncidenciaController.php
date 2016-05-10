@@ -9,6 +9,7 @@ use Fonasa\MonitorBundle\Entity\Incidencia;
 use Fonasa\MonitorBundle\Entity\HistorialIncidencia;
 use Fonasa\MonitorBundle\Entity\EstadoIncidencia;
 use Fonasa\MonitorBundle\Entity\ObservacionIncidencia;
+use Fonasa\MonitorBundle\Entity\DocumentoIncidencia;
 
 use Fonasa\MonitorBundle\Form\IncidenciaType;
 
@@ -37,6 +38,17 @@ class IncidenciaController extends Controller
     public function newAction(Request $request)
     {
         $incidencia = new Incidencia();
+        
+        //die(json_encode($request->get('documentosIncidencia')));
+        
+        // dummy code - this is here just so that the Task has some tags
+        // otherwise, this isn't an interesting example
+        /*
+        $documentoIncidencia1 = new DocumentoIncidencia();
+        $documentoIncidencia1->setNombre('documentoIncidencia1');
+        $incidencia->getDocumentosIncidencia()->add($documentoIncidencia1);                 
+         */
+        // end dummy code
         
         $em = $this->getDoctrine()->getManager();        
         
@@ -80,12 +92,43 @@ class IncidenciaController extends Controller
                 case 'Resuelta MT':
                     $incidencia->setFechaSalida(new\DateTime('now'));
                     break;            
-            }
-            
-            //die($incidencia);                        
-            
+            }                        
+                               
             $em = $this->getDoctrine()->getManager();
             $em->persist($incidencia);                                    
+            //$em->flush();
+            
+            // $file stores the uploaded PDF file
+            /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            foreach($incidencia->getDocumentosIncidencia() as $documentoIncidencia){
+                
+                $file = $documentoIncidencia->getNombre();
+
+                // Generate a unique name for the file before saving it
+                $fileName = md5(uniqid()).'.'.$file->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                //$brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/uploads';
+                $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads';
+                
+                $file->move($brochuresDir, $fileName);
+                
+                $documentoIncidencia->setNombre($fileName);
+                $documentoIncidencia->setIncidencia($incidencia);
+                $documentoIncidencia->setIdIncidencia($incidencia->getId());
+                
+                //$em = $this->getDoctrine()->getManager();
+                $em->persist($documentoIncidencia);                                    
+                //$em->refresh($documentoIncidencia);
+                //$em->merge($documentoIncidencia);                                    
+                //$em->flush();
+                                
+                // Update the 'brochure' property to store the PDF file name
+                // instead of its contents
+                //$incidencia->addDocumentosIncidencia($documentoIncidencia);                
+                // ... persist the $product variable or any other work                
+            }            
+            
             $em->flush();
                         
             $this->addFlash(
@@ -207,7 +250,8 @@ class IncidenciaController extends Controller
                 $incidencia[0]->setFechaSalida(null);
                 break;            
             case 'Pendiente MT': // Si se deja Pendiente MT se actualiza la fecha inicio
-                $incidencia[0]->setFechaInicio(new\DateTime('now'));
+                if($incidencia[0]->getFechaInicio() == null)
+                    $incidencia[0]->setFechaInicio(new\DateTime('now'));
                 $incidencia[0]->setFechaSalida(null);
                 //$incidencia[0]->setHhEfectivas(0);
                 $incidencia[0]->setFechaUltHH(new\DateTime('now'));

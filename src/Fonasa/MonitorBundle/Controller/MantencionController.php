@@ -706,13 +706,14 @@ class MantencionController extends Controller
         
         switch ($status){
             case 'En Cola': // Si se deja en cola, la fecha de inicio salida se anulan
-                $mantencion[0]->setFechaInicio(null);
+                //$mantencion[0]->setFechaInicio(null);
                 $mantencion[0]->setFechaSalida(null);
                 $mantencion[0]->setUsuario(null);
                 break;
             case 'En Desarrollo': // Si se deja en gestión FONASA, no se hace nada
                 $mantencion[0]->setFechaUltHH(new\DateTime('now'));
-                $mantencion[0]->setFechaInicio(new\DateTime('now'));
+                if($mantencion[0]->getFechaInicio() == null)
+                    $mantencion[0]->setFechaInicio(new\DateTime('now'));
                 $mantencion[0]->setFechaSalida(null);
                 break;            
             case 'En Testing': // Si se deja Pendiente MT se actualiza la fecha inicio

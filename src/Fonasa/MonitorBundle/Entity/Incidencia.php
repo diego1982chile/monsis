@@ -182,6 +182,12 @@ class Incidencia
      */
     protected $observacionesIncidencia;        
     
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="DocumentoIncidencia", mappedBy="incidencia")          
+     */
+    public $documentosIncidencia;            
+    
     /**
      * Get id
      *
@@ -659,5 +665,41 @@ class Incidencia
         
         return $this->mantenciones;
     }
+    
+    /**
+    * Get documentosIncidencia
+    *    
+    * @return \Doctrine\Common\Collections\Collection
+    */
+    public function getDocumentosIncidencia(){
+        
+        return $this->documentosIncidencia;
+    }
+    
+    /**
+    * Add documentosIncidencia
+    *    
+    * @param \Fonasa\MonitorBundle\Entity\DocumentoIncidencia $documentoIncidencia
+    * @return Incidencia
+    */
+    public function addDocumentosIncidencia(DocumentoIncidencia $documentoIncidencia = null){
+        
+        $this->documentosIncidencia[] = $documentoIncidencia;
+        
+        return $this;
+    }
+    
+    /**
+    * Remove documentosIncidencia
+    *    
+    * @param \Fonasa\MonitorBundle\Entity\DocumentoIncidencia $documentoIncidencia
+    * @return Incidencia
+    */
+    public function removeDocumentosIncidencia(DocumentoIncidencia $documentoIncidencia = null){
+        
+        $this->documentosIncidencia->removeElement($documentoIncidencia);
+        
+        return $this;
+    }    
 }
 
