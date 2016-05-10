@@ -1,4 +1,6 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE IF NOT EXISTS `monsis`.`round_robin_incidencias`()
+DROP PROCEDURE IF EXISTS `monsis`.`round_robin_incidencias`;
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `monsis`.`round_robin_incidencias`()
     NO SQL
 BEGIN	
 	DECLARE dentro_horario INT DEFAULT 0;                            
