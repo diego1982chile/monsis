@@ -38,10 +38,12 @@ class IncidenciaType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder        
-            ->add('id', HiddenType::class);
+        
+        $filtroComponente = $options['filtroComponente'];                
         
         $builder        
+            ->add('id', HiddenType::class);
+                        
             /*
             ->add('origenIncidencia', EntityType::class, array(
                   'class' => 'MonitorBundle:OrigenIncidencia',
@@ -57,57 +59,58 @@ class IncidenciaType extends AbstractType
                 //'attr' => array('class' => 'form-inline')
             ))
             */
-            ->add('componente', EntityType::class, array(
-                  'class' => 'MonitorBundle:Componente',
-                  'choice_label' => 'nombre',                   
-                  'placeholder' => 'Seleccione una opción...',
-                  'position' => array('after' => 'numeroTicket'),
-                  //'disabled' => true, 
-            ))
-            ->add('numeroTicket', TextType::class, array(
-                  'position' => 'first',
-                  //'disabled' => true,
+            $builder
+                ->add('numeroTicket', TextType::class, array(
+                      'position' => 'first',
+                      //'disabled' => true,
+                ));    
+        
+        if($filtroComponente == -1){
+            
+            $builder
+                ->add('componente', EntityType::class, array(
+                      'class' => 'MonitorBundle:Componente',
+                      'choice_label' => 'nombre',                   
+                      'placeholder' => 'Seleccione una opción...',
+                      'position' => array('after' => 'numeroTicket'),
+                      //'disabled' => true, 
+                      'data' => $filtroComponente,
                 ));
-        ;                
-        
-        $formModifierCategoria = function (FormInterface $form, Componente $componente = null) {
-            
-            $categorias = null === $componente ? array() : $componente->getCategoriasIncidencia();             
-            
-            $placeHolder= 'No hay opciones';
-            $disabled = false;    
-            $idComponente= null;
-            
-            if($componente!=null){  
-                $idComponente= $componente->getId();
-                $disabled = false;
-                $placeHolder= 'Seleccione una opción...';
-            }
 
-            $form->add('categoriaIncidencia', EntityType::class, array(
-                       'class'       => 'MonitorBundle:CategoriaIncidencia',
-                        'query_builder' => function (EntityRepository $er) use ($idComponente) {
-                          return $er->createQueryBuilder('c')
-                                    ->where('c.componente = ?1')
-                                    ->setParameter(1, $idComponente)                                       
-                                    ->orderBy('c.nombre', 'ASC');
-                        },                
-                       //'choices'     => $categorias,
-                       'choice_label' => 'nombre',
-                       'choices_as_values' => true,
-                       /*
-                       'choice_attr' => function($val, $key, $index) {
-                            // adds a class like attending_yes, attending_no, etc
-                            return ['idTipoAlcance' => $val->getTipoAlcance()->getId()];
-                        },                 
-                        */                                   
-                       'placeholder' => $placeHolder,
-                       'disabled' => $disabled,
-                       'position' => array('after' => 'componente')
-            ));            
-        };        
-        
-        $builder                        
+            $formModifierCategoria = function (FormInterface $form, Componente $componente = null) {
+
+                $categorias = null === $componente ? array() : $componente->getCategoriasIncidencia();             
+
+                $placeHolder= 'No hay opciones';
+                $disabled = false;    
+                $idComponente= null;
+
+                //echo $componente->getNombre();
+
+                if($componente!=null){  
+                    $idComponente= $componente->getId();
+                    $disabled = false;
+                    $placeHolder= 'Seleccione una opción...';
+                }
+
+                $form->add('categoriaIncidencia', EntityType::class, array(
+                           'class'       => 'MonitorBundle:CategoriaIncidencia',
+                           'query_builder' => function (EntityRepository $er) use ($idComponente) {
+                              return $er->createQueryBuilder('c')
+                                        ->where('c.componente = ?1')
+                                        ->setParameter(1, $idComponente)                                       
+                                        ->orderBy('c.nombre', 'ASC');
+                            },               
+                           //'choices'     => $categorias,
+                           'choice_label' => 'nombre',
+                           'choices_as_values' => true,                                                                                                      
+                           'placeholder' => $placeHolder,
+                           'disabled' => $disabled,
+                           'position' => array('after' => 'componente')
+                ));            
+            }; 
+            
+            $builder                        
             ->addEventListener(
                 FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) use ($formModifierCategoria) {                    
@@ -118,7 +121,7 @@ class IncidenciaType extends AbstractType
                 }
             );
                             
-        $builder                                    
+            $builder                                    
             ->get('componente')->addEventListener(
                 FormEvents::POST_SUBMIT,
                 function (FormEvent $event) use ($formModifierCategoria) {
@@ -130,7 +133,51 @@ class IncidenciaType extends AbstractType
                     // the parent to the callback functions!                    
                     $formModifierCategoria($event->getForm()->getParent(), $componente);                    
                 }
-            );            
+            );   
+        }
+        else{
+            
+            $builder
+                ->add('componente', EntityType::class, array(
+                      'class' => 'MonitorBundle:Componente',
+                      'query_builder' => function (EntityRepository $er) use ($filtroComponente) {
+                              return $er->createQueryBuilder('c')
+                                        ->where('c.id = ?1')
+                                        ->setParameter(1, $filtroComponente)                                       
+                                        ->orderBy('c.nombre', 'ASC');
+                      }, 
+                      'choice_label' => 'nombre',                   
+                      //'placeholder' => 'Seleccione una opción...',
+                      'position' => array('after' => 'numeroTicket'),
+                      //'disabled' => true, 
+                      'data' => $filtroComponente,
+                      'choice_attr' => function($val, $key, $index) use ($filtroComponente) {
+                                // adds a class like attending_yes, attending_no, etc                             
+                                //Obtener filtros desde la sesión                             
+                                if($filtroComponente != null){                                                                   
+                                     if($val->getId() == $filtroComponente)                                      
+                                         return ['selected' => true];
+                                     else
+                                         return ['selected' => false];
+                                }                                                                                                                     
+                      },
+                      'label' => false,
+                      'attr' => array('style' => 'display:none'),
+                ));            
+            $builder->add('categoriaIncidencia', EntityType::class, array(
+                           'class'       => 'MonitorBundle:CategoriaIncidencia',
+                           'query_builder' => function (EntityRepository $er) use ($filtroComponente) {
+                              return $er->createQueryBuilder('c')
+                                        ->where('c.componente = ?1')
+                                        ->setParameter(1, $filtroComponente)                                       
+                                        ->orderBy('c.nombre', 'ASC');
+                            },    
+                           //'choices'     => $categorias,
+                           'placeholder' => 'Seleccione una opción...',
+                           'choice_label' => 'nombre',
+                           'choices_as_values' => true,                                                                                                                                                                                   
+                ));                        
+        }                                                                  
         
         $builder                                                    
             /*
@@ -155,13 +202,24 @@ class IncidenciaType extends AbstractType
                 'position' => 'first',
                 //'attr' => array('class' => 'form-inline')
             ))            
-            ->add('documentosIncidencia', CollectionType::class, array(
-                  'entry_type' => DocumentoIncidenciaType::class,
+            ->add('comentariosIncidencia', CollectionType::class, array(
+                  'entry_type' => ComentarioIncidenciaType::class,
+                  'data_class' => null,
                   'by_reference' => false,
                   'allow_add'    => true,
                   'allow_delete' => true,
-                  'label' => false     
-            ))
+                  'label' => false,
+                  'attr' => array('style' => 'display:none'),                  
+            ))                                                
+            ->add('documentosIncidencia', CollectionType::class, array(
+                  'entry_type' => DocumentoIncidenciaType::class,
+                  'data_class' => null,
+                  'by_reference' => false,
+                  'allow_add'    => true,
+                  'allow_delete' => true,
+                  'label' => false,
+                  'attr' => array('style' => 'display:none'),                  
+            ))                        
             
             /*
             ->add('estadoIncidencia', EntityType::class, array(
@@ -179,11 +237,13 @@ class IncidenciaType extends AbstractType
             */
         ;
         
+        /*
         if($options['assign']==true){
             $builder                                                    
                 ->add('hhEstimadas', NumberType::class
             );
         }
+        */
         
         /*
         $builder
@@ -213,7 +273,7 @@ class IncidenciaType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Fonasa\MonitorBundle\Entity\Incidencia',
-            'assign' => [false,true]
+            'filtroComponente' => 'Symfony\Component\Form\Extension\Core\Type\IntegerType',            
         ));
     }
 }

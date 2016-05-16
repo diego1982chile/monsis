@@ -29,16 +29,24 @@ class DocumentoIncidencia
     private $nombre;
     
     /**
+     * @var string
+     *
+     * @ORM\Column(name="archivo", type="string", length=255, unique=true)
+     */
+    private $archivo;        
+    
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="fecha_ult_hh", type="datetime", nullable=true)
      */
     private $fechaHora;    
+        
     
     /**
      * @var \Incidencia
      *
-     * @ORM\ManyToOne(targetEntity="Incidencia", inversedBy="documentosIncidencia", cascade={"persist", "remove" })
+     * @ORM\ManyToOne(targetEntity="Incidencia", inversedBy="documentosIncidencia")
      * @ORM\JoinColumns{(
      *    @ORM\JoinColumn(name="ID_INCIDENCIA", referencedColumnName="id", onDelete="CASCADE")
      * })
@@ -50,6 +58,23 @@ class DocumentoIncidencia
      * @ORM\Column(name="ID_INCIDENCIA", type="integer", nullable=true)               
      */
     private $idIncidencia; 
+    
+    
+    /**
+     * @var \TipoDocumentoIncidencia
+     *
+     * @ORM\ManyToOne(targetEntity="TipoDocumentoIncidencia", inversedBy="documentosIncidencia")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_TIPO_DOCUMENTO_INCIDENCIA", referencedColumnName="id", onDelete="CASCADE")
+     * })
+     */
+    protected $tipoDocumentoIncidencia;
+    
+    /**
+     *      
+     * @ORM\Column(name="ID_TIPO_DOCUMENTO_INCIDENCIA", type="integer", nullable=true)               
+     */
+    private $idTipoDocumentoIncidencia;           
 
 
     /**
@@ -86,7 +111,31 @@ class DocumentoIncidencia
         return $this->nombre;
     }
     
-/**
+    /**
+     * Set archivo
+     *
+     * @param string $archivo
+     *
+     * @return DocumentoIncidencia
+     */
+    public function setArchivo($archivo)
+    {
+        $this->archivo = $archivo;
+
+        return $this;
+    }
+
+    /**
+     * Get archivo
+     *
+     * @return string
+     */
+    public function getArchivo()
+    {
+        return $this->archivo;
+    }    
+    
+    /**
      * Get incidencia
      *
      * @return \Fonasa\MonitorBundle\Entity\Incidencia
@@ -138,5 +187,50 @@ class DocumentoIncidencia
         }
     }    
     */
+    
+    /**
+     * Get tipoDocumentoIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\TipoDocumentoIncidencia
+     */
+    public function getTipoDocumentoIncidencia()
+    {
+        return $this->tipoDocumentoIncidencia;
+    }
+    
+    /**
+     * Set tipoDocumentoIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\DocumentoIncidencia
+     */
+    public function setTipoDocumentoIncidencia(\Fonasa\MonitorBundle\Entity\TipoDocumentoIncidencia $tipoDocumentoIncidencia = null)
+    {
+        $this->tipoDocumentoIncidencia=$tipoDocumentoIncidencia;
+        
+        return $this;
+    }    
+    
+    /**
+     * Get idTipoDocumentoIncidencia
+     *
+     * @return int
+     */
+    public function getIdTipoDocumentoIncidencia()
+    {
+        return $this->idTipoDocumentoIncidencia;
+    }
+    
+    /**
+    * Set idTipoDocumentoIncidencia
+    *
+    * @param int $idTipoDocumentoIncidencia
+    * @return DocumentoIncidencia
+    */
+    public function setIdTipoDocumentoIncidencia($idTipoDocumentoIncidencia)
+    {
+        $this->idTipoDocumentoIncidencia = $idTipoDocumentoIncidencia;
+        
+        return $this;
+    }        
 }
 

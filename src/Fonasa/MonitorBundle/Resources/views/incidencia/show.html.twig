@@ -21,7 +21,7 @@
         </div>
     </div>                    
     {% endfor %}
-    <h1>Incidencia</h1>    
+    <h2>Incidencia</h2>    
     <div id="form" style="width:100%">
     <fieldset class="scheduler-border" >
     <legend class="scheduler-border">Datos de la Incidencia</legend>
@@ -129,15 +129,33 @@
                 </table>
             </div>    
     </fieldset>   
+    {% if incidencia.comentariosIncidencia|length > 0 %}
+        <fieldset class="scheduler-border">
+            <legend class="scheduler-border">Comentarios</legend>
+                <div class="control-group">
+                    <table width="100%" class="table" border="0">
+                    {% for com in incidencia.comentariosIncidencia %}   
+                        <tr>
+                            <td>
+                                {{ com.comentario }}
+                            </td>
+                        </tr>    
+                    {% endfor %}
+                    </table>
+                </div>
+        </fieldset>
+    {% endif %}                        
     {% if incidencia.documentosIncidencia|length > 0 %}
         <fieldset class="scheduler-border">
             <legend class="scheduler-border">Adjuntos</legend>
                 <div class="control-group">
                     <table width="100%" class="table" border="0">
-                    {% for var in incidencia.documentosIncidencia %}   
+                    {% for doc in incidencia.documentosIncidencia %}   
                         <tr>
                             <td>
-                                {{ var.nombre }}
+                                <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo) }}">                                    
+                                    {{ doc.nombre }}
+                                </a>
                             </td>
                         </tr>    
                     {% endfor %}

@@ -3,25 +3,107 @@
 {% extends 'base.html.twig' %}
 {% form_theme edit_form 'bootstrap_3_layout.html.twig' %}
 {% block body %}
-    <h1>Incidencia edit</h1>
-    <div class="form" style="width:60%;display:none">
-        {{ form_start(edit_form) }}
-        {{ form_errors(edit_form) }}        
-        {{ form_row(edit_form.componente) }}
-        {{ form_row(edit_form.categoriaIncidencia) }}
-        {{ form_label(edit_form.numeroTicket) }}
-        <div class="form-group input-group">        
-            <span class="input-group-addon" id="basic-addon2">Ticket#</span>
-            {{ form_widget(edit_form.numeroTicket) }}            
-        </div>                
-        {{ form_row(edit_form.descripcion) }}
-        {{ form_row(edit_form.severidad) }}        
-        <input type="submit" value="Editar" style="display:none" class="btn btn-primary active" />        
-        <button id="validate_form" class="btn btn-primary active" type="button">Modificar</button>        
-        <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>
-    {{ form_end(edit_form) }}
-    </div>
-    <br>
+    <div class="form" style="width:60%;display:none">    
+    <h2>Incidencia edit  {{ app.session.get('nombreComponente') }}</h2>        
+        <div class="btn-group pull-right">            
+            <a href="#" id="adjuntarDocumento2" class="add_tag_link btn btn-default" role="button">                            
+                Adjuntar
+                <span class="glyphicon glyphicon-paperclip">                       
+                </span>
+            </a>                                        
+            <a href="#" id="agregarComentario2" class="add_tag_link btn btn-default" role="button">                            
+                Comentar
+                <span class="glyphicon glyphicon-comment">                       
+                </span>
+            </a>                            
+        </div>
+        <div class="panel-body">
+            {{ form_start(edit_form) }}
+            {{ form_errors(edit_form) }}        
+            {{ form_row(edit_form.componente) }}
+            {{ form_row(edit_form.categoriaIncidencia) }}
+            {{ form_label(edit_form.numeroTicket) }}
+            <div class="form-group input-group">        
+                <span class="input-group-addon" id="basic-addon2">Ticket#</span>
+                {{ form_widget(edit_form.numeroTicket) }}            
+            </div>                
+            {{ form_row(edit_form.descripcion) }}
+            {{ form_row(edit_form.severidad) }}   
+            <label class="control-label required">
+                Comentarios
+            </label>               
+            <div class="form-group input-group" style="width:100%">                                
+                <ul class="comments" data-prototype="{{ form_widget(edit_form.comentariosIncidencia.vars.prototype)|e }}">
+                    {% if edit_form.comentariosIncidencia|length > 0  %}
+                        {# iterate over each existing tag and render its only field: name #}                
+                        {% for com in edit_form.comentariosIncidencia %}
+                            <div class="input-group comment-field">                                               
+                                {{ form_row(com.comentario) }}                                    
+                                <span class="input-group-btn">
+                                    <a role="button" class="btn elim-com">
+                                        <span class="glyphicon glyphicon-remove">                                    
+                                        </span>
+                                    </a>                                
+                                </span>
+                            </div>
+                        {% endfor %}                                            
+                    {% endif %}
+                </ul>   
+                <div class="input-group comment-field" id="place_holder2" style="width:100%;display:none">
+                    <h4 class="form-group" style="opacity:0.5">                                
+                        Ningún Comentario
+                    </h4>
+                </div>
+                <a href="#" id="agregarComentario" class="add_tag_link btn active btn-info" role="button" style="display:none">                            
+                    <span class="glyphicon glyphicon-paperclip">                       
+                    </span>
+                </a>            
+            </div>                                
+            <label class="control-label required">
+                Documentos Adjuntos
+            </label>               
+            <div class="form-group input-group" style="width:100%">                                
+                <ul class="tags" data-prototype="{{ form_widget(edit_form.documentosIncidencia.vars.prototype)|e }}">
+                    {% if edit_form.documentosIncidencia|length > 0  %}
+                        {# iterate over each existing tag and render its only field: name #}                
+                        {% for doc in edit_form.documentosIncidencia %}
+                            <div class="input-group file-field">
+                                {% if doc.tipoDocumentoIncidencia is defined %}                    
+                                    {{ form_row(doc.tipoDocumentoIncidencia) }}
+                                    {{ form_row(doc.archivo) }}                     
+                                {% else %}  
+                                    <div class="form-group">
+                                        <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo.vars.value ) }}">                                    
+                                            {{ doc.nombre.vars.value }}
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                <span class="input-group-btn">
+                                    <a role="button" class="btn elim-doc" id="{{doc.archivo.vars.value}}">
+                                        <span class="glyphicon glyphicon-remove">                                    
+                                        </span>
+                                    </a>                                
+                                </span>
+                            </div>
+                        {% endfor %}                                            
+                    {% endif %}
+                </ul>   
+                <div class="input-group file-field" id="place_holder" style="width:100%;display:none">
+                    <h4 class="form-group" style="opacity:0.5">                                
+                        Ningún Documento Adjunto                                
+                    </h4>
+                </div>
+                <a href="#" id="adjuntarDocumento" class="add_tag_link btn active btn-info" role="button" style="display:none">                            
+                    <span class="glyphicon glyphicon-paperclip">                       
+                    </span>
+                </a>            
+            </div>                    
+            <input type="submit" value="Editar" style="display:none" class="btn btn-primary active" />        
+            <button id="validate_form" class="btn btn-primary active" type="button">Modificar</button>                        
+            <button id="delete" class="btn btn-warning active" style="float:right" type="button">Eliminar</button>        
+        {{ form_end(edit_form) }}
+        </div>
+    </div>    
     <ul>
         <li>
             <a href="{{ path('incidencia_index') }}">Volver</a>
@@ -40,13 +122,79 @@
 {% endblock %}
 {% block javascripts %}
 <script>
+var $collectionHolder;
+var $collectionHolder2;
+
+// setup an "add a tag" link
+//var $addTagLink = $('<a href="#" class="add_tag_link">Add a tag</a>');
+var $addTagLink = $('#adjuntarDocumento');
+var $newLinkLi = $('').append($addTagLink);   
+
+var $addCommentLink = $('#agregarComentario');
+var $newLinkLi2 = $('').append($addCommentLink);
     
 $( window ).load(function() {
    $('.form').show();
-});    
+});  
     
 $(function() {
-    $( "#incidencia_fechaReporte_date" ).datepicker();    
+    $( "#incidencia_fechaReporte_date" ).datepicker(); 
+    
+    if($('.tags').children().length<1)
+        $('#place_holder').show();
+    
+    if($('.comments').children().length<1)
+        $('#place_holder2').show();    
+    
+    // Get the ul that holds the collection of tags
+    $collectionHolder = $('ul.tags');
+    $collectionHolder2 = $('ul.comments');
+
+    // add a delete link to all of the existing tag form li elements
+    $collectionHolder.find('li').each(function() {
+        addTagFormDeleteLink($(this));
+    });        
+    
+    $collectionHolder2.find('li').each(function() {
+        addCommentFormDeleteLink($(this));
+    });   
+    
+    //////////////////////////////////////////////////
+    // Get the ul that holds the collection of tags
+    $collectionHolder = $('ul.tags');
+    $collectionHolder2 = $('ul.comments');
+
+    // add the "add a tag" anchor and li to the tags ul
+    $collectionHolder.append($newLinkLi);
+    $collectionHolder2.append($newLinkLi2);
+
+    // count the current form inputs we have (e.g. 2), use that as the new
+    // index when inserting a new item (e.g. 2)
+    $collectionHolder.data('index', $collectionHolder.find(':input').length);
+    $collectionHolder2.data('index', $collectionHolder2.find(':input').length);
+
+    $addTagLink.on('click', function(e) {
+        // prevent the link from creating a "#" on the URL        
+        e.preventDefault();        
+        // add a new tag form (see next code block)
+        addTagForm($collectionHolder, $addTagLink);
+    });
+    
+    $addCommentLink.on('click', function(e) {
+        // prevent the link from creating a "#" on the URL        
+        e.preventDefault();        
+        // add a new tag form (see next code block)
+        addCommentForm($collectionHolder2, $addCommentLink);
+    });
+    ////////////////////////////////////////////////////////////////
+    
+    $('#adjuntarDocumento2').click(function(){        
+        $( "#adjuntarDocumento" ).trigger( "click" ); 
+    }); 
+    
+    $('#agregarComentario2').click(function(){
+        $( "#agregarComentario" ).trigger( "click" ); 
+    });    
 });  
 
 var $origen = $('#incidencia_origenIncidencia');
@@ -62,7 +210,7 @@ loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
 loader.className = 'loader';
 
 var edit = new Image();
-edit.src = '{{ asset('bundles/monsis/images/edit_2.png') }}';
+edit.src = '{{ asset('bundles/monsis/images/pencil_3.png') }}';
 edit.className = 'save';
 
 var del = new Image();
@@ -214,8 +362,10 @@ $validateForm.click(function(){
             $(loader).replaceWith(edit);
             $validateForm.attr('disabled',false);
       } 
-      else{        
-        $('form[name="incidencia"]').submit();
+      else{                
+            alert($('#incidencia_documentosIncidencia').html());
+            //return false;            
+            $('form[name="incidencia"]').submit();
       }
       // Position field now displays the appropriate positions.      
   });    
@@ -230,5 +380,142 @@ $deleteForm.click(function(){
         $('form[name="form"]').submit();
     }    
 });
+
+function addTagForm($collectionHolder, $newLinkLi) { 
+    // ocultar place_holder
+    $('#place_holder').hide();
+    
+    // Get the data-prototype explained earlier
+    var prototype = $collectionHolder.data('prototype');
+
+    // get the new index
+    //var index = $collectionHolder.data('index');        
+    var index = $('.tags').children().length;        
+
+    // Replace '__name__' in the prototype's HTML to
+    // instead be a number based on how many items we have
+    var newForm = prototype.replace(/__name__/g, index);
+
+    // increase the index with one for the next item
+    $collectionHolder.data('index', index + 1);
+
+    // Display the form in the page in an li, before the "Add a tag" link li
+    var $newFormLi = $('<div class="input-group file-field" style="margin-left:40px">').append(newForm);
+    $newLinkLi.before($newFormLi);                
+    
+    // add a delete link to the new form
+    addTagFormDeleteLink($newFormLi);
+}
+
+var $removeFormB = $('.elim-doc');
+
+$removeFormB.on('click', function(e) {
+
+    // si no hay file fields mostrar placeholder        
+    if( $('.file-field').length <= 1)
+        $('#place_holder').show();
+    // prevent the link from creating a "#" on the URL
+    e.preventDefault();        
+    
+    //$('#incidencia_documentosIncidencia_'+$(this).index()).remove();                
+    
+    //alert($(this).parent().parent().index());
+    
+    $('#incidencia_documentosIncidencia_'+$(this).parent().parent().index()+'_nombre').val('eliminado');        
+
+    // remove the li for the tag form
+    $(this).parent().parent().remove();                
+    
+    // si no hay file fields mostrar placeholder        
+    if( $('.file-field').length <= 1)
+        $('#place_holder').show();    
+});
+
+var $removeFormC = $('.elim-com');
+
+$removeFormC.on('click', function(e) {
+    
+    // si no hay file fields mostrar placeholder        
+    if( $('.comment-field').length <= 1)
+        $('#place_holder2').show();
+    // prevent the link from creating a "#" on the URL
+    e.preventDefault();        
+    
+    //$('#incidencia_documentosIncidencia_'+$(this).index()).remove();                
+    
+    //alert($(this).parent().parent().index());
+    
+    $('#incidencia_comentariosIncidencia_'+$(this).parent().parent().index()+'_comentario').val('eliminado');        
+
+    // remove the li for the tag form
+    //$(this).parent().parent().remove();                
+    $(this).parent().parent().hide();                            
+    
+    // si no hay file fields mostrar placeholder        
+    if( $('.comment-field:hidden').length == $('.comment-field').length)
+        $('#place_holder2').show();    
+});
+
+function addTagFormDeleteLink($tagFormLi) {        
+    
+    var $removeFormA = $('<span class="input-group-btn"><a role="button" class="btn elim-doc" href="#"><span class="glyphicon glyphicon-remove"></span></a></span></div>');
+    $tagFormLi.append($removeFormA);
+
+    $removeFormA.on('click', function(e) {
+                        
+        // si no hay file fields mostrar placeholder        
+        if( $('.file-field').length <= 2)
+            $('#place_holder').show();
+        // prevent the link from creating a "#" on the URL
+        e.preventDefault();
+
+        // remove the li for the tag form
+        $tagFormLi.remove();                
+    });
+}
+
+function addCommentForm($collectionHolder2, $newLinkLi2) {    
+    // ocultar place_holder
+    $('#place_holder2').hide();
+    
+    // Get the data-prototype explained earlier
+    var prototype = $collectionHolder2.data('prototype');
+
+    // get the new index
+    var index = $collectionHolder2.data('index');
+
+    // Replace '__name__' in the prototype's HTML to
+    // instead be a number based on how many items we have
+    var newForm = prototype.replace(/__name__/g, index);
+
+    // increase the index with one for the next item
+    $collectionHolder2.data('index', index + 1);
+
+    // Display the form in the page in an li, before the "Add a tag" link li
+    var $newFormLi = $('<div class="input-group comment-field" style="margin-left:40px">').append(newForm);
+    $newLinkLi2.before($newFormLi);
+    
+    // add a delete link to the new form
+    addCommentFormDeleteLink($newFormLi);
+}
+
+function addCommentFormDeleteLink($tagFormLi) {
+    var $removeFormA = $('<span class="input-group-btn"><a role="button" class="btn elim-com" href="#"><span class="glyphicon glyphicon-remove"></span></a></span></div>');
+    $tagFormLi.append($removeFormA);
+
+    $removeFormA.on('click', function(e) {
+                
+        // si no hay file fields mostrar placeholder        
+        if( $('.comment-field').length <= 2)
+            $('#place_holder2').show();
+        // prevent the link from creating a "#" on the URL
+        e.preventDefault();
+
+        // remove the li for the tag form
+        $tagFormLi.remove();
+    });
+}
+
+
 </script>
 {% endblock %}

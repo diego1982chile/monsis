@@ -13,6 +13,11 @@ use Fonasa\MonitorBundle\Entity\DocumentoIncidencia;
 
 use Fonasa\MonitorBundle\Form\IncidenciaType;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 
@@ -39,6 +44,8 @@ class IncidenciaController extends Controller
     {
         $incidencia = new Incidencia();
         
+         $session = $request->getSession();
+        
         //die(json_encode($request->get('documentosIncidencia')));
         
         // dummy code - this is here just so that the Task has some tags
@@ -52,7 +59,7 @@ class IncidenciaController extends Controller
         
         $em = $this->getDoctrine()->getManager();        
         
-        $form = $this->createForm('Fonasa\MonitorBundle\Form\IncidenciaType', $incidencia, array('assign' => false));
+        $form = $this->createForm('Fonasa\MonitorBundle\Form\IncidenciaType', $incidencia, array('filtroComponente' => $session->get('filtroComponente')));
         $form->handleRequest($request);                                
                 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -100,9 +107,9 @@ class IncidenciaController extends Controller
             
             // $file stores the uploaded PDF file
             /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */
-            foreach($incidencia->getDocumentosIncidencia() as $documentoIncidencia){
+            foreach($incidencia->getDocumentosIncidencia() as $key => $documentoIncidencia){
                 
-                $file = $documentoIncidencia->getNombre();
+                $file = $documentoIncidencia->getArchivo();
 
                 // Generate a unique name for the file before saving it
                 $fileName = md5(uniqid()).'.'.$file->guessExtension();
@@ -113,7 +120,11 @@ class IncidenciaController extends Controller
                 
                 $file->move($brochuresDir, $fileName);
                 
-                $documentoIncidencia->setNombre($fileName);
+                $documentoIncidencia->setNombre(str_replace(' ','_',$documentoIncidencia->getTipoDocumentoIncidencia()->getNombre()).
+                                                '_Ticket_'.$incidencia->getNumeroTicket().'_'.($key+1));
+                
+                $documentoIncidencia->setArchivo($fileName);
+                                
                 $documentoIncidencia->setIncidencia($incidencia);
                 $documentoIncidencia->setIdIncidencia($incidencia->getId());
                 
@@ -128,6 +139,23 @@ class IncidenciaController extends Controller
                 //$incidencia->addDocumentosIncidencia($documentoIncidencia);                
                 // ... persist the $product variable or any other work                
             }            
+            
+            foreach($incidencia->getComentariosIncidencia() as $key => $comentarioIncidencia){
+                                                                
+                $comentarioIncidencia->setIncidencia($incidencia);
+                $comentarioIncidencia->setIdIncidencia($incidencia->getId());
+                
+                //$em = $this->getDoctrine()->getManager();
+                $em->persist($comentarioIncidencia);                                    
+                //$em->refresh($documentoIncidencia);
+                //$em->merge($documentoIncidencia);                                    
+                //$em->flush();
+                                
+                // Update the 'brochure' property to store the PDF file name
+                // instead of its contents
+                //$incidencia->addDocumentosIncidencia($documentoIncidencia);                
+                // ... persist the $product variable or any other work                
+            }                        
             
             $em->flush();
                         
@@ -179,18 +207,125 @@ class IncidenciaController extends Controller
      */
     public function editAction(Request $request, Incidencia $incidencia)
     {
+        //die(json_encode($request->request->get('incidencia')));
+        
+        $em = $this->getDoctrine()->getManager();
+                
         $deleteForm = $this->createDeleteForm($incidencia);
         
-        $editForm = $this->createForm('Fonasa\MonitorBundle\Form\IncidenciaType', $incidencia, array('assign' => false));                        
+        $session = $request->getSession();
+        
+        $editForm = $this->createForm('Fonasa\MonitorBundle\Form\IncidenciaType', $incidencia, array('filtroComponente' => $session->get('filtroComponente')));                        
         
         $editForm->handleRequest($request);
-                
+                              
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             
             $incidencia->setTocada(new\DateTime('now'));
-            
-            $em = $this->getDoctrine()->getManager();
+                        
             $em->persist($incidencia);
+            //$em->flush();            
+            
+            foreach($incidencia->getComentariosIncidencia() as $comentarioIncidencia){            
+                                                                                                
+                if ($comentarioIncidencia->getComentario() == 'eliminado') {
+                    
+                    // remove the Task from the Tag                    
+                    $incidencia->removeComentariosIncidencia($comentarioIncidencia);                    
+
+                    // if it was a many-to-one relationship, remove the relationship like this                                
+                    $em->remove($comentarioIncidencia);
+                    $em->persist($incidencia);
+
+                    // if you wanted to delete the Tag entirely, you can also do that
+                    // $em->remove($tag);
+                } 
+                else{                    
+                    //if($tipo != 'string'){
+                               
+                    if($comentarioIncidencia->getId() == null){                        
+                        // Si el tipo es file es un archivo nuevo                                                                    
+
+                        $comentarioIncidencia->setIncidencia($incidencia);
+                        $comentarioIncidencia->setIdIncidencia($incidencia->getId());                                                
+                        $incidencia->addComentariosIncidencia($comentarioIncidencia);
+                        
+                        $em->persist($incidencia);  
+                        
+                        $em->persist($comentarioIncidencia);                                                                          
+                    }                                                                                                                          
+                }                
+            }
+            
+            foreach($incidencia->getDocumentosIncidencia() as $key => $documentoIncidencia){            
+                                                                                
+                $file = $documentoIncidencia->getArchivo();
+                
+                $tipo = gettype($file);                                                            
+                
+                if ($documentoIncidencia->getNombre() == 'eliminado') {
+                    // Eliminar archivo del repositorio
+                    $path = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads/';
+                    $fs = new Filesystem();
+                    
+                    unlink($path.$file);
+                    /*
+                    try {
+                        $fs->remove(array('symlink', $path, $file));
+                    } catch (IOExceptionInterface $e) {
+                        echo "Ha ocurrido un error mientras se eliminaba el archivo ".$documentoIncidencia->getNombre();
+                    }                            
+                    */
+                    // remove the Task from the Tag                    
+                    $incidencia->removeDocumentosIncidencia($documentoIncidencia);                    
+
+                    // if it was a many-to-one relationship, remove the relationship like this                                
+                    $em->remove($documentoIncidencia);
+                    $em->persist($incidencia);
+
+                    // if you wanted to delete the Tag entirely, you can also do that
+                    // $em->remove($tag);
+                } 
+                /*
+                elseif($tipo == 'string' && $documentoIncidencia->getNombre() != 'eliminado'){
+                    //No hacer nada
+                }                
+                */
+                else{                    
+                    //if($tipo != 'string'){
+                               
+                    if($documentoIncidencia->getId() == null){                        
+                        // Si el tipo es file es un archivo nuevo                    
+
+                        // Generate a unique name for the file before saving it
+                        $fileName = md5(uniqid()).'.'.$file->guessExtension();
+
+                        // Move the file to the directory where brochures are stored
+                        //$brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/uploads';
+                        $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads';
+
+                        $file->move($brochuresDir, $fileName);
+
+                        $documentoIncidencia->setNombre(str_replace(' ','_',$documentoIncidencia->getTipoDocumentoIncidencia()->getNombre()).
+                                                        '_Ticket_'.$incidencia->getNumeroTicket().'_'.(count($incidencia->getDocumentosIncidencia())));
+                        
+                        //$documentoIncidencia->setNombre('algo'+$key);
+                        
+                        $documentoIncidencia->setArchivo($fileName);
+                        
+                        //die($documentoIncidencia->getNombre());
+
+                        $documentoIncidencia->setIncidencia($incidencia);
+                        $documentoIncidencia->setIdIncidencia($incidencia->getId());                                                
+                        $incidencia->addDocumentosIncidencia($documentoIncidencia);
+                        
+                        $em->persist($incidencia);  
+                        
+                        $em->persist($documentoIncidencia);                                                                          
+                    }                                                                                                                          
+                }                
+            }            
+            
             $em->flush();
 
             //return $this->redirectToRoute('incidencia_edit', array('id' => $incidencia->getId()));
@@ -315,6 +450,45 @@ class IncidenciaController extends Controller
 
         return $this->redirectToRoute('incidencia_index');
     }
+    
+/**
+     * Deletes a Incidencia entity.
+     *
+     */
+    public function deleteDocumentoAction(Request $request)
+    {        
+        $archivo= $request->request->get('archivo');
+        
+        $em = $this->getDoctrine()->getManager();                    
+        $error = false;
+        $message = 'OK';
+        
+        //Si se esta editando o asignando un servicio se debe proveer el id del servicio        
+        $documentoIncidencia= $em->getRepository('MonitorBundle:DocumentoIncidencia')
+                                 ->createQueryBuilder('di')                                
+                                 ->where('di.archivo = ?1')                                 
+                                 ->setParameter(1, $archivo)                                                     
+                                 ->getQuery()
+                                 ->getResult(); 
+        
+        if(empty($documentoIncidencia)){
+            $error=true;
+            $message='No existe el archivo';
+        }
+        
+        
+        /*
+        $incidencia = $documentoIncidencia[0]->getIncidencia();        
+        $incidencia->removeDocumentosIncidencia($documentoIncidencia[0]);
+                        
+        $em->persist($incidencia);
+        
+        //$em->remove($documentoIncidencia[0]);
+        $em->flush();        
+        */
+        
+        return new JsonResponse(array('error' => $error, 'message' => $message));                
+    }    
 
     /**
      * Creates a form to delete a Servicio entity.
@@ -417,14 +591,10 @@ class IncidenciaController extends Controller
                 ->join('i.categoriaIncidencia', 'ci')
                 ->join('i.componente', 'c')
                 ->join('i.severidad', 's')
-                ->join('i.estadoIncidencia', 'e')                                                
-                ->where('YEAR(i.fechaInicio) = ?1')
-                ->andWhere('MONTH(i.fechaInicio) = ?2');
-        
-        $parameters[1] = $anio;
-        
-        $parameters[2] = $mes;
-                
+                ->join('i.estadoIncidencia', 'e');                                                
+                //->where('YEAR(i.fechaInicio) = ?1')
+                //->andWhere('MONTH(i.fechaInicio) = ?2');
+                        
         if($componente != -1){
             $qb->andWhere('c.id = ?3');
             $parameters[3] = $componente;
@@ -432,6 +602,15 @@ class IncidenciaController extends Controller
         
         if($estado != -1){
             $qb->andWhere('e.nombre in (?4)');                
+        }
+        
+        // Si se estan consultando las incidencias resueltas agregar filtro por mes y año
+        if($estado == 2){            
+            $qb->andWhere('YEAR(i.fechaInicio) = ?1');                
+            $qb->andWhere('MONTH(i.fechaInicio) = ?2');                
+            $parameters[1] = $anio;        
+            $parameters[2] = $mes;
+                    
         }
                         
         switch($estado){

@@ -34,6 +34,8 @@ class MantencionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         
+        $filtroComponente = $options['filtroComponente'];                
+        
         $builder        
             ->add('id', HiddenType::class);            
         
@@ -321,7 +323,8 @@ class MantencionType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Fonasa\MonitorBundle\Entity\Mantencion',
-            'idIncidencia' => 'Symfony\Component\Form\Extension\Core\Type\IntegerType'
+            'idIncidencia' => 'Symfony\Component\Form\Extension\Core\Type\IntegerType',
+            'filtroComponente' => 'Symfony\Component\Form\Extension\Core\Type\IntegerType',
         ));
     }        
 }

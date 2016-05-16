@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% form_theme form 'bootstrap_3_layout.html.twig' %}
 {% block body %}        
-    <h1>Nueva Mantencion</h1>
+    <h1>Nueva Mantencion {{ app.session.get('nombreComponente') }}</h1>
     <div id="form" style="width:60%;display:none">
     {{ form_start(form) }}              
         {{ form_start(form) }}        

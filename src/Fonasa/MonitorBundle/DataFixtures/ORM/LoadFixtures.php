@@ -18,6 +18,7 @@ use Fonasa\MonitorBundle\Entity\TipoMantencion;
 use Fonasa\MonitorBundle\Entity\TareaUsuario;
 use Fonasa\MonitorBundle\Entity\CategoriaIncidencia;
 use Fonasa\MonitorBundle\Entity\TipoRequerimiento;
+use Fonasa\MonitorBundle\Entity\TipoDocumentoIncidencia;
 
 use Fonasa\MonitorBundle\Entity\Incidencia;
 use Fonasa\MonitorBundle\Entity\Mantencion;
@@ -36,6 +37,22 @@ class LoadFixtures extends Controller implements FixtureInterface
         
         $em = $this->getDoctrine()->getManager();
         $connection = $em->getConnection();
+        
+        $connection->exec("ALTER TABLE tipo_documento_incidencia AUTO_INCREMENT = 1;");
+        
+        $tipoDocumentoIncidencia1 = new TipoDocumentoIncidencia();
+                
+        $tipoDocumentoIncidencia1->setNombre("Captura Pantalla");
+        $tipoDocumentoIncidencia1->setDescripcion("Captura Pantalla");                
+                
+        $manager->persist($tipoDocumentoIncidencia1);        
+        
+        $tipoDocumentoIncidencia2 = new TipoDocumentoIncidencia();
+                
+        $tipoDocumentoIncidencia2->setNombre("Documento de análisis");
+        $tipoDocumentoIncidencia2->setDescripcion("Documento de análisis");                
+                
+        $manager->persist($tipoDocumentoIncidencia2);        
         
         $connection->exec("ALTER TABLE area AUTO_INCREMENT = 1;");
         
@@ -1342,7 +1359,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         
         //------------------------------POBLAR INCIDENCIAS-----------------------------------------------
         
-        echo "  > cargando Data Transaccional...\r";
+        echo "  > cargando Datos Dummy...\r";
         
         $descripcionesIncidencia=[
             'Crear a un nuevo Medico en sistema',
@@ -1505,7 +1522,7 @@ class LoadFixtures extends Controller implements FixtureInterface
             $manager->persist($mantencion);
             $manager->flush();    
         }        
-        echo "  > cargando Data Transaccional OK\n";
+        echo "  > cargando Datos Dummy OK\n";
     
         echo "  > cargando Objetos BD...\r";
         loadDbObjects($connection);

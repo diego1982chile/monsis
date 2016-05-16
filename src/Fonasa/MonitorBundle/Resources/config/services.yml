@@ -29,5 +29,5 @@ services:
         class: Fonasa\MonitorBundle\Twig\GlobalFiltersExtension
         arguments:  ["@service_container"]
         tags:
-            - { name: twig.extension }         
+            - { name: twig.extension }             
             

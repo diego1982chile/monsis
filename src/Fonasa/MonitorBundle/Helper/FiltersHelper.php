@@ -59,7 +59,7 @@ class FiltersHelper {
         $estados = array(            
                     'Activas' => 1,
                     'Resueltas' => 2,
-                    'Todas' => -1
+                    //'Todas' => -1
         );  
         
         $componentes = $this->em->getRepository('MonitorBundle:Componente')
@@ -81,6 +81,14 @@ class FiltersHelper {
         
         array_push($componentes,$componente);
         */
+        $form_visible = 'display:none';
+        $label_visible = false;
+        
+        if($this->session->get('filtroEstado') == 2){
+            $form_visible = 'display:inline';
+            $label_visible = null;
+        }
+            
         
         return $form_filtros = $this->formFactory->createBuilder()
             ->add('Componente', ChoiceType::class, array(
@@ -125,12 +133,12 @@ class FiltersHelper {
                                             return ['selected' => false];                                        
                                     }                            
                             },                 
-                'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')))                   
+                'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')))               
             ->add('Mes', ChoiceType::class, array(
-                'choices' => $meses, 
-                'choices_as_values' => true, 
-                //'data' => intval(date("m")),
-                'choice_attr' => function($val, $key, $index) {
+                  'choices' => $meses, 
+                  'choices_as_values' => true, 
+                  //'data' => intval(date("m")),
+                  'choice_attr' => function($val, $key, $index) {
                                     if($this->session->get('filtroMes') != null){
                                         if($index==$this->session->get('filtroMes'))
                                             return ['selected' => true];
@@ -144,6 +152,8 @@ class FiltersHelper {
                                             return ['selected' => false];                                        
                                     }                            
                             },                                 
+                  'attr' => array('style' => $form_visible),
+                  'label' => $label_visible                                                      
                 ))
             ->add('Anio', ChoiceType::class, array(
                 'choices' => $anyos, 
@@ -162,6 +172,8 @@ class FiltersHelper {
                                             return ['selected' => false];                                        
                                     }                            
                             },                                 
+                'attr' => array('style' => $form_visible),
+                'label' => $label_visible                                    
                 ))
             ->add('Reset', CheckBoxType::class, array(                  
                 'label' => 'Reset Filtros',

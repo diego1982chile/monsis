@@ -31,7 +31,7 @@ use Fonasa\MonitorBundle\Entity\TipoDocumentoIncidencia;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class DocumentoIncidenciaType extends AbstractType
+class ComentarioIncidenciaType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -39,46 +39,31 @@ class DocumentoIncidenciaType extends AbstractType
             ->addEventListener(
                 FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) {                    
-                    $documentoIncidencia = $event->getData();
+                    $comentarioIncidencia = $event->getData();
                     $form = $event->getForm();
 
                     // Check whether the user from the initial data has chosen to
                     // display his email or not.
-                    if (!$documentoIncidencia) {                        
-                        $form
-                            ->add('tipoDocumentoIncidencia', EntityType::class, array(
-                                  'class' => 'MonitorBundle:TipoDocumentoIncidencia',
-                                  'choice_label' => 'nombre',
-                                  //'expanded' => true,
-                                  //'multiple' => false,
-                                  'position' => 'first',
-                                  'attr' => array('style' => 'margin-bottom:10px'),
-                                  'placeholder' => 'Seleccione una opción...',
-                                  'label' => 'Tipo Documento',                                  
-                            ))
-                            ->add('archivo', FileType::class, array(
+                    if (!$comentarioIncidencia) {                        
+                        $form                            
+                            ->add('comentario', TextType::class, array(
                                   'label' => false,
-                                  'data_class' => null,
+                                  //'data_class' => null,
                                   //'property_path' => 'archivo',                                      
-                                  //'attr' => array('style' => 'margin-top:10px'),
+                                  'attr' => array('style' => 'margin-top:0px;margin-bottom:10px'),
 
                             ));                                                                                      
                     }
                     else
                     {
                         $form
-                            ->add('nombre', TextType::class, array(
+                            ->add('comentario', TextType::class, array(
                                   'label' => false,
-                                  'data_class' => null,
-                                  'attr' => array('style' => 'display:none'),
+                                  //'data_class' => null,
+                                  //'attr' => array('style' => 'display:none'),
                                   //'property_path' => 'archivo',                                                          
-                            ))
-                            ->add('archivo', TextType::class, array(
-                                  'label' => false,
-                                  'data_class' => null,
-                                  'attr' => array('style' => 'display:none')
-                                  //'property_path' => 'archivo',                                                          
-                            ));  
+                                  'attr' => array('style' => 'margin-top:0px;margin-bottom:10px'),
+                            ));                           
                         
                     }
 
@@ -89,7 +74,7 @@ class DocumentoIncidenciaType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Fonasa\MonitorBundle\Entity\DocumentoIncidencia',
+            'data_class' => 'Fonasa\MonitorBundle\Entity\ComentarioIncidencia',
             'allow_extra_fields' => true
             //'attr' => array('class' => 'btn btn-default active'),
         ));

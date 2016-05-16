@@ -56,6 +56,7 @@ class ControllerListener
             case 'body':                
                 //Obtener parámetros de filtros
                 $componente= $request->query->get('componente');
+                $nombreComponente= $request->query->get('nombreComponente');
                 $anio= $request->query->get('anio');
                 $mes= $request->query->get('mes');
                 $estado= $request->query->get('estado');                
@@ -64,13 +65,15 @@ class ControllerListener
                 //Setear filtros en la sesion        
                 // Si se estan reseteando los filtros limpiar las variables de la sesion                               
                 if($resetFiltros){
-                    $this->session->set('filtroComponente',null);        
+                    $this->session->set('filtroComponente',null);    
+                    $this->session->set('nombreComponente','SIGGES');    
                     $this->session->set('filtroAnio',null);
                     $this->session->set('filtroMes',null);
                     $this->session->set('filtroEstado',null);        
                 }
                 else{            
                     $this->session->set('filtroComponente',$componente);        
+                    $this->session->set('nombreComponente',$nombreComponente);    
                     $this->session->set('filtroAnio',$anio);
                     $this->session->set('filtroMes',$mes);
                     $this->session->set('filtroEstado',$estado);        

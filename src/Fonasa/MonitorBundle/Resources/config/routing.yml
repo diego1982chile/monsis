@@ -58,6 +58,11 @@ incidencia_mantencion:
     defaults: { _controller: "MonitorBundle:Incidencia:mantencion" }
     methods:  [GET,POST]                
     
+incidencia_delete_documento:
+    path:     /incidencia/delete_documento
+    defaults: { _controller: "MonitorBundle:Incidencia:deleteDocumento" }
+    methods:  [GET,POST]       
+    
 mantencion_index:
     path:     /mantencion
     defaults: { _controller: "MonitorBundle:Mantencion:index" }

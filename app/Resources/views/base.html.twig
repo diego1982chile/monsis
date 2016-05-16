@@ -282,14 +282,30 @@
                 color: LightSlateGray;
             }
             
+            .elim-com{
+                color: LightSlateGray;
+            }
+            
             .file-field{                                                
-                border: 1px solid lightgray;
-                margin: 2px;
+                border: 1px solid lightgray;                
+                margin-bottom: 10px;                
                 background-color: ghostwhite;                
+                padding:6px;
             }
             
             .file-field .form-group{
-                margin:6px;
+                margin:10px;                
+            }
+            
+            .comment-field{                                                
+                border: 1px solid lightgray;                
+                margin-bottom: 10px;                
+                background-color: ghostwhite;                
+                padding:6px;
+            }
+            
+            .comment-field .form-group{
+                margin:10px;                
             }
             
         </style>
@@ -378,6 +394,7 @@
     <script src="{{ asset('bundles/monsis/js/highcharts-3d.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/modules/exporting.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/modules/drilldown.js') }}"></script>    
+    <script src="{{ asset('bundles/monsis/js/loadingoverlay.js') }}"></script>        
     {% block javascripts %}
     <script>             
     </script>

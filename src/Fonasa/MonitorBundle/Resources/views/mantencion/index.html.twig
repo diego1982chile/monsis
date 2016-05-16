@@ -80,6 +80,7 @@
     var $estado = $('#form_Estado');
     var $componente = $('#form_Componente');
     var $resetFiltros = $('#form_Reset');
+    var cambioEstado = false;
     
     var loader = new Image();
     loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
@@ -97,11 +98,19 @@
     
     
     function updateTitle(){
-        $('#title').html("Mantenciones "+
+        if($estado.find('option:selected').text() == 'Resueltas'){
+            $('#title').html("Mantenciones "+
                          $estado.find('option:selected').text()+" "+
                          $componente.find('option:selected').text()+" "+
                          $mes.find('option:selected').text()+" "+
-                         $anio.val());        
+                         $anio.val());           
+        }        
+        else{
+            $('#title').html("Mantenciones "+
+                         $estado.find('option:selected').text()+" "+
+                         $componente.find('option:selected').text()
+                         );           
+        }
     }
     
     $(function() {
@@ -151,8 +160,8 @@
                 sSearch: "Buscar:",
                 sProcessing: "Procesando...",
                 oPaginate: {
-                    sPrevious: "<",
-                    sNext: ">",                    
+                    sPrevious: "«",
+                    sNext: "»",              
                 }
             },                     
             fnDrawCallback: function( oSettings ) {
@@ -242,6 +251,8 @@
     });
 
     $estado.change(function() {
+        $.LoadingOverlay("show");
+        cambioEstado = true;
         updateTitle();
         oTable.fnDraw();            
     });

@@ -41,10 +41,12 @@ class MantencionController extends Controller
         $em = $this->getDoctrine()->getManager();  
         
         $idIncidencia = $request->attributes->get('idIncidencia');
+        $session = $request->getSession();
         
         $mantencion = new Mantencion();
         $form = $this->createForm('Fonasa\MonitorBundle\Form\MantencionType', $mantencion, array(
-                                  'idIncidencia' => $idIncidencia
+                                  'idIncidencia' => $idIncidencia,
+                                  'filtroComponente' => $session->get('filtroComponente')
         ));
         $form->handleRequest($request);                
 

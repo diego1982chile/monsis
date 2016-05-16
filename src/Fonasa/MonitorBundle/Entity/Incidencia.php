@@ -184,10 +184,15 @@ class Incidencia
     
     
     /**          
-     * @ORM\OneToMany(targetEntity="DocumentoIncidencia", mappedBy="incidencia")          
+     * @ORM\OneToMany(targetEntity="DocumentoIncidencia", mappedBy="incidencia", orphanRemoval=true)          
      */
     public $documentosIncidencia;            
     
+    /**          
+     * @ORM\OneToMany(targetEntity="ComentarioIncidencia", mappedBy="incidencia", orphanRemoval=true)          
+     */
+    public $comentariosIncidencia;    
+        
     /**
      * Get id
      *
@@ -684,7 +689,7 @@ class Incidencia
     */
     public function addDocumentosIncidencia(DocumentoIncidencia $documentoIncidencia = null){
         
-        $this->documentosIncidencia[] = $documentoIncidencia;
+        $this->documentosIncidencia->add($documentoIncidencia);
         
         return $this;
     }
@@ -698,6 +703,46 @@ class Incidencia
     public function removeDocumentosIncidencia(DocumentoIncidencia $documentoIncidencia = null){
         
         $this->documentosIncidencia->removeElement($documentoIncidencia);
+        $documentoIncidencia->setIncidencia(null);
+        
+        return $this;
+    }    
+    
+    //-------------------------------------------------------------------------
+    
+    /**
+    * Get comentariosIncidencia
+    *    
+    * @return \Doctrine\Common\Collections\Collection
+    */
+    public function getComentariosIncidencia(){
+        
+        return $this->comentariosIncidencia;
+    }
+    
+    /**
+    * Add comentariosIncidencia
+    *    
+    * @param \Fonasa\MonitorBundle\Entity\ComentarioIncidencia $comentarioIncidencia
+    * @return Incidencia
+    */
+    public function addComentariosIncidencia(ComentarioIncidencia $comentarioIncidencia = null){
+        
+        $this->comentariosIncidencia->add($comentarioIncidencia);
+        
+        return $this;
+    }
+    
+    /**
+    * Remove comentariosIncidencia
+    *    
+    * @param \Fonasa\MonitorBundle\Entity\ComentarioIncidencia $documentoIncidencia
+    * @return Incidencia
+    */
+    public function removeComentariosIncidencia(ComentarioIncidencia $comentarioIncidencia = null){
+        
+        $this->comentariosIncidencia->removeElement($comentarioIncidencia);
+        $comentarioIncidencia->setIncidencia(null);
         
         return $this;
     }    

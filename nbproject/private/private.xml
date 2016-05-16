@@ -46,6 +46,8 @@
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/config/routing.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/CategoriaIncidencia.php</file>
             <file>file:/C:/xampp/htdocs/monsis/app/config/security.yml</file>
+            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/TipoDocumentoIncidencia.php</file>
+            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Form/DocumentoIncidenciaType.php</file>
             <file>file:/C:/xampp/htdocs/monsis/app/config/config.yml</file>
             <file>file:/C:/xampp/htdocs/monsis/app/Resources/views/base.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/mantencion/show.html.twig</file>
@@ -54,6 +56,7 @@
             <file>file:/C:/xampp/htdocs/monsis/app/AppCache.php</file>
             <file>file:/C:/xampp/htdocs/monsis/web/app_dev.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/config/services.yml</file>
+            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/Form/fields.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/app/Resources/FOSUserBundle/views/layout.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/Severidad.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Form/IncidenciaType.php</file>
@@ -62,11 +65,14 @@
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/TipoMantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Resources/views/incidencia/index.html.twig</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/EventListener/ControllerListener.php</file>
+            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/DocumentoIncidencia.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/DataFixtures/ORM/jobs/scheduler_hh_incidencias.sql</file>
+            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Repository/DocumentoIncidenciaRepository.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/DataFixtures/ORM/procedures/round_robin_incidencias.sql</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/DataFixtures/ORM/jobs/scheduler_hh_mantenciones.sql</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/EventListener/LoginSuccessHandler.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/DataFixtures/ORM/procedures/round_robin_mantenciones.sql</file>
+            <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Form/Extension/ImageTypeExtension.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/OrigenIncidencia.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/Mantencion.php</file>
             <file>file:/C:/xampp/htdocs/monsis/src/Fonasa/MonitorBundle/Entity/TipoRequerimiento.php</file>

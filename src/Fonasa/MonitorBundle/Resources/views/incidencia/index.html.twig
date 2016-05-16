@@ -76,10 +76,11 @@
     var $estado = $('#form_Estado');
     var $componente = $('#form_Componente');        
     var $resetFiltros = $('#form_Reset');
+    var cambioEstado = false;
     
     var loader = new Image();
     loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
-    loader.className = 'loader';
+    loader.className = 'loader';      
 
     var reset = new Image();
     reset.src = '{{ asset('bundles/monsis/images/reset_1.png') }}';
@@ -87,16 +88,28 @@
     
     $resetFiltros.children(':eq(0)').append(reset);
     
+    $.LoadingOverlaySetup({                
+        image           : '{{ asset('bundles/monsis/images/loading.gif') }}',
+    });
+    
     $( window ).load(function() {
         $('#filtros').show();
     });
     
     function updateTitle(){
-        $('#title').html("Incidencias "+
+        if($estado.find('option:selected').text() == 'Resueltas'){
+            $('#title').html("Incidencias "+
                          $estado.find('option:selected').text()+" "+
                          $componente.find('option:selected').text()+" "+
                          $mes.find('option:selected').text()+" "+
-                         $anio.val());        
+                         $anio.val());           
+        }        
+        else{
+            $('#title').html("Incidencias "+
+                         $estado.find('option:selected').text()+" "+
+                         $componente.find('option:selected').text()
+                         );           
+        }
     }
     
     var dialog = $( "#dialog-form" ).dialog({
@@ -169,8 +182,8 @@
                 sSearch: "Buscar:",
                 sProcessing: "Procesando...",
                 oPaginate: {
-                    sPrevious: "<",
-                    sNext: ">",                    
+                    sPrevious: "«",
+                    sNext: "»",                    
                 }
             },                    
             fnDrawCallback: function( oSettings ) {
@@ -183,8 +196,9 @@
 			aoData.push( { "name": "anio", "value": $anio.val() } );
                         aoData.push( { "name": "mes", "value": $mes.val() } );
                         aoData.push( { "name": "estado", "value": $estado.val() } );
-                        aoData.push( { "name": "componente", "value": $componente.val() } );                        
-                        aoData.push( { "name": "resetFiltros", "value": $resetFiltros.find(':checked').val() } );                                                
+                        aoData.push( { "name": "componente", "value": $componente.val() } );                     
+                        aoData.push( { "name": "nombreComponente", "value": $componente.find(':selected').text() } );
+                        aoData.push( { "name": "resetFiltros", "value": $resetFiltros.find(':checked').val() } );                        
                         
 			$.getJSON( sSource, aoData, function (json) { 
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                
@@ -225,10 +239,15 @@
                                 else
                                     return true;
                             });                                                           
-                                                        
+                            //Si se resetean los filtros recargar los filtros
                             if($resetFiltros.find(':checked').val()){                                                                                                    
                                 location.reload();  
                             }                            
+                            //Si se modifica el filtro por estado recargar los filtros
+                            if(cambioEstado){                                         
+                                // Show full page Loading Overlay
+                                location.reload();  
+                            }                                                        
 			});
                     }                    
                 });                                                                          
@@ -244,6 +263,8 @@
         });
         
         $estado.change(function() {
+            $.LoadingOverlay("show");
+            cambioEstado = true;
             updateTitle();
             oTable.fnDraw();            
         });
@@ -254,6 +275,7 @@
         });
         
         $resetFiltros.click(function() {
+            $.LoadingOverlay("show");
             $(reset).parent().children(':eq(1)').replaceWith(loader);    
             $(this).attr('disabled',true);            
             updateTitle();
