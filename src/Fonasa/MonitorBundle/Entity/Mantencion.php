@@ -207,6 +207,11 @@ class Mantencion
      * @ORM\OneToMany(targetEntity="HhMantencion", mappedBy="mantencion")          
      */
     protected $hhsMantencion;        
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="DocumentoMantencion", mappedBy="mantencion", orphanRemoval=true)          
+     */
+    public $documentosMantencion = array();            
         
     /**
      * @var \Incidencia
@@ -902,6 +907,47 @@ class Mantencion
         
         return $this;
     }
+    
+    //------------------------------------------------------------------------
+    
+    /**
+    * Get documentosMantencion
+    *    
+    * @return \Doctrine\Common\Collections\Collection
+    */
+    public function getDocumentosMantencion(){
+        
+        return $this->documentosMantencion;
+    }
+    
+    /**
+    * Add documentosMantencion
+    *    
+    * @param \Fonasa\MonitorBundle\Entity\DocumentoMantencion $documentoMantencion
+    * @return Mantencion
+    */
+    public function addDocumentosMantencion(DocumentoMantencion $documentoMantencion = null){
+               
+        //$this->documentosMantencion->add($documentoMantencion);
+        
+        $this->documentosMantencion[] = $documentoMantencion;
+        
+        return $this;
+    }
+    
+    /**
+    * Remove documentosMantencion
+    *    
+    * @param \Fonasa\MonitorBundle\Entity\DocumentoMantencion $documentoMantencion
+    * @return Mantencion
+    */
+    public function removeDocumentosMantencion(DocumentoMantencion $documentoMantencion = null){
+        
+        $this->documentosMantencion->removeElement($documentoMantencion);
+        $documentoMantencion->setMantencion(null);
+        
+        return $this;
+    }    
    
 }
 

@@ -176,7 +176,7 @@ class IncidenciaType extends AbstractType
                            'placeholder' => 'Seleccione una opción...',
                            'choice_label' => 'nombre',
                            'choices_as_values' => true,                                                                                                                                                                                   
-                ));                        
+            ));                        
         }                                                                  
         
         $builder                                                    

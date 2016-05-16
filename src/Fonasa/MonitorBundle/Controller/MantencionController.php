@@ -37,20 +37,23 @@ class MantencionController extends Controller
      *
      */
     public function newAction(Request $request)
-    {
+    {                
         $em = $this->getDoctrine()->getManager();  
         
         $idIncidencia = $request->attributes->get('idIncidencia');
-        $session = $request->getSession();
+        $session = $request->getSession();                
         
         $mantencion = new Mantencion();
         $form = $this->createForm('Fonasa\MonitorBundle\Form\MantencionType', $mantencion, array(
                                   'idIncidencia' => $idIncidencia,
                                   'filtroComponente' => $session->get('filtroComponente')
-        ));
-        $form->handleRequest($request);                
+        ));                
+        
+        //die(json_encode($request->request->get('mantencion')));
+        
+        $form->handleRequest($request);                                                
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {                        
                         
             $inicioProgramado=$request->request->get('mantencion')['inicioProgramado'];
             //$fechaInicio=$request->request->get('mantencion')['fechaInicio']['date'];                                                
@@ -92,7 +95,7 @@ class MantencionController extends Controller
             
             //$em = $this->getDoctrine()->getManager();
             $em->persist($mantencion);
-            $em->flush();
+            //$em->flush();
             
             //echo '"'.$mantencion->getId().'"';
             
@@ -107,7 +110,40 @@ class MantencionController extends Controller
                  //Si no es inicio programado setear la fecha de inicio
                 $mantencion->setFechaInicio($fechaIngreso);
                 $msg='La mantención se ha iniciado y ha quedado asignada al área de desarrollo.';                            
+            }            
+            
+            // $file stores the uploaded PDF file
+            /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            if (is_array($mantencion->getDocumentosMantencion()) || 
+                is_object($mantencion->getDocumentosMantencion()))
+            {
+                foreach($mantencion->getDocumentosMantencion() as $key => $documentoMantencion){
+
+                    $file = $documentoMantencion->getArchivo();
+
+                    // Generate a unique name for the file before saving it
+                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
+
+                    // Move the file to the directory where brochures are stored
+                    //$brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/uploads';
+                    $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads';
+
+                    $file->move($brochuresDir, $fileName);
+
+                    $documentoMantencion->setNombre(str_replace(' ','_',$documentoMantencion->getTipoDocumentoMantencion()->getNombre()).
+                                                    '_'.$mantencion->getCodigoInterno().'_'.($key+1));
+
+                    $documentoMantencion->setArchivo($fileName);
+
+                    $documentoMantencion->setMantencion($mantencion);
+                    $documentoMantencion->setIdMantencion($mantencion->getId());
+
+                    //$em = $this->getDoctrine()->getManager();
+                    $em->persist($documentoMantencion);                                                    
+                }         
             }
+            
+            $em->flush();
 
             if($idIncidencia == null){
                 $this->addFlash(
@@ -177,9 +213,14 @@ class MantencionController extends Controller
      */
     public function editAction(Request $request, Mantencion $mantencion)
     {
+        //die(json_encode($request->request->get('mantencion')));
+        
+        $session = $request->getSession();   
+        
         $deleteForm = $this->createDeleteForm($mantencion);
         $editForm = $this->createForm('Fonasa\MonitorBundle\Form\MantencionType', $mantencion, array(
-                                      'idIncidencia' => $mantencion->getIdIncidencia()
+                                      'idIncidencia' => $mantencion->getIdIncidencia(),
+                                      'filtroComponente' => $session->get('filtroComponente')
                                       ));
         $editForm->handleRequest($request);
 
@@ -189,6 +230,77 @@ class MantencionController extends Controller
             $mantencion->setTocada(new\DateTime('now'));
             
             $em->persist($mantencion);
+            //$em->flush();
+            
+            foreach($mantencion->getDocumentosMantencion() as $key => $documentoMantencion){            
+                                                                                
+                $file = $documentoMantencion->getArchivo();
+                
+                $tipo = gettype($file);                                                            
+                
+                if ($documentoMantencion->getNombre() == 'eliminado') {
+                    // Eliminar archivo del repositorio
+                    $path = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads/';
+                    //$fs = new Filesystem();
+                    
+                    unlink($path.$file);
+                    /*
+                    try {
+                        $fs->remove(array('symlink', $path, $file));
+                    } catch (IOExceptionInterface $e) {
+                        echo "Ha ocurrido un error mientras se eliminaba el archivo ".$documentoIncidencia->getNombre();
+                    }                            
+                    */
+                    // remove the Task from the Tag                    
+                    $mantencion->removeDocumentosMantencion($documentoMantencion);                    
+
+                    // if it was a many-to-one relationship, remove the relationship like this                                
+                    $em->remove($documentoMantencion);
+                    $em->persist($mantencion);
+
+                    // if you wanted to delete the Tag entirely, you can also do that
+                    // $em->remove($tag);
+                } 
+                /*
+                elseif($tipo == 'string' && $documentoIncidencia->getNombre() != 'eliminado'){
+                    //No hacer nada
+                }                
+                */
+                else{                    
+                    //if($tipo != 'string'){
+                               
+                    if($documentoMantencion->getId() == null){                        
+                        // Si el tipo es file es un archivo nuevo                    
+
+                        // Generate a unique name for the file before saving it
+                        $fileName = md5(uniqid()).'.'.$file->guessExtension();
+
+                        // Move the file to the directory where brochures are stored
+                        //$brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/uploads';
+                        $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads';
+
+                        $file->move($brochuresDir, $fileName);
+
+                        $documentoMantencion->setNombre(str_replace(' ','_',$documentoMantencion->getTipoDocumentoMantencion()->getNombre()).
+                                                        '_'.$mantencion->getCodigoInterno().'_'.(count($mantencion->getDocumentosMantencion())));
+                        
+                        //$documentoIncidencia->setNombre('algo'+$key);
+                        
+                        $documentoMantencion->setArchivo($fileName);
+                        
+                        //die($documentoIncidencia->getNombre());
+
+                        $documentoMantencion->setMantencion($mantencion);
+                        $documentoMantencion->setIdMantencion($mantencion->getId());                                                
+                        $mantencion->addDocumentosMantencion($documentoMantencion);
+                        
+                        $em->persist($mantencion);  
+                        
+                        $em->persist($documentoMantencion);                                                                          
+                    }                                                                                                                          
+                }                
+            }                        
+            
             $em->flush();
             
             $this->addFlash(
@@ -423,13 +535,13 @@ class MantencionController extends Controller
                 ->join('m.componente', 'c')
                 ->join('m.estadoMantencion', 'e')
                 //->join('i.severidad', 'o')
-                ->join('m.estadoMantencion', 'em')                                                                
-                ->where('YEAR(m.fechaInicio) = ?1')
-                ->andWhere('MONTH(m.fechaInicio) = ?2');                
+                ->join('m.estadoMantencion', 'em');
+                //->where('YEAR(m.fechaInicio) = ?1')
+                //->andWhere('MONTH(m.fechaInicio) = ?2');                           
         
-        $parameters[1] = $anio;
+        //$parameters[1] = $anio;
         
-        $parameters[2] = $mes;
+        //$parameters[2] = $mes;
         
         if($componente != -1){
             $qb->andWhere('c.id = ?3');
@@ -438,6 +550,15 @@ class MantencionController extends Controller
         
         if($estado != -1){
             $qb->andWhere('e.nombre in (?4)');                
+        }
+        
+        // Si se estan consultando las incidencias resueltas agregar filtro por mes y año
+        if($estado == 2){            
+            $qb->andWhere('YEAR(i.fechaInicio) = ?1');                
+            $qb->andWhere('MONTH(i.fechaInicio) = ?2');                
+            $parameters[1] = $anio;        
+            $parameters[2] = $mes;
+                    
         }
         
         switch($estado){

@@ -44,9 +44,9 @@ class IncidenciaController extends Controller
     {
         $incidencia = new Incidencia();
         
-         $session = $request->getSession();
+        $session = $request->getSession();
         
-        //die(json_encode($request->get('documentosIncidencia')));
+        //die(json_encode($request->get('incidencia')));
         
         // dummy code - this is here just so that the Task has some tags
         // otherwise, this isn't an interesting example
@@ -266,7 +266,7 @@ class IncidenciaController extends Controller
                 if ($documentoIncidencia->getNombre() == 'eliminado') {
                     // Eliminar archivo del repositorio
                     $path = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads/';
-                    $fs = new Filesystem();
+                    //$fs = new Filesystem();
                     
                     unlink($path.$file);
                     /*

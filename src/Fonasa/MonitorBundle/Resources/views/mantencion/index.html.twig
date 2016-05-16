@@ -175,7 +175,8 @@
                         aoData.push( { "name": "mes", "value": $mes.val() } );
                         aoData.push( { "name": "estado", "value": $estado.val() } );
                         aoData.push( { "name": "componente", "value": $componente.val() } );
-                        aoData.push( { "name": "resetFiltros", "value": $resetFiltros.find(':checked').val() } );
+                        aoData.push( { "name": "nombreComponente", "value": $componente.find(':selected').text() } );
+                        aoData.push( { "name": "resetFiltros", "value": $resetFiltros.find(':checked').val() } );                                                
                         
 			$.getJSON( sSource, aoData, function (json) { 
                             /* Do whatever additional processing you want on the callback, then tell DataTables */                                

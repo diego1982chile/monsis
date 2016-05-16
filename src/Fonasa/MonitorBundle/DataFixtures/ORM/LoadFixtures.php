@@ -19,6 +19,7 @@ use Fonasa\MonitorBundle\Entity\TareaUsuario;
 use Fonasa\MonitorBundle\Entity\CategoriaIncidencia;
 use Fonasa\MonitorBundle\Entity\TipoRequerimiento;
 use Fonasa\MonitorBundle\Entity\TipoDocumentoIncidencia;
+use Fonasa\MonitorBundle\Entity\TipoDocumentoMantencion;
 
 use Fonasa\MonitorBundle\Entity\Incidencia;
 use Fonasa\MonitorBundle\Entity\Mantencion;
@@ -52,7 +53,44 @@ class LoadFixtures extends Controller implements FixtureInterface
         $tipoDocumentoIncidencia2->setNombre("Documento de análisis");
         $tipoDocumentoIncidencia2->setDescripcion("Documento de análisis");                
                 
-        $manager->persist($tipoDocumentoIncidencia2);        
+        $manager->persist($tipoDocumentoIncidencia2);    
+        
+        $connection->exec("ALTER TABLE tipo_documento_mantencion AUTO_INCREMENT = 1;");
+        
+        $tipoDocumentoMantencion1 = new TipoDocumentoMantencion();
+                
+        $tipoDocumentoMantencion1->setNombre("Captura Pantalla");
+        $tipoDocumentoMantencion1->setDescripcion("Captura Pantalla");                
+                
+        $manager->persist($tipoDocumentoMantencion1);        
+        
+        $tipoDocumentoMantencion2 = new TipoDocumentoMantencion();
+                
+        $tipoDocumentoMantencion2->setNombre("Documento de análisis");
+        $tipoDocumentoMantencion2->setDescripcion("Documento de análisis");                
+                
+        $manager->persist($tipoDocumentoMantencion2);    
+        
+        $tipoDocumentoMantencion3 = new TipoDocumentoMantencion();
+                
+        $tipoDocumentoMantencion3->setNombre("Documento Oracle");
+        $tipoDocumentoMantencion3->setDescripcion("Documento Oracle");                
+                
+        $manager->persist($tipoDocumentoMantencion3);         
+        
+        $tipoDocumentoMantencion4 = new TipoDocumentoMantencion();
+                
+        $tipoDocumentoMantencion4->setNombre("Documento Java");
+        $tipoDocumentoMantencion4->setDescripcion("Documento Java");                
+                
+        $manager->persist($tipoDocumentoMantencion4);         
+        
+        $tipoDocumentoMantencion5 = new TipoDocumentoMantencion();
+                
+        $tipoDocumentoMantencion5->setNombre("Documento Evidencia");
+        $tipoDocumentoMantencion5->setDescripcion("Documento Evidencia");                
+                
+        $manager->persist($tipoDocumentoMantencion5);                         
         
         $connection->exec("ALTER TABLE area AUTO_INCREMENT = 1;");
         

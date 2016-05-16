@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -36,6 +38,26 @@ class MantencionType extends AbstractType
         
         $filtroComponente = $options['filtroComponente'];                
         
+        $formModifierInicioProgramado = function (FormInterface $form, $inicioProgramado = null) {
+        
+            if($inicioProgramado == null)
+                return;                         
+            
+            if($inicioProgramado){
+                $form 
+                ->add('fechaInicio', DateTimeType::class, array(
+                'date_widget'=> 'single_text',
+                'date_format'=>'d/MM/y',
+                'data'=> new \DateTime()
+                //'disabled' => true
+                )); 
+            }
+            else{
+                $form 
+                ->remove('fechaInicio');
+            }            
+        };   
+        
         $builder        
             ->add('id', HiddenType::class);            
         
@@ -57,23 +79,60 @@ class MantencionType extends AbstractType
                          },                                                               
                          'attr' => array('style' => 'display:none'),
                          'label' => false                                 
-                ))                    
-                ->add('componente', EntityType::class, array(
-                      'class' => 'MonitorBundle:Componente',
-                      'query_builder' => function (EntityRepository $er) use ($options) {
-                                       return $er->createQueryBuilder('c')
-                                       ->join('c.incidencias', 'i')
-                                       ->where('i.id = ?1')
-                                       ->setParameter(1, $options['idIncidencia'])                                       
-                                       ->orderBy('c.nombre', 'DESC');
-                      },                    
-                      'choice_label' => 'nombre',                                         
-                      'position' => 'first',                      
-                      'attr' => array('style' => 'display:none'),
-                      'label' => false                    
-                      //'position' => array('after' => 'origenMantencion'),
-                      //'disabled' => true, 
-                ))                    
+                ));
+                         
+                if($filtroComponente == -1){
+                    
+                    $builder
+                    ->add('componente', EntityType::class, array(
+                          'class' => 'MonitorBundle:Componente',
+                          'query_builder' => function (EntityRepository $er) use ($options) {
+                                           return $er->createQueryBuilder('c')
+                                           ->join('c.incidencias', 'i')
+                                           ->where('i.id = ?1')
+                                           ->setParameter(1, $options['idIncidencia'])                                       
+                                           ->orderBy('c.nombre', 'DESC');
+                          },                    
+                          'choice_label' => 'nombre',                                         
+                          'position' => 'first',                      
+                          'attr' => array('style' => 'display:none'),
+                          'label' => false                    
+                          //'position' => array('after' => 'origenMantencion'),
+                          //'disabled' => true, 
+                    ));   
+                                                                  
+                }
+                else{
+                    $builder
+                    ->add('componente', EntityType::class, array(
+                          'class' => 'MonitorBundle:Componente',
+                          'query_builder' => function (EntityRepository $er) use ($filtroComponente) {
+                                  return $er->createQueryBuilder('c')
+                                            ->where('c.id = ?1')
+                                            ->setParameter(1, $filtroComponente)                                       
+                                            ->orderBy('c.nombre', 'ASC');
+                          }, 
+                          'choice_label' => 'nombre',                   
+                          //'placeholder' => 'Seleccione una opción...',
+                          //'position' => array('after' => 'numeroTicket'),
+                          //'disabled' => true, 
+                          'data' => $filtroComponente,
+                          'choice_attr' => function($val, $key, $index) use ($filtroComponente) {
+                                    // adds a class like attending_yes, attending_no, etc                             
+                                    //Obtener filtros desde la sesión                             
+                                    if($filtroComponente != null){                                                                   
+                                         if($val->getId() == $filtroComponente)                                      
+                                             return ['selected' => true];
+                                         else
+                                             return ['selected' => false];
+                                    }                                                                                                                     
+                          },
+                          'label' => false,
+                          'attr' => array('style' => 'display:none'),
+                    ));                                
+                }
+                                
+                $builder
                 ->add('incidencia', EntityType::class, array(
                       'class' => 'MonitorBundle:Incidencia',
                       'query_builder' => function (EntityRepository $er) use ($options) {
@@ -103,7 +162,7 @@ class MantencionType extends AbstractType
                 //'attr' => array('class' => 'form-inline')
                 ));                                                                                                         
         }        
-        else{
+        else{ // Origen requerimiento
             $builder        
                 ->add('origenMantencion', EntityType::class, array(
                           'class' => 'MonitorBundle:OrigenMantencion',
@@ -121,15 +180,123 @@ class MantencionType extends AbstractType
                          },                                                               
                          'attr' => array('style' => 'display:none'),
                          'label' => false                                 
-                ))
-                ->add('componente', EntityType::class, array(
-                      'class' => 'MonitorBundle:Componente',
-                      'choice_label' => 'nombre',                   
-                      'placeholder' => 'Seleccione una opción...',
-                      'position' => 'first',
-                      //'position' => array('after' => 'origenMantencion'),
-                      //'disabled' => true, 
-                ))                                                         
+                ));
+                         
+                //echo  $filtroComponente;
+                         
+                if($filtroComponente == -1){
+                                        
+                    $builder
+                        ->add('componente', EntityType::class, array(
+                              'class' => 'MonitorBundle:Componente',
+                              'choice_label' => 'nombre',                   
+                              'placeholder' => 'Seleccione una opción...',
+                              //'position' => array('after' => 'numeroTicket'),
+                              //'disabled' => true, 
+                              'data' => $filtroComponente,
+                        ));  
+                          
+                    $formModifierTipo = function (FormInterface $form, Componente $componente = null) {
+            
+                    $tipos = null === $componente ? array() : $componente->getTiposRequerimiento();             
+
+                    $placeHolder= 'No hay opciones';
+                    $disabled = false;                        
+
+                    if($componente!=null){                
+                        $disabled = false;
+                        $placeHolder= 'Seleccione una opción...';
+                    }
+
+                    $form->add('tipoRequerimiento', EntityType::class, array(
+                               'class'       => 'MonitorBundle:TipoRequerimiento',
+                               'choices'     => $tipos,
+                               'choice_label' => function($tipo, $key, $index) {
+                                    /** @var Category $category */
+                                    return $tipo->getNombre();
+                                },
+                               'choices_as_values' => true,
+                               /*
+                               'choice_attr' => function($val, $key, $index) {
+                                    // adds a class like attending_yes, attending_no, etc
+                                    return ['idTipoAlcance' => $val->getTipoAlcance()->getId()];
+                                },                 
+                                */                                   
+                               'placeholder' => $placeHolder,
+                               'disabled' => $disabled,
+                               'position' => array('after' => 'componente')
+                        ));            
+                    };
+                    
+                    $builder                        
+                    ->addEventListener(
+                        FormEvents::PRE_SET_DATA,
+                        function (FormEvent $event) use ($formModifierTipo, $formModifierInicioProgramado, $options) {                    
+                            // this would be your entity, i.e. SportMeetup
+                            $data = $event->getData();                                        
+                            if($options['idIncidencia'] == null)
+                                $formModifierTipo($event->getForm(), $data->getComponente()); 
+                            $formModifierInicioProgramado($event->getForm(), $data->getInicioProgramado()); 
+                        }
+                    );
+
+                    $builder                                    
+                    ->get('componente')->addEventListener(
+                        FormEvents::POST_SUBMIT,
+                        function (FormEvent $event) use ($formModifierTipo) {
+                            // It's important here to fetch $event->getForm()->getData(), as
+                            // $event->getData() will get you the client data (that is, the ID)
+                            $componente = $event->getForm()->getData();
+
+                            // since we've added the listener to the child, we'll have to pass on
+                            // the parent to the callback functions!                    
+                            $formModifierTipo($event->getForm()->getParent(), $componente);                    
+                        }
+                    );                    
+                }
+                else{                    
+                    $builder
+                    ->add('componente', EntityType::class, array(
+                          'class' => 'MonitorBundle:Componente',
+                          'query_builder' => function (EntityRepository $er) use ($filtroComponente) {
+                                  return $er->createQueryBuilder('c')
+                                            ->where('c.id = ?1')
+                                            ->setParameter(1, $filtroComponente)                                       
+                                            ->orderBy('c.nombre', 'ASC');
+                          }, 
+                          'choice_label' => 'nombre',                   
+                          //'placeholder' => 'Seleccione una opción...',
+                          //'position' => array('after' => 'numeroTicket'),
+                          //'disabled' => true, 
+                          'data' => $filtroComponente,
+                          'choice_attr' => function($val, $key, $index) use ($filtroComponente) {
+                                    // adds a class like attending_yes, attending_no, etc                             
+                                    //Obtener filtros desde la sesión                             
+                                    if($filtroComponente != null){                                                                   
+                                         if($val->getId() == $filtroComponente)                                      
+                                             return ['selected' => true];
+                                         else
+                                             return ['selected' => false];
+                                    }                                                                                                                     
+                          },
+                          'label' => false,
+                          'attr' => array('style' => 'display:none'),
+                    ));            
+                    $builder->add('tipoRequerimiento', EntityType::class, array(
+                                   'class'       => 'MonitorBundle:TipoRequerimiento',
+                                   'query_builder' => function (EntityRepository $er) use ($filtroComponente) {
+                                      return $er->createQueryBuilder('c')
+                                                ->where('c.componente = ?1')
+                                                ->setParameter(1, $filtroComponente)                                       
+                                                ->orderBy('c.nombre', 'ASC');
+                                    },    
+                                   //'choices'     => $categorias,
+                                   'placeholder' => 'Seleccione una opción...',
+                                   'choice_label' => 'nombre',
+                                   'choices_as_values' => true,                                    
+                    ));    
+                }  
+                $builder
                 ->add('numeroRequerimiento', TextType::class, array(
                       'position' => array('after' => 'tipoRequerimiento'),
                       //'disabled' => true,
@@ -167,85 +334,7 @@ class MantencionType extends AbstractType
             ->add('codigoInterno', TextType::class, array(
                   //'position' => array('after' => 'numeroRequerimiento'),
                   //'disabled' => true,
-                ));                         
-        
-        $formModifierTipo = function (FormInterface $form, Componente $componente = null) {
-            
-            $tipos = null === $componente ? array() : $componente->getTiposRequerimiento();             
-            
-            $placeHolder= 'No hay opciones';
-            $disabled = false;                        
-            
-            if($componente!=null){                
-                $disabled = false;
-                $placeHolder= 'Seleccione una opción...';
-            }
-                        
-            $form->add('tipoRequerimiento', EntityType::class, array(
-                       'class'       => 'MonitorBundle:TipoRequerimiento',
-                       'choices'     => $tipos,
-                       'choice_label' => function($tipo, $key, $index) {
-                            /** @var Category $category */
-                            return $tipo->getNombre();
-                        },
-                       'choices_as_values' => true,
-                       /*
-                       'choice_attr' => function($val, $key, $index) {
-                            // adds a class like attending_yes, attending_no, etc
-                            return ['idTipoAlcance' => $val->getTipoAlcance()->getId()];
-                        },                 
-                        */                                   
-                       'placeholder' => $placeHolder,
-                       'disabled' => $disabled,
-                       'position' => array('after' => 'componente')
-            ));            
-        };        
-        
-        $formModifierInicioProgramado = function (FormInterface $form, $inicioProgramado = null) {
-        
-            if($inicioProgramado == null)
-                return;                         
-            
-            if($inicioProgramado){
-                $form 
-                ->add('fechaInicio', DateTimeType::class, array(
-                'date_widget'=> 'single_text',
-                'date_format'=>'d/MM/y',
-                'data'=> new \DateTime()
-                //'disabled' => true
-                )); 
-            }
-            else{
-                $form 
-                ->remove('fechaInicio');
-            }            
-        };        
-        
-        $builder                        
-            ->addEventListener(
-                FormEvents::PRE_SET_DATA,
-                function (FormEvent $event) use ($formModifierTipo, $formModifierInicioProgramado, $options) {                    
-                    // this would be your entity, i.e. SportMeetup
-                    $data = $event->getData();                                        
-                    if($options['idIncidencia'] == null)
-                        $formModifierTipo($event->getForm(), $data->getComponente()); 
-                    $formModifierInicioProgramado($event->getForm(), $data->getInicioProgramado()); 
-                }
-            );
-                            
-        $builder                                    
-            ->get('componente')->addEventListener(
-                FormEvents::POST_SUBMIT,
-                function (FormEvent $event) use ($formModifierTipo) {
-                    // It's important here to fetch $event->getForm()->getData(), as
-                    // $event->getData() will get you the client data (that is, the ID)
-                    $componente = $event->getForm()->getData();
-
-                    // since we've added the listener to the child, we'll have to pass on
-                    // the parent to the callback functions!                    
-                    $formModifierTipo($event->getForm()->getParent(), $componente);                    
-                }
-            );                                   
+                ));                                                                                                         
             
         $choices = array(            
             'Iniciar Inmediatamente' => false,
@@ -300,6 +389,16 @@ class MantencionType extends AbstractType
                 //'attr' => array('class' => 'form-inline')
             ));                       
             */
+         $builder       
+            ->add('documentosMantencion', CollectionType::class, array(
+                  'entry_type' => DocumentoMantencionType::class,
+                  'data_class' => null,
+                  'by_reference' => false,
+                  'allow_add'    => true,
+                  'allow_delete' => true,
+                  'label' => false,
+                  'attr' => array('style' => 'display:none'),                  
+            ));                
                 
         $builder                                    
             ->get('inicioProgramado')->addEventListener(

@@ -38,7 +38,7 @@ class DocumentoIncidencia
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="fecha_ult_hh", type="datetime", nullable=true)
+     * @ORM\Column(name="fecha_hora", type="datetime", nullable=true)
      */
     private $fechaHora;    
         
