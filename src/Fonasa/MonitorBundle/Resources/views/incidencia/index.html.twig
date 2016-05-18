@@ -288,17 +288,17 @@
             var row = oTable.row( tr );
             $(this).find('i').replaceWith('<i class="fa fa-spinner fa-spin"></i>');
                                     
-            $.getJSON('{{ path('incidencia_historial') }}',{ 'id' : $(this).attr('id') }, function(data){
-                 
-                $('i.fa-spinner').replaceWith('<i class="fa fa-list"></i>');
+            $.getJSON('{{ path('incidencia_historial') }}',{ 'id' : $(this).attr('id') }, function(data){                                 
                  
                 if (row.child.isShown())
                 {
+                    $('i.fa-spinner').replaceWith('<i class="fa fa-list"></i>');
                     row.child.hide();
                     tr.removeClass('shown');
                 }
                 else 
                 {
+                    $('i.fa-spinner').replaceWith('<i class="fa fa-chevron-up"></i>');
                     row.child( format_historial(data) ).show();                                     
                     tr.addClass('shown');
                 }                            
@@ -311,17 +311,17 @@
             var row = oTable.row( tr );
             $(this).find('i').replaceWith('<i class="fa fa-spinner fa-spin"></i>');
                                     
-            $.getJSON('{{ path('incidencia_comentario') }}',{ 'id' : $(this).attr('id') }, function(data){
-                
-                $('i.fa-spinner').replaceWith('<i class="fa fa-comment-o"></i>');
+            $.getJSON('{{ path('incidencia_comentario') }}',{ 'id' : $(this).attr('id') }, function(data){                                
         
                 if (row.child.isShown())
                 {
+                    $('i.fa-spinner').replaceWith('<i class="fa fa-list"></i>');
                     row.child.hide();
                     tr.removeClass('shown');
                 }
                 else 
                 {
+                    $('i.fa-spinner').replaceWith('<i class="fa fa-chevron-up"></i>');
                     row.child( format_comentario(data) ).show();                                     
                     tr.addClass('shown');
                 }                            
