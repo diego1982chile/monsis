@@ -87,8 +87,7 @@ class FiltersHelper {
         if($this->session->get('filtroEstado') == 2){
             $form_visible = 'display:inline';
             $label_visible = null;
-        }
-            
+        }            
         
         return $form_filtros = $this->formFactory->createBuilder()
             ->add('Componente', ChoiceType::class, array(

@@ -715,8 +715,8 @@ class MantencionController extends Controller
         
         // Si se estan consultando las incidencias resueltas agregar filtro por mes y año
         if($estado == 2){            
-            $qb->andWhere('YEAR(i.fechaSalida) = ?1');                
-            $qb->andWhere('MONTH(i.fechaSalida) = ?2');                
+            $qb->andWhere('YEAR(m.fechaSalida) = ?1');                
+            $qb->andWhere('MONTH(m.fechaSalida) = ?2');                
             $parameters[1] = $anio;        
             $parameters[2] = $mes;
                     
