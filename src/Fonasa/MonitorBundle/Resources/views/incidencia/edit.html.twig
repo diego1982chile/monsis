@@ -28,7 +28,8 @@
                 {{ form_widget(edit_form.numeroTicket) }}            
             </div>                
             {{ form_row(edit_form.descripcion) }}
-            {{ form_row(edit_form.severidad) }}   
+            {{ form_row(edit_form.severidad) }}
+            {{ form_row(edit_form.usuario) }}
             <label class="control-label required">
                 Comentarios
             </label>               
@@ -100,7 +101,7 @@
             </div>                    
             <input type="submit" value="Editar" style="display:none" class="btn btn-primary active" />        
             <button id="validate_form" class="btn btn-primary active" type="button">Modificar</button>                        
-            <button id="delete" class="btn btn-warning active" style="float:right" type="button">Eliminar</button>        
+            <button id="delete" class="btn btn-danger active" style="float:right" type="button">Eliminar</button>        
         {{ form_end(edit_form) }}
         </div>
     </div>    
@@ -116,7 +117,7 @@
     </ul>
     <div class="form" style="width:60%;display:none">
         {{ form_start(delete_form) }}
-            <input type="submit" style="display:none" value="Eliminar" class="btn btn-warning active">                
+            <input type="submit" style="display:none" value="Eliminar" class="btn btn-danger active">                
         {{ form_end(delete_form) }}
     </div>          
 {% endblock %}

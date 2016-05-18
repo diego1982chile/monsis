@@ -388,8 +388,17 @@ class MantencionType extends AbstractType
                 //'position' => 'first',
                 //'attr' => array('class' => 'form-inline')
             ));                       
-            */
+            */                            
          $builder       
+            ->add('comentariosMantencion', CollectionType::class, array(
+                  'entry_type' => ComentarioMantencionType::class,
+                  'data_class' => null,
+                  'by_reference' => false,
+                  'allow_add'    => true,
+                  'allow_delete' => true,
+                  'label' => false,
+                  'attr' => array('style' => 'display:none'),                  
+            ))                           
             ->add('documentosMantencion', CollectionType::class, array(
                   'entry_type' => DocumentoMantencionType::class,
                   'data_class' => null,

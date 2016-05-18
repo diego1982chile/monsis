@@ -43,7 +43,12 @@ class EstadoIncidencia
     /**          
      * @ORM\OneToMany(targetEntity="HistorialIncidencia", mappedBy="estadoIncidencia")          
      */
-    protected $historialesIncidencia;     
+    protected $historialesIncidencia; 
+
+    /**          
+     * @ORM\OneToMany(targetEntity="Usuario", mappedBy="estadoIncidencia")          
+     */
+    protected $usuarios;     
 
 
     /**

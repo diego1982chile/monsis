@@ -127,37 +127,30 @@ class IncidenciaController extends Controller
                                 
                 $documentoIncidencia->setIncidencia($incidencia);
                 $documentoIncidencia->setIdIncidencia($incidencia->getId());
-                
-                //$em = $this->getDoctrine()->getManager();
-                $em->persist($documentoIncidencia);                                    
-                //$em->refresh($documentoIncidencia);
-                //$em->merge($documentoIncidencia);                                    
-                //$em->flush();
                                 
-                // Update the 'brochure' property to store the PDF file name
-                // instead of its contents
-                //$incidencia->addDocumentosIncidencia($documentoIncidencia);                
-                // ... persist the $product variable or any other work                
+                $em->persist($documentoIncidencia);                                                    
             }            
             
             foreach($incidencia->getComentariosIncidencia() as $key => $comentarioIncidencia){
                                                                 
                 $comentarioIncidencia->setIncidencia($incidencia);
                 $comentarioIncidencia->setIdIncidencia($incidencia->getId());
-                
-                //$em = $this->getDoctrine()->getManager();
-                $em->persist($comentarioIncidencia);                                    
-                //$em->refresh($documentoIncidencia);
-                //$em->merge($documentoIncidencia);                                    
-                //$em->flush();
                                 
-                // Update the 'brochure' property to store the PDF file name
-                // instead of its contents
-                //$incidencia->addDocumentosIncidencia($documentoIncidencia);                
-                // ... persist the $product variable or any other work                
-            }                        
+                $em->persist($comentarioIncidencia);                                                    
+            }   
             
-            $em->flush();
+            $historialIncidencia = new HistorialIncidencia();
+            
+            $historialIncidencia->setInicio($fechaIngreso);
+            $historialIncidencia->setObservacion('Se inicia la incidencia N°Ticket '.$numeroTicket);            
+            $historialIncidencia->setEstadoIncidencia($estado[0]);
+            $historialIncidencia->setIdEstadoIncidencia($estado[0]->getId());            
+            $historialIncidencia->setIncidencia($incidencia);
+            $historialIncidencia->setIdIncidencia($incidencia->getId());
+            
+            $em->persist($historialIncidencia);
+                                    
+            $em->flush();                        
                         
             $this->addFlash(
                 'notice',
@@ -191,13 +184,40 @@ class IncidenciaController extends Controller
      *
      */
     public function showAction(Incidencia $incidencia)
-    {        
-        
+    {                        
         $deleteForm = $this->createDeleteForm($incidencia);
+        
+        $em = $this->getDoctrine()->getManager();                 
+        
+        $items = array();
+        
+        foreach($incidencia->getHistorialesIncidencia() as $historialIncidencia){
+            $item['type'] = 'smallItem';
+            $item['label'] = $historialIncidencia->getInicio()->format('d/m/Y H:i').'<br><i>'.$historialIncidencia->getEstadoIncidencia()->getNombre().'</i>';
+            $item['relativePosition'] = $historialIncidencia->getInicio();
+            $item['shortContent'] = '<i><small>'.$historialIncidencia->getObservacion().'</small></i>';
+            
+            $items[] = $item;
+        }
+        
+        $fillRatio = intval(100*$incidencia->getHhEfectivas()/$incidencia->getSeveridad()->getSla());                        
+            
+        $color='';
+
+        if(80<$fillRatio && $fillRatio<=100)
+            $color='orange';
+        if($fillRatio>100)
+            $color='red';                                                    
+        if($incidencia->getEstadoIncidencia()->getNombre()=='Resuelta MT')
+            $color='green';                            
+
+        $html='<div class="c100 p'.min($fillRatio,100).' center big '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
 
         return $this->render('MonitorBundle:incidencia:show.html.twig', array(
             'incidencia' => $incidencia,
             'delete_form' => $deleteForm->createView(),
+            'eventos' => json_encode($items),
+            'fill_ratio' => $html
         ));
     }
     
@@ -349,10 +369,11 @@ class IncidenciaController extends Controller
      * Displays a form to edit an existing Servicio entity.
      *
      */
-    public function statusAction($id, $status, $observacion)
+    public function statusAction($id, $status, $usuario, $observacion)
     {                                            
         //$id= $request->request->get('id');
         //$status= $request->request->get('status');
+        //die($observacion);
         
         $em = $this->getDoctrine()->getManager();
         
@@ -368,21 +389,35 @@ class IncidenciaController extends Controller
             ->where('e.nombre = ?1')
             ->setParameter(1, $status)
             ->getQuery()
-            ->getResult();                                  
+            ->getResult();                    
+        
+        $usuarios= $em->getRepository('MonitorBundle:Usuario')
+            ->createQueryBuilder('u')                                
+            ->where('u.username = ?1')
+            ->setParameter(1, $usuario)
+            ->getQuery()
+            ->getResult();   
+        
+        if(sizeof($usuarios)){                        
+            $incidencia[0]->setUsuario($usuarios[0]);
+            $incidencia[0]->setIdUsuario($usuarios[0]->getId());                
+        }
 
         $incidencia[0]->setEstadoIncidencia($estado[0]);
         $incidencia[0]->setIdEstadoIncidencia($estado[0]->getId());                
         
-        $incidencia[0]->setTocada(new\DateTime('now'));                
+        $incidencia[0]->setTocada(new\DateTime('now'));                                
         
         switch ($status){
             case 'En Cola': // Si se deja en cola, la fecha de inicio salida se anulan
                 //$incidencia[0]->setFechaInicio(null);
                 //$incidencia[0]->setFechaSalida(null
                 $incidencia[0]->setFechaSalida(null);
+                $incidencia[0]->setUsuario(null);
                 break;
             case 'En Gestión FONASA': // Si se deja en gestión FONASA, no se hace nada
                 $incidencia[0]->setFechaSalida(null);
+                $incidencia[0]->setUsuario(null);
                 break;            
             case 'Pendiente MT': // Si se deja Pendiente MT se actualiza la fecha inicio
                 if($incidencia[0]->getFechaInicio() == null)
@@ -393,13 +428,8 @@ class IncidenciaController extends Controller
                 break;        
             case 'Resuelta MT':
                 // Si se deja como resuelta, agregar observaciones...
-                $incidencia[0]->setFechaSalida(new\DateTime('now'));                
-                $observacionIncidencia= new ObservacionIncidencia();
-                $observacionIncidencia->setObservacion($observacion);
-                $observacionIncidencia->setIncidencia($incidencia[0]);
-                $observacionIncidencia->setIdIncidencia($incidencia[0]->getId());
-                $em->persist($observacionIncidencia);
-                $em->flush();                
+                $incidencia[0]->setFechaSalida(new\DateTime('now'));                                                               
+                $incidencia[0]->setUsuario(null);
                 break;            
         }
         
@@ -413,7 +443,10 @@ class IncidenciaController extends Controller
         $historial->setIncidencia($incidencia[0]);                     
         $historial->setIdIncidencia($incidencia[0]->getId());
         $historial->setEstadoIncidencia($estado[0]);
-        $historial->setIdEstadoIncidencia($estado[0]->getId());            
+        $historial->setIdEstadoIncidencia($estado[0]->getId());        
+        $historial->setObservacion($observacion);                            
+        $historial->setUsuario($usuarios[0]->getUsername());
+        
         $historial->setInicio($fechaTerminado);                   
 
         $em = $this->getDoctrine()->getManager();
@@ -606,8 +639,8 @@ class IncidenciaController extends Controller
         
         // Si se estan consultando las incidencias resueltas agregar filtro por mes y año
         if($estado == 2){            
-            $qb->andWhere('YEAR(i.fechaInicio) = ?1');                
-            $qb->andWhere('MONTH(i.fechaInicio) = ?2');                
+            $qb->andWhere('YEAR(i.fechaSalida) = ?1');                
+            $qb->andWhere('MONTH(i.fechaSalida) = ?2');                
             $parameters[1] = $anio;        
             $parameters[2] = $mes;
                     
@@ -697,7 +730,25 @@ class IncidenciaController extends Controller
             //$html='<div class="progress"><div class="progress-bar '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
             array_push($fila,$html);                                                
             
-            array_push($fila,'Ticket'.$incidencia->getNumeroTicket());
+            //$color;
+            
+            /*
+            switch($incidencia->getEstadoIncidencia()->getNombre()){
+                case 'En Gestión FONASA':
+                    $color='#F5A9A9';
+                    break;
+                case 'Pendiente MT':
+                    $color='yellow';
+                    break;
+                case 'Resuelta MT':
+                    $color='#A5DF00';
+                    break;
+            }
+            */
+                        
+            $html='<a href="'.$this->generateUrl('incidencia_show', array('id' => $incidencia->getId())).'">Ticket'.$incidencia->getNumeroTicket().'</a>';
+            
+            array_push($fila,$html);
             array_push($fila,$incidencia->getFechaInicio()==null?'-':$incidencia->getFechaInicio()->format('d/m/Y H:i'));
             array_push($fila,$incidencia->getFechaSalida()==null?'-':$incidencia->getFechaSalida()->format('d/m/Y H:i'));            
             //array_push($fila,$servicio->getComponente()->getNombre());
@@ -709,35 +760,51 @@ class IncidenciaController extends Controller
             $html=$html.'<a href="#" class="dropdown-toggle" data-toggle="dropdown">'.$incidencia->getEstadoIncidencia()->getNombre().'<span class="caret"></span></a>';
             
             if($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')){
+                
+                $html=$html.'<ul class="dropdown-menu">';                                    
             
-                $html=$html.'<ul class="dropdown-menu">';            
-
-                /*
-                $html='<select class="incidencia_estadoIncidencia" onchange="location = this.value;">';
-                $selected;
-                */
-                $active="";                                
-
                 foreach($estados as $estado)                        
-                {
-                    /*
-                    if($estado->getNombre()==$incidencia->getEstadoIncidencia()->getNombre())
-                        $selected='selected';
-                    else
-                        $selected=null;
+                {                                                          
+                    $usuarios = $em->getRepository('MonitorBundle:Usuario')
+                    ->createQueryBuilder('u')                                
+                    ->join('u.estadoIncidencia','em')
+                    ->where('em.nombre = ?1')
+                    ->setParameter(1, $estado->getNombre())
+                    ->getQuery()
+                    ->getResult();
 
-                    $html=$html.'<option value='.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre())).' '.$selected.'>'.$estado->getNombre().'</button>';
-                    */
-                    $active="";  
+                    $active="";                    
 
-                    if($incidencia->getEstadoIncidencia()->getNombre()==$estado->getNombre())
-                        $active="active";
-                    $html=$html.'<li class="'.$active.'"><a class="estados" href="'.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre(), 'observacion' => 'null')).'">'.$estado->getNombre().'</a></li>';                                        
-                }            
-                //$html=$html.'</select>';    
+                    if(sizeof($usuarios)){                                        
 
-                $html=$html.'</ul>';                        
-            }
+                        if($incidencia->getEstadoIncidencia()->getNombre()==$estado->getNombre())
+                            $active="active";
+
+                        $html=$html.'<li class="'.$active.'">';   
+                        $html=$html.'<a class="trigger right-caret">'.$estado->getNombre().'</a>';
+                        $html=$html.'<ul class="dropdown-menu sub-menu">';
+
+                        foreach($usuarios as $usuario){     
+                            $active2="";
+                                if($incidencia->getUsuario()!=null){
+                                    if($incidencia->getUsuario()->getUsername()==$usuario->getUsername())                            
+                                        $active2="active";
+                                }
+                                $html=$html.'<li class="'.$active2.'"><a class="estados" href="'.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre(), 'usuario' => $usuario->getUsername(), 'observacion' => 'null')).'">'.$usuario->getUsername().'</a></li>';                            
+
+                        }
+                        $html=$html.'</ul>';
+                    }   
+                    else{                    
+                        if($incidencia->getEstadoIncidencia()->getNombre()==$estado->getNombre())
+                            $active="active";
+                        $html=$html.'<li class="'.$active.'"><a class="estados" href="'.$this->generateUrl('incidencia_status', array('id' => $incidencia->getId(), 'status' => $estado->getNombre(), 'usuario' => 'null', 'observacion' => 'null')).'">'.$estado->getNombre().'</a></li>';        
+                    }
+                }   
+            }   
+            $html=$html.'</ul>';
+            
+            '</select>';    
             
             array_push($fila,$html);
             
@@ -758,13 +825,22 @@ class IncidenciaController extends Controller
                     array_push($fila,'<a id="'.$incidencia->getId().'" href="'.$this->generateUrl('incidencia_init', array('id' => $incidencia->getId())).'" role="button" class="btn btn-default">Iniciar</button>');                                                            
                     break;
             }              
-            */                  
+            */          
             
+            $html='<div class="btn-group">';
+            $html=$html.'<a href="#" class="add_tag_link btn btn-secondary"><span class="glyphicon glyphicon-list-alt"></span></a>';
+            
+            if(count($incidencia->getComentariosIncidencia())>0)
+                $html=$html.'<a href="#" class="add_tag_link btn btn-secondary"><span class="glyphicon glyphicon-comment"></span></a>';
+
+            $html=$html.'</div>';
+            
+            /*
             $html='<ul><li><a href="'.$this->generateUrl('incidencia_show', array('id' => $incidencia->getId())).'">ver</a></li>';
             
             if($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN'))                
                 $html=$html.'<li><a href="'.$this->generateUrl('incidencia_edit', array('id' => $incidencia->getId())).'">editar</a></li></ul>';            
-            
+            */
             array_push($fila,$html);
             
             //Se añade campo tocada

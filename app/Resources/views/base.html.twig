@@ -24,7 +24,8 @@
     <link href="{{ asset('bundles/monsis/css/buttons.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('bundles/monsis/css/dataTables.bootstrap.css') }}" rel="stylesheet">  
     <link href="{{ asset('bundles/monsis/css/circle.css') }}" rel="stylesheet">        
-    <link href="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">        
+    <link href="{{ asset('bundles/monsis/js/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">      
+    <link href="{{ asset('bundles/monsis/css/jquery.timelineMe.css') }}" rel="stylesheet">
     {% block stylesheets %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('bundles/monsis/images/fonasalogo.png') }}" />
         <style type="text/css">
@@ -308,6 +309,21 @@
                 margin:10px;                
             }
             
+            
+            .timeline-me-shortcontent{                
+                background-color: #fffa90;                
+            }
+            
+            .timeline-me-shortcontent:before{                
+                background-color: #fffa90;                
+            }
+            
+            .vcenter {                
+                display: table-cell;               
+                vertical-align: middle;                
+            }
+            
+            
         </style>
   </head>
 
@@ -395,6 +411,7 @@
     <script src="{{ asset('bundles/monsis/js/modules/exporting.js') }}"></script>
     <script src="{{ asset('bundles/monsis/js/modules/drilldown.js') }}"></script>    
     <script src="{{ asset('bundles/monsis/js/loadingoverlay.js') }}"></script>        
+    <script src="{{ asset('bundles/monsis/js/jquery.timelineMe.js') }}"></script>        
     {% block javascripts %}
     <script>             
     </script>

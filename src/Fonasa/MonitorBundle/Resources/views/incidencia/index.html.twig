@@ -65,8 +65,7 @@
     </ul>
     {% endif %}
 <div id="dialog-form" title="Agregar Observacion" style="padding:1em;display:none">     
-    <textarea id="observacion" class="form-control" style="padding:1em;margin:1em;width:95%" value="">                
-    </textarea>                  
+    <input id="observacion" class="form-control" style="padding:1em;margin:1em;width:95%" value="" />                    
 </div>            
 {% endblock %}
 {% block javascripts %}
@@ -114,8 +113,8 @@
     
     var dialog = $( "#dialog-form" ).dialog({
       autoOpen: false,
-      height: 250,
-      width: 400,
+      height: 200,
+      width: 500,
       modal: true,
       buttons: {
         "Aceptar": addObservacion,
@@ -129,7 +128,8 @@
     
     function addObservacion() {
         var link=$("#dialog-form").data('link');        
-        $(link).attr('href',$(link).attr('href').replace('null',$('#observacion').val()));      
+        $(link).attr('href',$(link).attr('href').replace(/null(?![\s\S]*null)/,$('#observacion').val()));  
+        alert($(link).attr('href'));
         $(link).click();        
     }                
     
@@ -225,7 +225,8 @@
                             $( "a.estados" ).on( "click", function(e) {                                                                                                   
                                 if($(this).parent().parent().prev().text()==$(this).text())
                                     return false;
-                                if($(this).text()=='Resuelta MT'){
+                                //if($(this).text()=='Resuelta MT' || $(this).text()=='En Gestión FONASA' || 
+                                   //$(this).text()=='Pendiente MT'){
                                     if($('#observacion').val().trim()==''){
                                         dialog.data('link',$(this));
                                         dialog.dialog( "open" );
@@ -235,10 +236,12 @@
                                         dialog.dialog( "close" );
                                         window.location=$(this).attr('href');                                                                                        
                                     }
-                                }
-                                else
-                                    return true;
-                            });                                                           
+                                    return false;
+                                //}
+                                //else
+                                    //return true;                                
+                            });
+                            
                             //Si se resetean los filtros recargar los filtros
                             if($resetFiltros.find(':checked').val()){                                                                                                    
                                 location.reload();  
@@ -262,8 +265,8 @@
             oTable.fnDraw();            
         });
         
-        $estado.change(function() {
-            $.LoadingOverlay("show");
+        $estado.change(function(e) {            
+            $(e.target).parent().children(':eq(0)').append(loader);
             cambioEstado = true;
             updateTitle();
             oTable.fnDraw();            
@@ -274,16 +277,16 @@
             oTable.fnDraw();            
         });
         
-        $resetFiltros.click(function() {
-            $.LoadingOverlay("show");
+        $resetFiltros.click(function() {            
             $(reset).parent().children(':eq(1)').replaceWith(loader);    
             $(this).attr('disabled',true);            
             updateTitle();
             oTable.fnDraw();            
         });
-        
+        /*
         setInterval( function () {
             oTable.fnDraw(false);
         }, 30000 );        
+        */
 </script>
 {% endblock %}

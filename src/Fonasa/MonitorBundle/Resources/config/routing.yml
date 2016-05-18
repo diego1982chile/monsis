@@ -49,9 +49,9 @@ incidencia_body:
     methods:  [GET]    
     
 incidencia_status:    
-    path:   /incidencia/{id}/{status}/{observacion}/status
+    path:   /incidencia/{id}/{status}/{usuario}/{observacion}/status
     defaults: { _controller: "MonitorBundle:Incidencia:status" }
-    methods:  [GET,POST]     
+    methods:  [GET,POST]            
     
 incidencia_mantencion:
     path:   /incidencia/{id}/mantencion
@@ -109,7 +109,7 @@ mantencion_check3:
     methods:  [POST]      
     
 mantencion_status:    
-    path:   /mantencion/{id}/{status}/{usuario}/status
+    path:   /mantencion/{id}/{status}/{usuario}/{observacion}/status
     defaults: { _controller: "MonitorBundle:Mantencion:status" }
     methods:  [GET,POST]      
 

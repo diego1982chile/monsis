@@ -220,50 +220,22 @@ class IncidenciaType extends AbstractType
                   'label' => false,
                   'attr' => array('style' => 'display:none'),                  
             ))                        
-            
-            /*
-            ->add('estadoIncidencia', EntityType::class, array(
-                  'class' => 'MonitorBundle:EstadoIncidencia',
+            ->add('usuario', EntityType::class, array(
+                  'class' => 'MonitorBundle:Usuario',
                   'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('ei')
-                              ->orderBy('ei.nombre', 'ASC');
+                    return $er->createQueryBuilder('om')                                            
+                              ->join('om.area', 'a')
+                              ->where('a.nombre in (?1)')
+                              ->setParameter(1, ['Análisis'])
+                              ->orderBy('om.username', 'DESC');
                 },
-                'choice_label' => 'nombre',
-                //'expanded' => true,
-                //'multiple' => false,
-                'position' => 'first',
+                'choice_label' => 'userName',                                          
+                'placeholder' => 'Seleccione una opción...',                
                 //'attr' => array('class' => 'form-inline')
-            ))                  
-            */
+            ))  
+
         ;
         
-        /*
-        if($options['assign']==true){
-            $builder                                                    
-                ->add('hhEstimadas', NumberType::class
-            );
-        }
-        */
-        
-        /*
-        $builder
-            ->add('codigoOrigen')
-            ->add('codigoInterno')
-            ->add('descripcion')
-            ->add('fechaReporte', DatetimeType::class)
-            ->add('fechaIngreso', DatetimeType::class)
-            ->add('fechaSalida', DatetimeType::class)
-            ->add('fechaUltHh', DatetimeType::class)
-            ->add('idComponente')
-            ->add('idOrigenIncidencia')
-            ->add('idEstadoIncidencia')
-            ->add('idCategoriaIncidencia')
-            ->add('componente')
-            ->add('origenIncidencia')
-            ->add('estadoIncidencia')
-            ->add('categoriaIncidencia')
-        ;
-        */
     }
     
     /**

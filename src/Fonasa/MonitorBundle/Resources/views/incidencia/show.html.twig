@@ -20,152 +20,156 @@
             </ul>
         </div>
     </div>                    
-    {% endfor %}
-    <h2>Incidencia</h2>    
-    <div id="form" style="width:100%">
-    <fieldset class="scheduler-border" >
-    <legend class="scheduler-border">Datos de la Incidencia</legend>
-    <div class="control-group">
-        <table width="100%" class="table" border="0">
-            <tr>
-                <th width="20%">
-                    Componente:
-                </th>
-                <td width="80%">
-                    {{ incidencia.componente.nombre }}        
-                </td>                            
-            </tr>
-            <tr>
-                <th width="20%">
-                    Tipo:
-                </th>
-                <td width="80%">
-                    {{ incidencia.categoriaIncidencia.nombre }}        
-                </td>                     
-            </tr>
-            <tr>
-                <th width="20%">
-                    N°Ticket:
-                </th>
-                <td width="80%">
-                    {{ incidencia.numeroTicket }}        
-                </td>                     
-            </tr>            
-            <tr>
-                <th width="20%">
-                    Severidad:
-                </th>
-                <td width="80%">
-                    {{ incidencia.severidad.nombre }}        
-                </td>                     
-            </tr>                        
-            <tr>
-                <th width="20%">
-                    Estado:
-                </th>
-                <td width="80%">
-                    {{ incidencia.estadoIncidencia.nombre }}        
-                </td>                     
-            </tr>                  
-            <tr>
-                <th width="20%">
-                    Mantención asociada:
-                </th>
-                <td width="80%">
-                    {% if incidencia.mantenciones|length > 0 %}
-                        <a href="{{ path('mantencion_show', { 'id': incidencia.mantenciones[0].id }) }}">{{ incidencia.mantenciones[0].codigoInterno }}</a>
-                    {% else %}
-                        -
-                    {% endif %}                          
-                </td>                     
-            </tr>                              
-            <tr>
-                <th width="20%">
-                    Descripción:
-                </th>
-                <td width="80%">
-                    {{ incidencia.descripcion }}                         
-                </td>                     
-            </tr>               
-        </table>
-    </div>
-    </fieldset>    
-    <fieldset class="scheduler-border">
-        <legend class="scheduler-border">Eventos</legend>
+    {% endfor %}    
+        <div class="col-md-5">
+            <h1>
+                Incidencia {{ incidencia.numeroTicket }}
+            </h1>
+        </div>
+        <div class="col-md-6">
+            <h1>
+                {{ incidencia.estadoIncidencia.nombre }}
+            </h1>
+        </div>  
+        <div class="col-md-1">
+            {{ fill_ratio|raw }}
+            <br>
+        </div>              
+        <div id="form" class="col-md-7">
+        <fieldset class="scheduler-border" >
+        <legend class="scheduler-border">Datos de la Incidencia</legend>
+        <div class="control-group">
+            <table width="100%" class="table" border="0">
+                <tr>
+                    <th width="30%">
+                        Componente:
+                    </th>
+                    <td width="70%">
+                        {{ incidencia.componente.nombre }}        
+                    </td>                            
+                </tr>
+                <tr>
+                    <th width="30%">
+                        Tipo:
+                    </th>
+                    <td width="70%">
+                        {{ incidencia.categoriaIncidencia.nombre }}        
+                    </td>                     
+                </tr>
+                <tr>
+                    <th width="30%">
+                        N°Ticket:
+                    </th>
+                    <td width="70%">
+                        {{ incidencia.numeroTicket }}        
+                    </td>                     
+                </tr>            
+                <tr>
+                    <th width="30%">
+                        Severidad:
+                    </th>
+                    <td width="70%">
+                        {{ incidencia.severidad.nombre }}        
+                    </td>                     
+                </tr>                        
+                <tr>
+                    <th width="30%">
+                        Estado:
+                    </th>
+                    <td width="70%">
+                        {{ incidencia.estadoIncidencia.nombre }}        
+                    </td>                     
+                </tr>                  
+                <tr>
+                    <th width="30%">
+                        Mantención asociada:
+                    </th>
+                    <td width="70%">
+                        {% if incidencia.mantenciones|length > 0 %}
+                            <a href="{{ path('mantencion_show', { 'id': incidencia.mantenciones[0].id }) }}">{{ incidencia.mantenciones[0].codigoInterno }}</a>
+                        {% else %}
+                            -
+                        {% endif %}                          
+                    </td>                     
+                </tr>                              
+                <tr>
+                    <th width="30%">
+                        Descripción:
+                    </th>
+                    <td width="70%">
+                        {{ incidencia.descripcion }}                         
+                    </td>                     
+                </tr>               
+            </table>
+        </div>
+        </fieldset>            
+        {% if incidencia.comentariosIncidencia|length > 0 %}
+            <fieldset class="scheduler-border">
+                <legend class="scheduler-border">Comentarios</legend>
+                    <div class="control-group">
+                        <table width="100%" class="table" border="0">
+                        {% for com in incidencia.comentariosIncidencia %}   
+                            <tr>
+                                <td>
+                                    <span class="glyphicon glyphicon-comment">                       
+                                    </span>
+                                    {{ com.comentario }}
+                                </td>
+                            </tr>    
+                        {% endfor %}
+                        </table>
+                    </div>
+            </fieldset>
+        {% endif %}                        
+        {% if incidencia.documentosIncidencia|length > 0 %}
+            <fieldset class="scheduler-border">
+                <legend class="scheduler-border">Adjuntos</legend>
+                    <div class="control-group">
+                        <table width="100%" class="table" border="0">
+                        {% for doc in incidencia.documentosIncidencia %}   
+                            <tr>
+                                <td>
+                                    <span class="glyphicon glyphicon-paperclip">                       
+                                    </span>
+                                    <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo) }}">                                    
+                                        {{ doc.nombre }}
+                                    </a>
+                                </td>
+                            </tr>    
+                        {% endfor %}
+                        </table>
+                    </div>
+            </fieldset>
+        {% endif %}                                                      
+        <fieldset class="scheduler-border" >
+            <legend class="scheduler-border">Datos de la Asignación</legend>
             <div class="control-group">
-                <table width="100%" class="table" border="0">                           
+                <table width="100%" class="table" border="0">
                     <tr>
                         <th width="20%">
-                            Fecha Ingreso:
+                            Responsable:
                         </th>
                         <td width="80%">
-                            {% if incidencia.fechaIngreso %}{{ incidencia.fechaIngreso|date('Y-m-d H:i') }}{% endif %}
-                        </td>                     
-                    </tr>                                   
-                    <tr>
-                        <th width="20%">
-                            Fecha Inicio:
-                        </th>
-                        <td width="80%">
-                            {% if incidencia.fechaInicio %}
-                                {{ incidencia.fechaInicio|date('Y-m-d H:i') }}
+                            {% if incidencia.usuario is not null %}       
+                                {{ incidencia.usuario.username }}        
                             {% else %}
                                 -
                             {% endif %}
-                        </td>                     
+                        </td>                                      
                     </tr>                    
-                    <tr>
-                        <th width="20%">
-                            Fecha Término:
-                        </th>
-                        <td width="80%">
-                            {% if incidencia.fechaSalida %}
-                                {{ incidencia.fechaSalida|date('Y-m-d H:i') }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>                     
-                    </tr>                                        
                 </table>
-            </div>    
-    </fieldset>   
-    {% if incidencia.comentariosIncidencia|length > 0 %}
-        <fieldset class="scheduler-border">
-            <legend class="scheduler-border">Comentarios</legend>
-                <div class="control-group">
-                    <table width="100%" class="table" border="0">
-                    {% for com in incidencia.comentariosIncidencia %}   
-                        <tr>
-                            <td>
-                                {{ com.comentario }}
-                            </td>
-                        </tr>    
-                    {% endfor %}
-                    </table>
-                </div>
-        </fieldset>
-    {% endif %}                        
-    {% if incidencia.documentosIncidencia|length > 0 %}
-        <fieldset class="scheduler-border">
-            <legend class="scheduler-border">Adjuntos</legend>
-                <div class="control-group">
-                    <table width="100%" class="table" border="0">
-                    {% for doc in incidencia.documentosIncidencia %}   
-                        <tr>
-                            <td>
-                                <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo) }}">                                    
-                                    {{ doc.nombre }}
-                                </a>
-                            </td>
-                        </tr>    
-                    {% endfor %}
-                    </table>
-                </div>
-        </fieldset>
-    {% endif %}
-    <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>                                                
-    </div>        
-    <div>
+            </div>
+            </fieldset>     
+        </div>        
+        <div class="col-md-5">
+            <fieldset class="scheduler-border">
+                <legend class="scheduler-border">Eventos</legend>
+                    <div class="control-group" id="eventos">                        
+                    </div>
+            </fieldset>
+        </div>             
+    <div class="col-md-12">
+        <button id="delete" class="btn btn-danger active" type="button" style="float:right">Eliminar</button>         
         <ul>
             <li>
                 <a href="{{ path('incidencia_index') }}">Volver</a>
@@ -183,7 +187,7 @@
         </ul>
     </div>
     {{ form_start(delete_form) }}
-        <input type="submit" style="display:none" value="Eliminar" class="btn btn-warning active">
+        <input type="submit" style="display:none" value="Eliminar" class="btn btn-error active">
     {{ form_end(delete_form) }}                    
 {% endblock %}
 {% block javascripts %}
@@ -192,6 +196,16 @@
 $( window ).load(function() {
    $('#form').show();
 });    
+
+$(function() {
+    $('#eventos').timelineMe({
+      //orientation: 'horizontal',
+      //scrollZones: true,
+      scrollArrows: true,
+      scrollBar: true,
+      items: {{ eventos|raw }}
+    });
+});
 
 var loader = new Image();
 loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';

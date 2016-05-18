@@ -51,8 +51,8 @@
         <thead>
             <tr>
                 <th width="3%">&nbsp;</th>
-                <th width="5%">N°Req/Ticket</th>                                                
-                <th width="5%">N°Mantencion</th>                                
+                <th width="5%">N°Mantencion</th>
+                <th width="5%">N°Req/Ticket</th>                                                                                                
                 <th width="10%">Fecha inicio</th>                                
                 <th width="10%">Fecha término</th>                
                 <th width="12%">Estado</th>                
@@ -72,6 +72,9 @@
         </li>        
     </ul>    
     {% endif %}
+<div id="dialog-form" title="Agregar Observacion" style="padding:1em;display:none">     
+    <input id="observacion" class="form-control" style="padding:1em;margin:1em;width:95%" value="" />                    
+</div>      
 {% endblock %}
 {% block javascripts %}
 <script>
@@ -112,6 +115,28 @@
                          );           
         }
     }
+    
+        var dialog = $( "#dialog-form" ).dialog({
+      autoOpen: false,
+      height: 200,
+      width: 500,
+      modal: true,
+      buttons: {
+        "Aceptar": addObservacion,
+        Cancel: function() {
+          dialog.dialog( "close" );          
+        }
+      },
+      close: function() {        
+      }
+    });
+    
+    function addObservacion() {
+        var link=$("#dialog-form").data('link');        
+        $(link).attr('href',$(link).attr('href').replace(/null(?![\s\S]*null)/,$('#observacion').val()));        
+        alert($(link).attr('href'));
+        $(link).click();        
+    } 
     
     $(function() {
         $('#mantenciones th').removeClass('ui-state-default');    
@@ -200,11 +225,23 @@
                                 root.find('.sub-menu:visible').hide();
                             });                                                           
                             
-                            $( "a.estados" ).on( "click", function(e) {                                                                                                   
+                            $( "a.estados, a.estados>li" ).on( "click", function(e) {                                                                                                   
                                 if($(this).parent().parent().prev().text()==$(this).text())
                                     return false;
-                                else
-                                    return true;
+                                //if($(this).text()=='Resuelta MT' || $(this).text()=='En Gestión FONASA' || 
+                                   //$(this).text()=='Pendiente MT'){
+                                    if($('#observacion').val().trim()==''){
+                                        dialog.data('link',$(this));
+                                        dialog.dialog( "open" );
+                                        return false;                 
+                                    }
+                                    else{                                        
+                                        dialog.dialog( "close" );
+                                        window.location=$(this).attr('href');                                                                                        
+                                    }
+                                //}
+                                //else
+                                    //return true;                                
                             });
                             
                             $('div.toolbar').html(json.pap);

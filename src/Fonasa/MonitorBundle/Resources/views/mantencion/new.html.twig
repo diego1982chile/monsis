@@ -46,6 +46,50 @@
         </div>                    
         {{ form_row(form.descripcion) }}
         {{ form_row(form.severidad) }}
+        {{ form_row(form.usuario) }}                
+        {{ form_row(form.hhEstimadas) }}                
+        <div id="form_inicioProgramado">                    
+            {% for child in form.inicioProgramado %}
+                {{ form_label(child) }} 
+                <label class="radio-inline">                                       
+                {{ form_widget(child) }}
+                </label>                
+            {% endfor %}
+        </div>            
+        {% if form.fechaInicio is defined %}
+            {{ form_row(form.fechaInicio) }}        
+        {% endif %}        
+        <label class="control-label required">
+            Comentarios
+        </label>   
+        <div class="form-group input-group" style="width:100%">    
+            <ul class="comments" data-prototype="{{ form_widget(form.comentariosMantencion.vars.prototype)|e }}">
+                {% if form.comentariosMantencion|length > 0  %}
+                        {# iterate over each existing tag and render its only field: name #}                
+                        {% for com in form.comentariosMantencion %}
+                            <div class="input-group comment-field">                                
+                                {{ form_row(com.comentario) }}                                                                
+                                <span class="input-group-btn">
+                                    <a role="button" class="btn elim-doc" id="{{com.id.vars.value}}">
+                                        <span class="glyphicon glyphicon-remove">                                    
+                                        </span>
+                                    </a>                                
+                                </span>
+                            </div>
+                        {% endfor %}
+                    {% else %}  
+                        <div class="input-group comment-field place" id="place_holder2" style="width:100%;">
+                            <h4 class="form-group" style="opacity:0.5">                                
+                                Ningún Comentario
+                            </h4>
+                        </div>
+                    {% endif %}
+            </ul>   
+            <a href="#" id="agregarComentario" class="add_tag_link btn active btn-info" role="button" style="display:none">                            
+                <span class="glyphicon glyphicon-paperclip">                       
+                </span>
+            </a>
+        </div>        
         <label class="control-label required">
             Documentos Adjuntos
         </label>   
@@ -85,20 +129,7 @@
                 <span class="glyphicon glyphicon-paperclip">                       
                 </span>
             </a>
-        </div>        
-        {{ form_row(form.usuario) }}                
-        {{ form_row(form.hhEstimadas) }}                
-        <div id="form_inicioProgramado">                    
-            {% for child in form.inicioProgramado %}
-                {{ form_label(child) }} 
-                <label class="radio-inline">                                       
-                {{ form_widget(child) }}
-                </label>                
-            {% endfor %}
-        </div>            
-        {% if form.fechaInicio is defined %}
-            {{ form_row(form.fechaInicio) }}        
-        {% endif %}
+        </div>                
         <input type="submit" class='btn btn-primary active' style="display:none" value="Create" />
         <button id="validate_form" class="btn btn-primary active" type="button">Grabar</button>
     {{ form_end(form) }}

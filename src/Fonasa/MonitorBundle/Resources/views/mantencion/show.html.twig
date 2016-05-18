@@ -20,86 +20,98 @@
         </div>
     </div>                    
     {% endfor %}
-    <h1>Mantencion</h1>
-
-<div style="width:100%">
+    <div class="col-md-5">
+            <h1>
+                Mantencion {{ mantencion.codigoInterno }}
+            </h1>
+        </div>
+        <div class="col-md-6">
+            <h1>
+                {{ mantencion.estadoMantencion.nombre }}
+            </h1>
+        </div>  
+        <div class="col-md-1">
+            {{ fill_ratio|raw }}
+            <br>
+        </div>              
+    <div  id="form" class="col-md-7">
     <fieldset class="scheduler-border" >
     <legend class="scheduler-border">Datos de la Mantención</legend>
     <div class="control-group">
         <table width="100%" class="table" border="0">
             <tr>
-                <th width="20%">
+                <th width="30%">
                     Componente:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.componente.nombre }}        
                 </td>                            
             </tr>
             <tr>
-                <th width="20%">
+                <th width="30%">
                     Origen:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.origenMantencion.nombre }}        
                 </td>                     
             </tr>
             {% if mantencion.tipoRequerimiento is not null %}            
             <tr>                        
-                <th width="20%">
+                <th width="30%">
                     Tipo Requerimiento:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.tipoRequerimiento.nombre }}        
                 </td>                                     
             </tr>            
             <tr>
-                <th width="20%">
+                <th width="30%">
                     N°Requerimiento:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.numeroRequerimiento }}        
                 </td>                     
             </tr>
             {% endif %}            
             {% if mantencion.incidencia is not null %}            
             <tr>                        
-                <th width="20%">
+                <th width="30%">
                     Tipo Incidencia:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.incidencia.categoriaIncidencia.nombre }}        
                 </td>                                     
             </tr>            
             <tr>
-                <th width="20%">
+                <th width="30%">
                     N°Ticket:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     <a href="{{ path('incidencia_show', { 'id': mantencion.incidencia.id }) }}">{{ mantencion.incidencia.numeroTicket }}</a>                        
                 </td>                     
             </tr>
             {% endif %}                        
             <tr>
-                <th width="20%">
+                <th width="30%">
                     N°Mantencion:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.codigoInterno }}        
                 </td>                     
             </tr>                        
             <tr>
-                <th width="20%">
+                <th width="30%">
                     Estado:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.estadoMantencion.nombre }}        
                 </td>                     
             </tr>                                                            
             <tr>
-                <th width="20%">
+                <th width="30%">
                     Descripción:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.descripcion }}                         
                 </td>                     
             </tr>               
@@ -111,10 +123,10 @@
     <div class="control-group">
         <table width="100%" class="table" border="0">
             <tr>
-                <th width="20%">
+                <th width="30%">
                     Responsable:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {% if mantencion.usuario is not null %}       
                         {{ mantencion.usuario.username }}        
                     {% else %}
@@ -123,65 +135,40 @@
                 </td>                                      
             </tr>
             <tr>
-                <th width="20%">
+                <th width="30%">
                     HH Estimadas:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.hhEstimadas }}        
                 </td>                     
             </tr>
             <tr>
-                <th width="20%">
+                <th width="30%">
                     HH Reales:
                 </th>
-                <td width="80%">
+                <td width="70%">
                     {{ mantencion.hhEfectivas }}        
                 </td>                     
             </tr>                        
         </table>
     </div>
-    </fieldset>                        
-    <fieldset class="scheduler-border">
-        <legend class="scheduler-border">Eventos</legend>
-            <div class="control-group">
-                <table width="100%" class="table" border="0">                                   
-                    <tr>
-                        <th width="20%">
-                            Fecha Ingreso:
-                        </th>
-                        <td width="80%">
-                            {% if mantencion.fechaIngreso %}
-                                {{ mantencion.fechaIngreso|date('Y-m-d H:i') }}
-                            {% endif %}
-                        </td>                     
-                    </tr>                                   
-                    <tr>
-                        <th width="20%">
-                            Fecha Inicio:
-                        </th>
-                        <td width="80%">
-                            {% if mantencion.fechaInicio %}
-                                {{ mantencion.fechaInicio|date('Y-m-d H:i') }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>                     
-                    </tr>                    
-                    <tr>
-                        <th width="20%">
-                            Fecha Término:
-                        </th>
-                        <td width="80%">
-                            {% if mantencion.fechaSalida %}
-                                {{ mantencion.fechaSalida|date('Y-m-d H:i') }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>                     
-                    </tr>                                        
-                </table>
-            </div>
-    </fieldset>
+    </fieldset>                           
+    {% if mantencion.comentariosMantencion|length > 0 %}
+        <fieldset class="scheduler-border">
+            <legend class="scheduler-border">Comentarios</legend>
+                <div class="control-group">
+                    <table width="100%" class="table" border="0">
+                    {% for com in mantencion.comentariosMantencion %}   
+                        <tr>
+                            <td>
+                                {{ com.comentario }}
+                            </td>
+                        </tr>    
+                    {% endfor %}
+                    </table>
+                </div>
+        </fieldset>
+    {% endif %}  
     {% if mantencion.documentosMantencion|length > 0 %}
         <fieldset class="scheduler-border">
             <legend class="scheduler-border">Adjuntos</legend>
@@ -199,7 +186,16 @@
                     </table>
                 </div>
         </fieldset>
-    {% endif %}                        
+    {% endif %} 
+    </div>
+    <div class="col-md-5">
+        <fieldset class="scheduler-border">
+            <legend class="scheduler-border">Eventos</legend>
+                <div class="control-group" id="eventos">                        
+                </div>
+        </fieldset>
+    </div>
+    <div class="col-md-12">
     <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>
     <ul>
         <li>
@@ -214,6 +210,7 @@
     {{ form_start(delete_form) }}
         <input type="submit" style="display:none" value="Delete" class="btn btn-warning active">
     {{ form_end(delete_form) }}                    
+    </div>
 {% endblock %}
 
 {% block javascripts %}
@@ -222,6 +219,16 @@
 $( window ).load(function() {
    $('#form').show();
 });    
+
+$(function() {
+    $('#eventos').timelineMe({
+      //orientation: 'horizontal',
+      //scrollZones: true,
+      scrollArrows: true,
+      scrollBar: true,
+      items: {{ eventos|raw }}
+    });
+});
 
 var loader = new Image();
 loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';

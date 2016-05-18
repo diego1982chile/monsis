@@ -36,6 +36,20 @@ class HistorialIncidencia
     private $termino;
     
     /**
+     * @var string
+     *
+     * @ORM\Column(name="observacion", type="string", length=1023)
+     */
+    private $observacion;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="usuario", type="string", length=127)
+     */
+    private $usuario;
+    
+    /**
      * @var \Incidencia
      *
      * @ORM\ManyToOne(targetEntity="Incidencia", inversedBy="historialesIncidencia")
@@ -125,6 +139,54 @@ class HistorialIncidencia
     public function getTermino()
     {
         return $this->termino;
+    }
+    
+    /**
+     * Set observacion
+     *
+     * @param string $observacion
+     *
+     * @return HistorialIncidencia
+     */
+    public function setObservacion($observacion)
+    {        
+        $this->observacion = $observacion;
+
+        return $this;
+    }
+
+    /**
+     * Get observacion
+     *
+     * @return string
+     */
+    public function getObservacion()
+    {
+        return $this->observacion;
+    }
+    
+    /**
+     * Set usuario
+     *
+     * @param string $usuario
+     *
+     * @return HistorialIncidencia
+     */
+    public function setUsuario($usuario)
+    {        
+        $this->usuario = $usuario;
+
+        return $this;
+    }
+
+    /**
+     * Get usuario
+     *
+     * @return string
+     */
+    public function getUsuario()
+    {
+        return $this->usuario;
     }
     
     /**

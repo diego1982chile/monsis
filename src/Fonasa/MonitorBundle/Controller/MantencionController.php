@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Fonasa\MonitorBundle\Entity\Mantencion;
 use Fonasa\MonitorBundle\Entity\HistorialMantencion;
+use Fonasa\MonitorBundle\Entity\HistorialIncidencia;
 use Fonasa\MonitorBundle\Form\MantencionType;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -56,9 +57,28 @@ class MantencionController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {                        
                         
             $inicioProgramado=$request->request->get('mantencion')['inicioProgramado'];
-            //$fechaInicio=$request->request->get('mantencion')['fechaInicio']['date'];                                                
-            
+            //$fechaInicio=$request->request->get('mantencion')['fechaInicio']['date'];                                                            
             $fechaIngreso=new\DateTime('now');
+
+            $prefix;
+            $suffix;
+
+            switch ($mantencion->getComponente()->getNombre()){
+                case 'SIGGES':
+                    $prefix='SIGG';
+                    break;
+                case 'GGPF':
+                    $prefix='GGPF';
+                    break;                
+                case 'PM':  
+                    $prefix='PM';
+                    break;                
+                case 'BGI / DataWareHouse':
+                    $prefix='DWH';
+                    break;                
+            }            
+            
+            $mantencion->getTipoMantencion()->getNombre()=='Mantención Correctiva'?$suffix='-MC':$suffix='-ME';
             
             if($inicioProgramado)
                 $nomEstado='En Cola';                                                        
@@ -110,38 +130,59 @@ class MantencionController extends Controller
                  //Si no es inicio programado setear la fecha de inicio
                 $mantencion->setFechaInicio($fechaIngreso);
                 $msg='La mantención se ha iniciado y ha quedado asignada al área de desarrollo.';                            
+                
+                // Si se inicia inmediatamente, generar el historial
+                $historialMantencion = new HistorialMantencion();
+            
+                $historialMantencion->setInicio($fechaIngreso);
+                $historialMantencion->setObservacion('Se inicia la mantencion '.$prefix.$suffix.$mantencion->getCodigoInterno());            
+                $historialMantencion->setEstadoMantencion($estado[0]);
+                $historialMantencion->setIdEstadoMantencion($estado[0]->getId());            
+                $historialMantencion->setMantencion($mantencion);
+                $historialMantencion->setIdMantencion($mantencion->getId());
+                $historialMantencion->setUsuario($mantencion->getUsuario()->getUsername());
+
+                $em->persist($historialMantencion);
             }            
             
             // $file stores the uploaded PDF file
-            /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */
-            if (is_array($mantencion->getDocumentosMantencion()) || 
-                is_object($mantencion->getDocumentosMantencion()))
-            {
-                foreach($mantencion->getDocumentosMantencion() as $key => $documentoMantencion){
+            /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */            
+            foreach($mantencion->getDocumentosMantencion() as $key => $documentoMantencion){
 
-                    $file = $documentoMantencion->getArchivo();
+                $file = $documentoMantencion->getArchivo();
 
-                    // Generate a unique name for the file before saving it
-                    $fileName = md5(uniqid()).'.'.$file->guessExtension();
+                // Generate a unique name for the file before saving it
+                $fileName = md5(uniqid()).'.'.$file->guessExtension();
 
-                    // Move the file to the directory where brochures are stored
-                    //$brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/uploads';
-                    $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads';
+                // Move the file to the directory where brochures are stored
+                //$brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/uploads';
+                $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads';
 
-                    $file->move($brochuresDir, $fileName);
+                $file->move($brochuresDir, $fileName);
 
-                    $documentoMantencion->setNombre(str_replace(' ','_',$documentoMantencion->getTipoDocumentoMantencion()->getNombre()).
-                                                    '_'.$mantencion->getCodigoInterno().'_'.($key+1));
+                $documentoMantencion->setNombre(str_replace(' ','_',$documentoMantencion->getTipoDocumentoMantencion()->getNombre()).
+                                                '_'.$mantencion->getCodigoInterno().'_'.($key+1));
 
-                    $documentoMantencion->setArchivo($fileName);
+                $documentoMantencion->setArchivo($fileName);
 
-                    $documentoMantencion->setMantencion($mantencion);
-                    $documentoMantencion->setIdMantencion($mantencion->getId());
+                $documentoMantencion->setMantencion($mantencion);
+                $documentoMantencion->setIdMantencion($mantencion->getId());
+
+                //$em = $this->getDoctrine()->getManager();
+                $em->persist($documentoMantencion);                                                                    
+            }
+            
+            if (is_array($mantencion->getComentariosMantencion()) || 
+                is_object($mantencion->getComentariosMantencion())){
+                foreach($mantencion->getComentariosMantencion() as $key => $comentarioMantencion){
+                                                                
+                    $comentarioMantencion->setMantencion($mantencion);
+                    $comentarioMantencion->setIdMantencion($mantencion->getId());
 
                     //$em = $this->getDoctrine()->getManager();
-                    $em->persist($documentoMantencion);                                                    
-                }         
-            }
+                    $em->persist($comentarioMantencion);                                                    
+                }                                                
+            }                
             
             $em->flush();
 
@@ -173,6 +214,19 @@ class MantencionController extends Controller
                 $incidencia[0]->setFechaSalida(new\DateTime('now'));
                 
                 $em->persist($incidencia[0]);
+                
+                //Agregar el historial
+                $historialIncidencia = new HistorialIncidencia();                               
+
+                $historialIncidencia->setInicio($fechaIngreso);
+                $historialIncidencia->setObservacion('Se levanta mantención '.$prefix.$suffix.$mantencion->getCodigoInterno());            
+                $historialIncidencia->setEstadoIncidencia($estado[0]);
+                $historialIncidencia->setIdEstadoIncidencia($estado[0]->getId());            
+                $historialIncidencia->setIncidencia($incidencia[0]);
+                $historialIncidencia->setIdIncidencia($incidencia[0]->getId());                
+
+                $em->persist($historialIncidencia);
+                
                 $em->flush();
                 
                 $this->addFlash(
@@ -201,9 +255,36 @@ class MantencionController extends Controller
     {
         $deleteForm = $this->createDeleteForm($mantencion);
         
+        $items = array();
+        
+        foreach($mantencion->getHistorialesMantencion() as $historialMantencion){
+            $item['type'] = 'smallItem';
+            $item['label'] = $historialMantencion->getInicio()->format('d/m/Y H:i').'<br><i>'.$historialMantencion->getEstadoMantencion()->getNombre().'</i>';
+            $item['relativePosition'] = $historialMantencion->getInicio();
+            $item['shortContent'] = '<i><small>'.$historialMantencion->getObservacion().'</small></i>';
+            
+            $items[] = $item;
+        }
+        
+        $fillRatio = intval(100*$mantencion->getHhEfectivas()/$mantencion->getHhEstimadas());                        
+            
+        $color='';
+
+        if(80<$fillRatio && $fillRatio<=100)
+            $color='orange';
+        if($fillRatio>100)
+            $color='red';                                                    
+        if($mantencion->getEstadoMantencion()->getNombre()=='Resuelta MT')
+            $color='green';                            
+
+        $html='<div class="c100 p'.min($fillRatio,100).' center big '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
+
+        
         return $this->render('MonitorBundle:mantencion:show.html.twig', array(
             'mantencion' => $mantencion,
             'delete_form' => $deleteForm->createView(),
+            'eventos' => json_encode($items),
+            'fill_ratio' => $html
         ));
     }
 
@@ -231,6 +312,37 @@ class MantencionController extends Controller
             
             $em->persist($mantencion);
             //$em->flush();
+            
+            foreach($mantencion->getComentariosMantencion() as $comentarioMantencion){            
+                                                                                                
+                if ($comentarioMantencion->getComentario() == 'eliminado') {
+                    
+                    // remove the Task from the Tag                    
+                    $mantencion->removeComentariosMantencion($comentarioMantencion);                    
+
+                    // if it was a many-to-one relationship, remove the relationship like this                                
+                    $em->remove($comentarioMantencion);
+                    $em->persist($mantencion);
+
+                    // if you wanted to delete the Tag entirely, you can also do that
+                    // $em->remove($tag);
+                } 
+                else{                    
+                    //if($tipo != 'string'){
+                               
+                    if($comentarioMantencion->getId() == null){                        
+                        // Si el tipo es file es un archivo nuevo                                                                    
+
+                        $comentarioMantencion->setMantencion($mantencion);
+                        $comentarioMantencion->setIdMantencion($mantencion->getId());                                                
+                        $mantencion->addComentariosMantencion($comentarioMantencion);
+                        
+                        $em->persist($mantencion);  
+                        
+                        $em->persist($comentarioMantencion);                                                                          
+                    }                                                                                                                          
+                }                
+            }
             
             foreach($mantencion->getDocumentosMantencion() as $key => $documentoMantencion){            
                                                                                 
@@ -554,8 +666,8 @@ class MantencionController extends Controller
         
         // Si se estan consultando las incidencias resueltas agregar filtro por mes y año
         if($estado == 2){            
-            $qb->andWhere('YEAR(i.fechaInicio) = ?1');                
-            $qb->andWhere('MONTH(i.fechaInicio) = ?2');                
+            $qb->andWhere('YEAR(i.fechaSalida) = ?1');                
+            $qb->andWhere('MONTH(i.fechaSalida) = ?2');                
             $parameters[1] = $anio;        
             $parameters[2] = $mes;
                     
@@ -651,9 +763,7 @@ class MantencionController extends Controller
             $html='<div class="c100 p'.min($fillRatio,100).' small '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
             
             //$html='<div class="progress"><div class="progress-bar '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
-            array_push($fila,$html);                                                
-            
-            array_push($fila,$mantencion->getIncidencia()==null?'Req'.$mantencion->getNumeroRequerimiento():'Ticket'.$mantencion->getIncidencia()->getNumeroTicket());            
+            array_push($fila,$html);                                                                        
             $prefix;
             switch ($mantencion->getComponente()->getNombre()){
                 case 'SIGGES':
@@ -669,7 +779,14 @@ class MantencionController extends Controller
                     $prefix='DWH';
                     break;                
             }
-            array_push($fila,$mantencion->getTipoMantencion()->getNombre()=='Mantención Evolutiva'?$prefix.'-ME'.$mantencion->getCodigoInterno():$prefix.'-MC'.$mantencion->getCodigoInterno());
+                        
+            $suffix;
+            $mantencion->getTipoMantencion()->getNombre()=='Mantención Evolutiva'?$suffix='-ME':'-MC';
+            
+            $html='<a href="'.$this->generateUrl('mantencion_show', array('id' => $mantencion->getId())).'">'.$prefix.$suffix.$mantencion->getCodigoInterno().'</a>';
+            
+            array_push($fila,$html);
+            array_push($fila,$mantencion->getIncidencia()==null?'Req'.$mantencion->getNumeroRequerimiento():'Ticket'.$mantencion->getIncidencia()->getNumeroTicket());            
             array_push($fila,$mantencion->getFechaInicio()==null?'-':$mantencion->getFechaInicio()->format('d/m/Y H:i'));
             //array_push($fila,$servicio->getComponente()->getNombre());
             array_push($fila,$mantencion->getFechaSalida()==null?'-':$mantencion->getFechaSalida()->format('d/m/Y H:i'));
@@ -714,15 +831,14 @@ class MantencionController extends Controller
                                     if($mantencion->getUsuario()->getUsername()==$usuario->getUsername())                            
                                         $active2="active";
                                 }
-                                $html=$html.'<li class="'.$active2.'"><a href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => $usuario->getUsername())).'">'.$usuario->getUsername().'</a></li>';                            
-
+                                $html=$html.'<li class="'.$active2.'"><a class="estados" href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => $usuario->getUsername(), 'observacion' => 'null')).'">'.$usuario->getUsername().'</a></li>';                            
                         }
                         $html=$html.'</ul>';
                     }   
                     else{                    
                         if($mantencion->getEstadoMantencion()->getNombre()==$estado->getNombre())
                             $active="active";
-                        $html=$html.'<li class="'.$active.'"><a class="estados" href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => 'null')).'">'.$estado->getNombre().'</a></li>';        
+                        $html=$html.'<li class="'.$active.'"><a class="estados" href="'.$this->generateUrl('mantencion_status', array('id' => $mantencion->getId(), 'status' => $estado->getNombre(), 'usuario' => 'null', 'observacion' => 'null')).'">'.$estado->getNombre().'</a></li>';        
                     }
                 }   
             }   
@@ -754,11 +870,19 @@ class MantencionController extends Controller
             }              
             */   
             
+            $html='<div class="btn-group">';
+            $html=$html.'<a href="#" class="add_tag_link btn btn-secondary"><span class="glyphicon glyphicon-list-alt"></span></a>';
+            
+            if(count($mantencion->getComentariosMantencion())>0)
+                $html=$html.'<a href="#" class="add_tag_link btn btn-secondary"><span class="glyphicon glyphicon-comment"></span></a>';
+
+            $html=$html.'</div>';
+            /*
             $html='<ul><li><a href="'.$this->generateUrl('mantencion_show', array('id' => $mantencion->getId())).'">ver</a></li>';
             
             if($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN'))                
                 $html=$html.'<li><a href="'.$this->generateUrl('mantencion_edit', array('id' => $mantencion->getId())).'">editar</a></li></ul>';
-            
+            */
             array_push($fila,$html);
             
             //Se añade campo tocada
@@ -790,7 +914,7 @@ class MantencionController extends Controller
      * Displays a form to edit an existing Servicio entity.
      *
      */
-    public function statusAction($id, $status, $usuario)
+    public function statusAction($id, $status, $usuario, $observacion)
     {                                            
         //$id= $request->request->get('id');
         //$status= $request->request->get('status');
@@ -862,6 +986,8 @@ class MantencionController extends Controller
         $historial->setEstadoMantencion($estado[0]);
         $historial->setIdEstadoMantencion($estado[0]->getId());            
         $historial->setInicio($fechaTerminado);                   
+        $historial->setObservacion($observacion);                            
+        $historial->setUsuario($usuarios[0]->getUsername());
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($historial);

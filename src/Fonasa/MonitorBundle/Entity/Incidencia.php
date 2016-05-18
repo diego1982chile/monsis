@@ -114,7 +114,18 @@ class Incidencia
      *      
      * @ORM\Column(name="ID_SEVERIDAD", type="integer", nullable=true)               
      */
-    protected $idSeveridad;         
+    protected $idSeveridad;     
+
+
+    /**
+     * @var \Usuario
+     *
+     * @ORM\ManyToOne(targetEntity="Usuario", inversedBy="incidencias")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_USUARIO", referencedColumnName="id")
+     * })
+     */
+    protected $usuario;    
     
     
     /**
@@ -745,6 +756,63 @@ class Incidencia
         $comentarioIncidencia->setIncidencia(null);
         
         return $this;
+    }  
+    
+    //-------------------------------------------------------------------------
+    
+    /**
+    * Get historialesIncidencia
+    *    
+    * @return \Doctrine\Common\Collections\Collection
+    */
+    public function getHistorialesIncidencia(){
+        
+        return $this->historialesIncidencia;
+    }
+    
+     /**
+     * Get usuario
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Usuario
+     */
+    public function getUsuario()
+    {
+        return $this->usuario;
+    }
+    
+    /**
+     * Set usuario
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Incidencia
+     */
+    public function setUsuario(\Fonasa\MonitorBundle\Entity\Usuario $usuario = null)
+    {
+        $this->usuario=$usuario;
+        
+        return $this;
     }    
+    
+    /**
+     * Get idUsuario
+     *
+     * @return int
+     */
+    public function getIdUsuario()
+    {
+        return $this->idUsuario;
+    }
+    
+    /**
+    * Set idUsuario
+    *
+    * @param int $idUsuario
+    * @return Incidencia
+    */
+    public function setIdUsuario($idUsuario)
+    {
+        $this->idUsuario = $idUsuario;
+        
+        return $this;
+    }
 }
 

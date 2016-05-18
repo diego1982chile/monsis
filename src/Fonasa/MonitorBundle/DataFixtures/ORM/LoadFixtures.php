@@ -217,6 +217,15 @@ class LoadFixtures extends Controller implements FixtureInterface
         $usuario3->setEstadoMantencion($estadoMantencion3);
         $userManager->updateUser($usuario3,false);                                                
         
+        $usuario4 = new Usuario();
+        
+        $usuario4->setUserName("jtoledo");
+        $usuario4->setEmail("analisis@example.com");
+        $usuario4->setPlainPassword('123');
+        $usuario4->setArea($area1);
+        $usuario4->setEstadoIncidencia($estadoIncidencia3);
+        $userManager->updateUser($usuario4,false);                                                
+        
         $connection->exec("ALTER TABLE origen_incidencia AUTO_INCREMENT = 1;");
         
         $origen1 = new OrigenIncidencia();                

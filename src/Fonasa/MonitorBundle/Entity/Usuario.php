@@ -53,12 +53,33 @@ class Usuario extends BaseUser
      *      
      * @ORM\Column(name="ID_ESTADO_MANTENCION", type="integer", nullable=true)               
      */
-    private $idEstadoMantencion;     
+    private $idEstadoMantencion;   
+    
+    /**
+     * @var \EstadoIncidencia
+     *
+     * @ORM\ManyToOne(targetEntity="EstadoIncidencia", inversedBy="usuarios")
+     * @ORM\JoinColumns{(
+     *    @ORM\JoinColumn(name="ID_ESTADO_INCIDENCIA", referencedColumnName="id")
+     * })
+     */
+    protected $estadoIncidencia;         
+    
+    /**
+     *      
+     * @ORM\Column(name="ID_ESTADO_INCIDENCIA", type="integer", nullable=true)               
+     */
+    private $idEstadoIncidencia;   
     
     /**          
      * @ORM\OneToMany(targetEntity="Mantencion", mappedBy="usuario")          
      */
-    protected $mantenciones;     
+    protected $mantenciones; 
+
+    /**          
+     * @ORM\OneToMany(targetEntity="Incidencia", mappedBy="usuario")          
+     */
+    protected $incidencias;     
     
     /**          
      * @ORM\OneToMany(targetEntity="HhMantencion", mappedBy="usuario")          
@@ -171,5 +192,52 @@ class Usuario extends BaseUser
         
         return $this;
     }
+    
+    //--------------------------------------------------------------------------
+        
+    /**
+     * Get estadoIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\EstadoIncidencia
+     */
+    public function getEstadoIncidencia()
+    {
+        return $this->estadoIncidencia;
+    }
+    
+    /**
+     * Get idEstadoIncidencia
+     *
+     * @return int
+     */
+    public function getIdEstadoIncidencia()
+    {
+        return $this->idEstadoIncidencia;
+    }
+    
+    /**
+     * Set estadoIncidencia
+     *
+     * @return \Fonasa\MonitorBundle\Entity\Usuario
+     */
+    public function setEstadoIncidencia(\Fonasa\MonitorBundle\Entity\EstadoIncidencia $estadoIncidencia = null)
+    {
+        $this->estadoIncidencia=$estadoIncidencia;
+        
+        return $this;
+    }  
+    
+    /**
+    * Set idEstadoIncidencia
+    *
+    * @param int $idEstadoIncidencia
+    * @return Usuario
+    */
+    public function setIdEstadoIncidencia($idEstadoIncidencia)
+    {
+        $this->idEstadoIncidencia = $idEstadoIncidencia;
+        
+        return $this;
+    }    
 }
 

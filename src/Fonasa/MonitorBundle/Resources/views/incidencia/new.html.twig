@@ -31,6 +31,7 @@
         </div>                
         {{ form_row(form.descripcion) }}        
         {{ form_row(form.severidad) }}  
+        {{ form_row(form.usuario) }}              
         <label class="control-label required">
             Comentarios
         </label>   
@@ -101,7 +102,7 @@
                 <span class="glyphicon glyphicon-paperclip">                       
                 </span>
             </a>
-        </div>
+        </div>        
         <input type="submit" class='btn btn-primary form-control active' style="display:none" value="Create" />
         <button id="validate_form" class="btn btn-primary active" type="button">Ingresar</button>
     {{ form_end(form) }}

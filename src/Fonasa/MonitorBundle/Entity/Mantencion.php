@@ -211,7 +211,12 @@ class Mantencion
     /**          
      * @ORM\OneToMany(targetEntity="DocumentoMantencion", mappedBy="mantencion", orphanRemoval=true)          
      */
-    public $documentosMantencion = array();            
+    public $documentosMantencion = array(); 
+    
+    /**          
+     * @ORM\OneToMany(targetEntity="ComentarioMantencion", mappedBy="mantencion", orphanRemoval=true)          
+     */
+    public $comentariosMantencion;       
         
     /**
      * @var \Incidencia
@@ -948,6 +953,56 @@ class Mantencion
         
         return $this;
     }    
+    
+    
+     //-------------------------------------------------------------------------
+    
+    /**
+    * Get comentariosMantencion
+    *    
+    * @return \Doctrine\Common\Collections\Collection
+    */
+    public function getComentariosMantencion(){
+        
+        return $this->comentariosMantencion;
+    }
+    
+    /**
+    * Add comentariosMantencion
+    *    
+    * @param \Fonasa\MonitorBundle\Entity\ComentarioMantencion $comentarioMantencion
+    * @return Mantencion
+    */
+    public function addComentariosMantencion(ComentarioMantencion $comentarioMantencion = null){
+        
+        $this->comentariosMantencion[] = $comentarioMantencion;
+        
+        return $this;
+    }
+    
+    /**
+    * Remove comentariosMantencion
+    *    
+    * @param \Fonasa\MonitorBundle\Entity\ComentarioMantencion $comentarioMantencion
+    * @return Mantencion
+    */
+    public function removeComentariosMantencion(ComentarioMantencion $comentarioMantencion = null){
+        
+        $this->comentariosMantencion->removeElement($comentarioMantencion);
+        $comentarioMantencion->setMantencion(null);
+        
+        return $this;
+    }    
+    
+    /**
+    * Get historialesMantencion
+    *    
+    * @return \Doctrine\Common\Collections\Collection
+    */
+    public function getHistorialesMantencion(){
+        
+        return $this->historialesMantencion;
+    }
    
 }
 
