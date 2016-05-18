@@ -152,7 +152,7 @@
     function addObservacion() {
         var link=$("#dialog-form").data('link');        
         $(link).attr('href',$(link).attr('href').replace(/null(?![\s\S]*null)/,$('#observacion').val()));  
-        alert($(link).attr('href'));
+        //alert($(link).attr('href'));
         $(link).click();        
     }                
     
