@@ -116,7 +116,7 @@ class IncidenciaController extends Controller
 
                 // Move the file to the directory where brochures are stored
                 //$brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/uploads';
-                $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads';
+                $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monitor/uploads';
                 
                 $file->move($brochuresDir, $fileName);
                 
@@ -335,7 +335,7 @@ class IncidenciaController extends Controller
                 
                 if ($documentoIncidencia->getNombre() == 'eliminado') {
                     // Eliminar archivo del repositorio
-                    $path = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads/';
+                    $path = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monitor/uploads/';
                     //$fs = new Filesystem();
                     
                     unlink($path.$file);
@@ -372,7 +372,7 @@ class IncidenciaController extends Controller
 
                         // Move the file to the directory where brochures are stored
                         //$brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/uploads';
-                        $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monsis/uploads';
+                        $brochuresDir = $this->container->getParameter('kernel.root_dir').'/../web/bundles/monitor/uploads';
 
                         $file->move($brochuresDir, $fileName);
 
