@@ -85,11 +85,7 @@
     reset.src = '{{ asset('bundles/monsis/images/reset_1.png') }}';
     reset.className = 'save';
     
-    $resetFiltros.children(':eq(0)').append(reset);
-    
-    $.LoadingOverlaySetup({                
-        image           : '{{ asset('bundles/monsis/images/loading.gif') }}',
-    });
+    $resetFiltros.children(':eq(0)').append(reset);    
     
     $( window ).load(function() {
         $('#filtros').show();
