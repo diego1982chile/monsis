@@ -830,8 +830,8 @@ class MantencionController extends Controller
             }
                         
             $suffix='';
-            echo $mantencion->getTipoMantencion()->getNombre();
-            $mantencion->getTipoMantencion()->getNombre()=='Mantención Evolutiva'?$suffix='-ME':'-MC';
+            
+            $mantencion->getTipoMantencion()->getNombre()=='Mantención Evolutiva'?$suffix='-ME':$suffix='-MC';
             
             $html='<a href="'.$this->generateUrl('mantencion_show', array('id' => $mantencion->getId())).'">'.$prefix.$suffix.$mantencion->getCodigoInterno().'</a>';
             
