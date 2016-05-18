@@ -74,7 +74,7 @@
                                     {{ form_row(doc.archivo) }}                     
                                 {% else %}  
                                     <div class="form-group">
-                                        <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo.vars.value ) }}">                                    
+                                        <a href="{{ asset('bundles/monitor/uploads/' ~ doc.archivo.vars.value ) }}">                                    
                                             {{ doc.nombre.vars.value }}
                                         </a>
                                     </div>
@@ -207,15 +207,15 @@ var $validar= $('#validar');
 var $componente = $('#incidencia_componente');
 
 var loader = new Image();
-loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+loader.src = '{{ asset('bundles/monitor/images/loader-minitrans.gif') }}';
 loader.className = 'loader';
 
 var edit = new Image();
-edit.src = '{{ asset('bundles/monsis/images/pencil_3.png') }}';
+edit.src = '{{ asset('bundles/monitor/images/pencil_3.png') }}';
 edit.className = 'save';
 
 var del = new Image();
-del.src = '{{ asset('bundles/monsis/images/delete_3.png') }}';
+del.src = '{{ asset('bundles/monitor/images/delete_3.png') }}';
 del.className = 'save';
 
 $validateForm=$('#validate_form');
@@ -227,7 +227,7 @@ $deleteForm.append(del);
 // When sport gets selected ...
 $componente.change(function() {
   $('#incidencia_categoriaIncidencia').parent().children(':eq(0)')
-    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monitor/images/loader-minitrans.gif') }}">');    
   // ... retrieve the corresponding form.
   var $form = $(this).closest('form');
   // Simulate form data, but only include the selected sport value.
@@ -253,7 +253,7 @@ $componente.change(function() {
 $validar.click(function(){
     
   $(this).parent().children(':eq(0)')
-    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monitor/images/loader-minitrans.gif') }}">');    
   // ... retrieve the corresponding form.  
   // Simulate form data, but only include the selected sport value.
   var data = {};
@@ -265,7 +265,7 @@ $validar.click(function(){
           $('#incidencia_numeroTicket').focus();
           $('#incidencia_numeroTicket').qtip({ // Grab some elements to apply the tooltip to
                 content: {
-                    text: '<img alt="" style="width:20px;height:20px" src="{{ asset('bundles/monsis/images/exclamation_2.png') }}"> '+data.message
+                    text: '<img alt="" style="width:20px;height:20px" src="{{ asset('bundles/monitor/images/exclamation_2.png') }}"> '+data.message
                 },
                 show: {
                     ready: true,

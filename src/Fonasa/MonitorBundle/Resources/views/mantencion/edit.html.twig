@@ -105,7 +105,7 @@
                                 {{ form_row(doc.archivo) }}                     
                             {% else %}  
                                 <div class="form-group">
-                                    <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo.vars.value ) }}">                                    
+                                    <a href="{{ asset('bundles/monitor/uploads/' ~ doc.archivo.vars.value ) }}">                                    
                                         {{ doc.nombre.vars.value }}
                                     </a>
                                 </div>
@@ -273,15 +273,15 @@ var $origenMantencion = $('#mantencion_origenMantencion');
 $validateForm=$('#validate_form');
 
 var loader = new Image();
-loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+loader.src = '{{ asset('bundles/monitor/images/loader-minitrans.gif') }}';
 loader.className = 'loader';
 
 var edit = new Image();
-edit.src = '{{ asset('bundles/monsis/images/pencil_3.png') }}';
+edit.src = '{{ asset('bundles/monitor/images/pencil_3.png') }}';
 edit.className = 'save';
 
 var del = new Image();
-del.src = '{{ asset('bundles/monsis/images/delete_3.png') }}';
+del.src = '{{ asset('bundles/monitor/images/delete_3.png') }}';
 del.className = 'save';
 
 $validateForm.append(edit);

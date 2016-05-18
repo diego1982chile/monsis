@@ -183,7 +183,7 @@
                                 <span class="glyphicon glyphicon-paperclip">                       
                                 </span>
                                 &nbsp;
-                                <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo) }}">                                    
+                                <a href="{{ asset('bundles/monitor/uploads/' ~ doc.archivo) }}">                                    
                                     {{ doc.nombre }}
                                 </a>
                             </td>
@@ -237,11 +237,11 @@ $(function() {
 });
 
 var loader = new Image();
-loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+loader.src = '{{ asset('bundles/monitor/images/loader-minitrans.gif') }}';
 loader.className = 'loader';
 
 var del = new Image();
-del.src = '{{ asset('bundles/monsis/images/delete_3.png') }}';
+del.src = '{{ asset('bundles/monitor/images/delete_3.png') }}';
 del.className = 'save';
 
 $deleteForm=$('#delete');

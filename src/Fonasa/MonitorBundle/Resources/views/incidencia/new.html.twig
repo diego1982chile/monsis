@@ -77,7 +77,7 @@
                                     {{ form_row(doc.archivo) }}                     
                                 {% else %}  
                                     <div class="form-group">
-                                        <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo.vars.value ) }}">                                    
+                                        <a href="{{ asset('bundles/monitor/uploads/' ~ doc.archivo.vars.value ) }}">                                    
                                             {{ doc.nombre.vars.value }}
                                         </a>
                                     </div>
@@ -148,11 +148,11 @@ var $validar= $('#validar');
 var $componente = $('#incidencia_componente');
 
 var loader = new Image();
-loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
+loader.src = '{{ asset('bundles/monitor/images/loader-minitrans.gif') }}';
 loader.className = 'loader';
 
 var save = new Image();
-save.src = '{{ asset('bundles/monsis/images/save_2.png') }}';
+save.src = '{{ asset('bundles/monitor/images/save_2.png') }}';
 save.className = 'save';
 
 $validateForm=$('#validate_form');
@@ -208,7 +208,7 @@ $(function() {
 // When sport gets selected ...
 $componente.change(function() {
   $('#incidencia_categoriaIncidencia').parent().children(':eq(0)')
-    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+    .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monitor/images/loader-minitrans.gif') }}">');    
   // ... retrieve the corresponding form.
   var $form = $(this).closest('form');
   // Simulate form data, but only include the selected sport value.
@@ -234,7 +234,7 @@ $componente.change(function() {
 $validar.click(function(){
     
   $(this).parent().children(':eq(0)')
-          .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monsis/images/loader-minitrans.gif') }}">');    
+          .append('<img class="loader" alt="" style=";margin-left:10px" src="{{ asset('bundles/monitor/images/loader-minitrans.gif') }}">');    
   // ... retrieve the corresponding form.  
   // Simulate form data, but only include the selected sport value.
   var data = {};
