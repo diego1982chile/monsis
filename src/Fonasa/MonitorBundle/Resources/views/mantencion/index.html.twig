@@ -116,7 +116,33 @@
         }
     }
     
-        var dialog = $( "#dialog-form" ).dialog({
+    /* Formatting function for row details - modify as you need */
+    function format_historial(d){
+        var html='<table width="100%"><thead><th width="20">Fecha</th><th width="20">Estado</th><th width="20">Responsable</th><th width="40">Observacion</th></thead><tbody>';
+        
+        $.each(d, function(k,v){            
+            html=html+'<tr><td>'+v[0]+'</td><td>'+v[1]+'</td><td>'+v[2]+'</td><td><small>'+v[3]+'</small></td></tr>';            
+        });
+        
+        html=html+'</tbody></table>';
+        
+        return html;
+    }
+    
+    /* Formatting function for row details - modify as you need */
+    function format_comentario(d){
+        var html='<table width="100%">';
+        
+        $.each(d, function(k,v){            
+            html=html+'<tr><td><i class="fa fa-comment-o"></i>&nbsp;<i>'+v[0]+'</i></td></tr>';            
+        });
+        
+        html=html+'</tbody></table>';
+        
+        return html;
+    }
+    
+    var dialog = $( "#dialog-form" ).dialog({
       autoOpen: false,
       height: 200,
       width: 500,
@@ -124,7 +150,8 @@
       buttons: {
         "Aceptar": addObservacion,
         Cancel: function() {
-          dialog.dialog( "close" );          
+            $('#observacion').val('');
+            dialog.dialog( "close" );          
         }
       },
       close: function() {        
@@ -144,7 +171,7 @@
         updateTitle();
     });     
     
-    var oTable = $('#mantenciones').dataTable({
+    var oTable = $('#mantenciones').DataTable({
             bPagination: true,                        
             //"pagingType": "full_numbers",
             iDisplayLength: 4,
@@ -168,7 +195,11 @@
                     {
                     aTargets: [1,2,3,4,5],
                     class: 'cols'                
-                    }                             
+                    },              
+                    {
+                    aTargets: [6],
+                    class: 'details-control'                
+                    }                           
                 ],            
             order: [[ 7, 'desc' ]],                               
             dom: 'Blfrtip',                         
@@ -274,37 +305,81 @@
             }                    
         });   
         
-    oTable.on( 'buttons-action', function ( e, buttonApi, dataTable, node, config ) {
-        console.log( 'Button '+buttonApi.text()+' was activated' );
-    } );
-
+    
+        // Add event listener for opening and closing details
+        $('#mantenciones tbody').on('click', 'td.details-control .ver_historial', function () {            
+            var tr = $(this).closest('tr');
+            var row = oTable.row( tr );
+            $(this).find('i').replaceWith('<i class="fa fa-spinner fa-spin"></i>');
+                                    
+            $.getJSON('{{ path('mantencion_historial') }}',{ 'id' : $(this).attr('id') }, function(data){
+                 
+                $('i.fa-spinner').replaceWith('<i class="fa fa-list"></i>');
+                 
+                if (row.child.isShown())
+                {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                }
+                else 
+                {
+                    row.child( format_historial(data) ).show();                                     
+                    tr.addClass('shown');
+                }                            
+            });                
+        }); 
+        
+        // Add event listener for opening and closing details
+        $('#mantenciones tbody').on('click', 'td.details-control .ver_comentario', function () {            
+            var tr = $(this).closest('tr');
+            var row = oTable.row( tr );
+            $(this).find('i').replaceWith('<i class="fa fa-spinner fa-spin"></i>');
+                                    
+            $.getJSON('{{ path('mantencion_comentario') }}',{ 'id' : $(this).attr('id') }, function(data){
+                
+                $('i.fa-spinner').replaceWith('<i class="fa fa-comment-o"></i>');
+        
+                if (row.child.isShown())
+                {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                }
+                else 
+                {
+                    row.child( format_comentario(data) ).show();                                     
+                    tr.addClass('shown');
+                }                            
+            });                
+        });          
+        
+        
     $anio.change(function() {
         updateTitle();
-        oTable.fnDraw();            
+        oTable.draw();            
     });
 
     $mes.change(function() {
         updateTitle();
-        oTable.fnDraw();            
+        oTable.draw();            
     });
 
     $estado.change(function() {
         $.LoadingOverlay("show");
         cambioEstado = true;
         updateTitle();
-        oTable.fnDraw();            
+        oTable.draw();            
     });
 
     $componente.change(function() {
         updateTitle();
-        oTable.fnDraw();            
+        oTable.draw();            
     });
 
     $resetFiltros.click(function() {
         $(reset).parent().children(':eq(1)').replaceWith(loader);    
         $(this).attr('disabled',true);            
         updateTitle();
-        oTable.fnDraw();            
+        oTable.draw();            
     });        
 
     setInterval( function () {

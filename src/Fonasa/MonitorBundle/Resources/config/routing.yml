@@ -58,10 +58,15 @@ incidencia_mantencion:
     defaults: { _controller: "MonitorBundle:Incidencia:mantencion" }
     methods:  [GET,POST]                
     
-incidencia_delete_documento:
-    path:     /incidencia/delete_documento
-    defaults: { _controller: "MonitorBundle:Incidencia:deleteDocumento" }
+incidencia_historial:
+    path:     /incidencia/historial
+    defaults: { _controller: "MonitorBundle:Incidencia:historial" }
     methods:  [GET,POST]       
+    
+incidencia_comentario:
+    path:     /incidencia/comentario
+    defaults: { _controller: "MonitorBundle:Incidencia:comentario" }
+    methods:  [GET,POST]     
     
 mantencion_index:
     path:     /mantencion
@@ -117,6 +122,16 @@ mantencion_cerrar:
     path:   /mantencion/{componente}/{mes}/{anio}/cerrar
     defaults: { _controller: "MonitorBundle:Mantencion:cerrar" }
     methods:  [GET,POST]      
+    
+mantencion_historial:
+    path:     /mantencion/historial
+    defaults: { _controller: "MonitorBundle:Mantencion:historial" }
+    methods:  [GET,POST]       
+    
+mantencion_comentario:
+    path:     /mantencion/comentario
+    defaults: { _controller: "MonitorBundle:Mantencion:comentario" }
+    methods:  [GET,POST]        
     
 dashboard_index:
     path:  /dashboard

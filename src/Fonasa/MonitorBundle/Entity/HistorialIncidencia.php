@@ -45,7 +45,7 @@ class HistorialIncidencia
     /**
      * @var string
      *
-     * @ORM\Column(name="usuario", type="string", length=127)
+     * @ORM\Column(name="usuario", type="string", length=127, nullable=true)
      */
     private $usuario;
     

@@ -111,8 +111,9 @@
                         {% for com in incidencia.comentariosIncidencia %}   
                             <tr>
                                 <td>
-                                    <span class="glyphicon glyphicon-comment">                       
-                                    </span>
+                                    <i class="fa fa-comment-o">                       
+                                    </i>
+                                    &nbsp;
                                     {{ com.comentario }}
                                 </td>
                             </tr>    
@@ -131,6 +132,7 @@
                                 <td>
                                     <span class="glyphicon glyphicon-paperclip">                       
                                     </span>
+                                    &nbsp;
                                     <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo) }}">                                    
                                         {{ doc.nombre }}
                                     </a>

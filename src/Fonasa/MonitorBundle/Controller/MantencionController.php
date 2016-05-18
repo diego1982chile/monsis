@@ -246,6 +246,53 @@ class MantencionController extends Controller
             'form' => $form->createView(),
         ));
     }
+    
+    public function historialAction(Request $request){
+        
+        $em = $this->getDoctrine()->getManager();              
+        
+        $id= $request->query->get('id');                
+        
+        $mantencion = $em->getRepository('MonitorBundle:Mantencion')->find($id);
+        
+        $historial = array();
+        
+        foreach($mantencion->getHistorialesMantencion() as $historialMantencion){
+            
+            $fila = array();
+            
+            array_push($fila,$historialMantencion->getInicio()->format('d/m/Y H:i'));
+            array_push($fila,$historialMantencion->getEstadoMantencion()->getNombre());
+            array_push($fila,$historialMantencion->getUsuario()==null?'-':$historialMantencion->getUsuario());                        
+            array_push($fila,$historialMantencion->getObservacion());            
+            
+            $historial[] = $fila;
+        }
+        
+        return new JsonResponse($historial);        
+    }
+    
+    public function comentarioAction(Request $request){
+        
+        $em = $this->getDoctrine()->getManager();              
+        
+        $id= $request->query->get('id');                
+        
+        $mantencion = $em->getRepository('MonitorBundle:Mantencion')->find($id);
+        
+        $comentario = array();
+        
+        foreach($mantencion->getComentariosMantencion() as $comentarioMantencion){
+            
+            $fila = array();
+            
+            array_push($fila,$comentarioMantencion->getComentario());
+            
+            $comentario[] = $fila;
+        }
+        
+        return new JsonResponse($comentario);        
+    }
 
     /**
      * Finds and displays a Mantencion entity.
@@ -259,7 +306,7 @@ class MantencionController extends Controller
         
         foreach($mantencion->getHistorialesMantencion() as $historialMantencion){
             $item['type'] = 'smallItem';
-            $item['label'] = $historialMantencion->getInicio()->format('d/m/Y H:i').'<br><i>'.$historialMantencion->getEstadoMantencion()->getNombre().'</i>';
+            $item['label'] = $historialMantencion->getInicio()->format('d/m/Y H:i').'<br><i>'.$historialMantencion->getEstadoMantencion()->getNombre().'</i> (<small>'.$historialMantencion->getUsuario().'</small>)';
             $item['relativePosition'] = $historialMantencion->getInicio();
             $item['shortContent'] = '<i><small>'.$historialMantencion->getObservacion().'</small></i>';
             
@@ -267,6 +314,8 @@ class MantencionController extends Controller
         }
         
         $fillRatio = intval(100*$mantencion->getHhEfectivas()/$mantencion->getHhEstimadas());                        
+        
+        $title='(HH_Reales/HH_Estimadas)%';
             
         $color='';
 
@@ -277,7 +326,7 @@ class MantencionController extends Controller
         if($mantencion->getEstadoMantencion()->getNombre()=='Resuelta MT')
             $color='green';                            
 
-        $html='<div class="c100 p'.min($fillRatio,100).' center big '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
+        $html='<div title='.$title.' class="c100 p'.min($fillRatio,100).' center big '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
 
         
         return $this->render('MonitorBundle:mantencion:show.html.twig', array(
@@ -871,10 +920,10 @@ class MantencionController extends Controller
             */   
             
             $html='<div class="btn-group">';
-            $html=$html.'<a href="#" class="add_tag_link btn btn-secondary"><span class="glyphicon glyphicon-list-alt"></span></a>';
+            $html=$html.'<a href="#" class="btn btn-default ver_historial" id='.$mantencion->getId().'><i class="fa fa-list"></i></a>';
             
             if(count($mantencion->getComentariosMantencion())>0)
-                $html=$html.'<a href="#" class="add_tag_link btn btn-secondary"><span class="glyphicon glyphicon-comment"></span></a>';
+                $html=$html.'<a href="#" class="btn btn-default ver_comentario" id='.$mantencion->getId().'><i class="fa fa-comment-o"></i></a>';
 
             $html=$html.'</div>';
             /*
@@ -987,7 +1036,8 @@ class MantencionController extends Controller
         $historial->setIdEstadoMantencion($estado[0]->getId());            
         $historial->setInicio($fechaTerminado);                   
         $historial->setObservacion($observacion);                            
-        $historial->setUsuario($usuarios[0]->getUsername());
+        if(sizeof($usuarios))
+            $historial->setUsuario($usuarios[0]->getUsername());        
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($historial);

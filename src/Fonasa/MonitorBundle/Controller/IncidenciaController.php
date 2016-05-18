@@ -147,6 +147,7 @@ class IncidenciaController extends Controller
             $historialIncidencia->setIdEstadoIncidencia($estado[0]->getId());            
             $historialIncidencia->setIncidencia($incidencia);
             $historialIncidencia->setIdIncidencia($incidencia->getId());
+            $historialIncidencia->setUsuario($incidencia->getUsuario()->getUsername());        
             
             $em->persist($historialIncidencia);
                                     
@@ -177,7 +178,54 @@ class IncidenciaController extends Controller
         return $this->forward('MonitorBundle:Mantencion:new', array(
             'request'  => $request      
         ));
-    }    
+    }
+
+    public function historialAction(Request $request){
+        
+        $em = $this->getDoctrine()->getManager();              
+        
+        $id= $request->query->get('id');                
+        
+        $incidencia = $em->getRepository('MonitorBundle:Incidencia')->find($id);
+        
+        $historial = array();
+        
+        foreach($incidencia->getHistorialesIncidencia() as $historialIncidencia){
+            
+            $fila = array();
+            
+            array_push($fila,$historialIncidencia->getInicio()->format('d/m/Y H:i'));
+            array_push($fila,$historialIncidencia->getEstadoIncidencia()->getNombre());
+            array_push($fila,$historialIncidencia->getUsuario()==null?'-':$historialIncidencia->getUsuario());                        
+            array_push($fila,$historialIncidencia->getObservacion());            
+            
+            $historial[] = $fila;
+        }
+        
+        return new JsonResponse($historial);        
+    }
+    
+    public function comentarioAction(Request $request){
+        
+        $em = $this->getDoctrine()->getManager();              
+        
+        $id= $request->query->get('id');                
+        
+        $incidencia = $em->getRepository('MonitorBundle:Incidencia')->find($id);
+        
+        $comentario = array();
+        
+        foreach($incidencia->getComentariosIncidencia() as $comentarioIncidencia){
+            
+            $fila = array();
+            
+            array_push($fila,$comentarioIncidencia->getComentario());
+            
+            $comentario[] = $fila;
+        }
+        
+        return new JsonResponse($comentario);        
+    }
 
     /**
      * Finds and displays a Incidencia entity.
@@ -193,7 +241,7 @@ class IncidenciaController extends Controller
         
         foreach($incidencia->getHistorialesIncidencia() as $historialIncidencia){
             $item['type'] = 'smallItem';
-            $item['label'] = $historialIncidencia->getInicio()->format('d/m/Y H:i').'<br><i>'.$historialIncidencia->getEstadoIncidencia()->getNombre().'</i>';
+            $item['label'] = $historialIncidencia->getInicio()->format('d/m/Y H:i').'<br><i>'.$historialIncidencia->getEstadoIncidencia()->getNombre().'</i> (<small>'.$historialIncidencia->getUsuario().'</small>)';
             $item['relativePosition'] = $historialIncidencia->getInicio();
             $item['shortContent'] = '<i><small>'.$historialIncidencia->getObservacion().'</small></i>';
             
@@ -210,8 +258,10 @@ class IncidenciaController extends Controller
             $color='red';                                                    
         if($incidencia->getEstadoIncidencia()->getNombre()=='Resuelta MT')
             $color='green';                            
+        
+        $title='(HH_Efectivas/SLA)%';
 
-        $html='<div class="c100 p'.min($fillRatio,100).' center big '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
+        $html='<div title='.$title.' class="c100 p'.min($fillRatio,100).' center big '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
 
         return $this->render('MonitorBundle:incidencia:show.html.twig', array(
             'incidencia' => $incidencia,
@@ -444,8 +494,9 @@ class IncidenciaController extends Controller
         $historial->setIdIncidencia($incidencia[0]->getId());
         $historial->setEstadoIncidencia($estado[0]);
         $historial->setIdEstadoIncidencia($estado[0]->getId());        
-        $historial->setObservacion($observacion);                            
-        $historial->setUsuario($usuarios[0]->getUsername());
+        $historial->setObservacion($observacion);  
+        if(sizeof($usuarios))   
+            $historial->setUsuario($usuarios[0]->getUsername());        
         
         $historial->setInicio($fechaTerminado);                   
 
@@ -828,10 +879,10 @@ class IncidenciaController extends Controller
             */          
             
             $html='<div class="btn-group">';
-            $html=$html.'<a href="#" class="add_tag_link btn btn-secondary"><span class="glyphicon glyphicon-list-alt"></span></a>';
+            $html=$html.'<a href="#" class="btn btn-default ver_historial" id='.$incidencia->getId().'><i class="fa fa-list"></i></a>';
             
             if(count($incidencia->getComentariosIncidencia())>0)
-                $html=$html.'<a href="#" class="add_tag_link btn btn-secondary"><span class="glyphicon glyphicon-comment"></span></a>';
+                $html=$html.'<a href="#" class="btn btn-default ver_comentario" id='.$incidencia->getId().'><i class="fa fa-comment-o"></i></a>';
 
             $html=$html.'</div>';
             

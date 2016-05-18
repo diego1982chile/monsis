@@ -161,6 +161,9 @@
                     {% for com in mantencion.comentariosMantencion %}   
                         <tr>
                             <td>
+                                <i class="fa fa-comment-o">                       
+                                </i>
+                                &nbsp;
                                 {{ com.comentario }}
                             </td>
                         </tr>    
@@ -177,6 +180,9 @@
                     {% for doc in mantencion.documentosMantencion %}   
                         <tr>
                             <td>
+                                <span class="glyphicon glyphicon-paperclip">                       
+                                </span>
+                                &nbsp;
                                 <a href="{{ asset('bundles/monsis/uploads/' ~ doc.archivo) }}">                                    
                                     {{ doc.nombre }}
                                 </a>
@@ -196,7 +202,7 @@
         </fieldset>
     </div>
     <div class="col-md-12">
-    <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>
+    <button id="delete" class="btn btn-danger active" type="button" style="float:right">Eliminar</button>
     <ul>
         <li>
             <a href="{{ path('mantencion_index') }}">Volver</a>

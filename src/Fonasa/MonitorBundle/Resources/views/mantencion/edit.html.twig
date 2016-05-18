@@ -12,8 +12,8 @@
                 </a>                                        
                 <a href="#" id="agregarComentario2" class="add_tag_link btn btn-default" role="button">                            
                     Comentar
-                    <span class="glyphicon glyphicon-comment">                       
-                    </span>
+                    <i class="fa fa-comment-o">                       
+                    </i>
                 </a>                            
             </div>
         <div class="panel-body">
@@ -132,7 +132,7 @@
         </div>             
         <input type="submit" value="Editar" class="btn btn-primary active" style="display:none" />
         <button id="validate_form" class="btn btn-primary active" type="button">Modificar</button>
-        <button id="delete" class="btn btn-warning active" type="button" style="float:right">Eliminar</button>
+        <button id="delete" class="btn btn-danger active" type="button" style="float:right">Eliminar</button>
     {{ form_end(edit_form) }}
     </div>
     </div>
@@ -277,7 +277,7 @@ loader.src = '{{ asset('bundles/monsis/images/loader-minitrans.gif') }}';
 loader.className = 'loader';
 
 var edit = new Image();
-edit.src = '{{ asset('bundles/monsis/images/edit_2.png') }}';
+edit.src = '{{ asset('bundles/monsis/images/pencil_3.png') }}';
 edit.className = 'save';
 
 var del = new Image();
