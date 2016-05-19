@@ -836,7 +836,8 @@ class MantencionController extends Controller
             $html='<a href="'.$this->generateUrl('mantencion_show', array('id' => $mantencion->getId())).'">'.$prefix.$suffix.$mantencion->getCodigoInterno().'</a>';
             
             array_push($fila,$html);
-            array_push($fila,$mantencion->getIncidencia()==null?'Req'.$mantencion->getNumeroRequerimiento():'Ticket'.$mantencion->getIncidencia()->getNumeroTicket());            
+                                                                                                                                                                        
+            array_push($fila,$mantencion->getIncidencia()==null?'Req'.$mantencion->getNumeroRequerimiento():'<a href="'.$this->generateUrl('incidencia_show', array('id' => $mantencion->getIncidencia()->getId())).'">Ticket'.$mantencion->getIncidencia()->getNumeroTicket().'</a>');            
             array_push($fila,$mantencion->getFechaInicio()==null?'-':$mantencion->getFechaInicio()->format('d/m/Y H:i'));
             //array_push($fila,$servicio->getComponente()->getNombre());
             array_push($fila,$mantencion->getFechaSalida()==null?'-':$mantencion->getFechaSalida()->format('d/m/Y H:i'));
