@@ -90,7 +90,15 @@
                     <a href="{{ path('incidencia_show', { 'id': mantencion.incidencia.id }) }}">{{ mantencion.incidencia.numeroTicket }}</a>                        
                 </td>                     
             </tr>
-            {% endif %}                        
+            {% endif %}
+            <tr>                        
+                <th width="30%">
+                    Tipo Mantencion:
+                </th>
+                <td width="70%">
+                    {{ mantencion.tipoMantencion.nombre }}        
+                </td>                                     
+            </tr>   
             <tr>
                 <th width="30%">
                     N°Mantencion:
@@ -202,7 +210,9 @@
         </fieldset>
     </div>
     <div class="col-md-12">
-    <button id="delete" class="btn btn-danger active" type="button" style="float:right">Eliminar</button>
+    {% if is_granted("ROLE_ADMIN") %}  
+        <button id="delete" class="btn btn-danger active" type="button" style="float:right">Eliminar</button>
+    {% endif %}        
     <ul>
         <li>
             <a href="{{ path('mantencion_index') }}">Volver</a>
@@ -213,9 +223,11 @@
             </li>                        
         {% endif %}
     </ul>
-    {{ form_start(delete_form) }}
-        <input type="submit" style="display:none" value="Delete" class="btn btn-warning active">
-    {{ form_end(delete_form) }}                    
+    {% if is_granted("ROLE_ADMIN") %} 
+        {{ form_start(delete_form) }}
+            <input type="submit" style="display:none" value="Delete" class="btn btn-warning active">
+        {{ form_end(delete_form) }}                    
+    {% endif %}        
     </div>
 {% endblock %}
 

@@ -26,7 +26,7 @@
                 Incidencia {{ incidencia.numeroTicket }}
             </h1>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6" style="text-align: left">
             <h1>
                 {{ incidencia.estadoIncidencia.nombre }}
             </h1>
@@ -171,7 +171,9 @@
             </fieldset>
         </div>             
     <div class="col-md-12">
-        <button id="delete" class="btn btn-danger active" type="button" style="float:right">Eliminar</button>         
+        {% if is_granted("ROLE_ADMIN") %}   
+            <button id="delete" class="btn btn-danger active" type="button" style="float:right">Eliminar</button>         
+        {% endif %}        
         <ul>
             <li>
                 <a href="{{ path('incidencia_index') }}">Volver</a>
@@ -187,10 +189,10 @@
                 {% endif %}                            
             {% endif %}
         </ul>
-    </div>
+    </div>     
     {{ form_start(delete_form) }}
         <input type="submit" style="display:none" value="Eliminar" class="btn btn-error active">
-    {{ form_end(delete_form) }}                    
+    {{ form_end(delete_form) }}                        
 {% endblock %}
 {% block javascripts %}
 <script>

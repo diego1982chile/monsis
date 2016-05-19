@@ -693,8 +693,7 @@ class IncidenciaController extends Controller
             $qb->andWhere('YEAR(i.fechaSalida) = ?1');                
             $qb->andWhere('MONTH(i.fechaSalida) = ?2');                
             $parameters[1] = $anio;        
-            $parameters[2] = $mes;
-                    
+            $parameters[2] = $mes;                    
         }
                         
         switch($estado){
@@ -776,7 +775,7 @@ class IncidenciaController extends Controller
             if($incidencia->getEstadoIncidencia()->getNombre()=='Resuelta MT')
                 $color='green';                            
             
-            $html='<div class="c100 p'.min($fillRatio,100).' small '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
+            $html='<div class="c100 p'.min($fillRatio,100).' center small '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';
             
             //$html='<div class="progress"><div class="progress-bar '.$color.'" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$fillRatio.'%"><span class="black-font"><strong class="active">'.$fillRatio.'%</strong></span></div></div>';
             array_push($fila,$html);                                                
