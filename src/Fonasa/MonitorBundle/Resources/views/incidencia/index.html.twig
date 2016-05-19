@@ -287,6 +287,8 @@
             var tr = $(this).closest('tr');
             var row = oTable.row( tr );
             $(this).find('i').replaceWith('<i class="fa fa-spinner fa-spin"></i>');
+            
+            //$(this).parent().next().find('i').
                                     
             $.getJSON('{{ path('incidencia_historial') }}',{ 'id' : $(this).attr('id') }, function(data){                                 
                  
@@ -315,7 +317,7 @@
         
                 if (row.child.isShown())
                 {
-                    $('i.fa-spinner').replaceWith('<i class="fa fa-list"></i>');
+                    $('i.fa-spinner').replaceWith('<i class="fa fa-comment-o"></i>');
                     row.child.hide();
                     tr.removeClass('shown');
                 }
