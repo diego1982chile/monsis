@@ -1405,7 +1405,7 @@ class LoadFixtures extends Controller implements FixtureInterface
         
         
         //------------------------------POBLAR INCIDENCIAS-----------------------------------------------
-        
+        /*
         echo "  > cargando Datos Dummy...\r";
         
         $descripcionesIncidencia=[
@@ -1570,7 +1570,7 @@ class LoadFixtures extends Controller implements FixtureInterface
             $manager->flush();    
         }        
         echo "  > cargando Datos Dummy OK\n";
-    
+        */
         echo "  > cargando Objetos BD...\r";
         loadDbObjects($connection);
         echo "  > cargando Objetos BD OK\n";
