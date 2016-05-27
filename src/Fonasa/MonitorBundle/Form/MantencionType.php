@@ -64,7 +64,8 @@ class MantencionType extends AbstractType
                               return $er->createQueryBuilder('ei')
                                         ->orderBy('ei.nombre', 'ASC');
                           },
-                          'choice_label' => 'nombre',                                                            
+                          'choice_label' => 'nombre',
+                          'placeholder' => 'Seleccione una opción...', 
                           //'expanded' => true,
                           //'multiple' => false,
                           //'position' => 'first',

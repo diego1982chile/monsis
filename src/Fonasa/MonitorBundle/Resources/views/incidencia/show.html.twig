@@ -42,6 +42,40 @@
             <table width="100%" class="table" border="0">
                 <tr>
                     <th width="30%">
+                        Ingresada:
+                    </th>
+                    <td width="70%">
+                        {% if incidencia.fechaIngreso %}
+                            {{ incidencia.fechaIngreso|date('Y-m-d H:i') }}
+                        {% endif %}
+                    </td>                            
+                </tr>
+                <tr>
+                    <th width="30%">
+                        Iniciada:
+                    </th>
+                    <td width="70%">
+                        {% if incidencia.fechaInicio %}
+                            {{ incidencia.fechaInicio|date('Y-m-d H:i') }}
+                        {% else %}    
+                            -
+                        {% endif %}
+                    </td>                            
+                </tr>
+                <tr>
+                    <th width="30%">
+                        Resuelta:
+                    </th>
+                    <td width="70%">
+                        {% if incidencia.fechaSalida %}
+                            {{ incidencia.fechaSalida|date('Y-m-d H:i') }}
+                        {% else %}    
+                            -
+                        {% endif %}
+                    </td>                            
+                </tr>                
+                <tr>
+                    <th width="30%">
                         Componente:
                     </th>
                     <td width="70%">

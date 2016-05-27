@@ -41,6 +41,40 @@
         <table width="100%" class="table" border="0">
             <tr>
                 <th width="30%">
+                    Ingresada:
+                </th>
+                <td width="70%">
+                    {% if mantencion.fechaIngreso %}
+                        {{ mantencion.fechaIngreso|date('Y-m-d H:i') }}
+                    {% endif %}
+                </td>                            
+            </tr>
+            <tr>
+                <th width="30%">
+                    Iniciada:
+                </th>
+                <td width="70%">
+                    {% if mantencion.fechaInicio %}
+                        {{ mantencion.fechaInicio|date('Y-m-d H:i') }}
+                    {% else %}    
+                        -
+                    {% endif %}
+                </td>                            
+            </tr>
+                <tr>
+                    <th width="30%">
+                        Cerrada:
+                    </th>
+                    <td width="70%">
+                        {% if mantencion.fechaSalida %}
+                            {{ mantencion.fechaSalida|date('Y-m-d H:i') }}
+                        {% else %}    
+                            -
+                        {% endif %}
+                    </td>                            
+                </tr> 
+            <tr>
+                <th width="30%">
                     Componente:
                 </th>
                 <td width="70%">

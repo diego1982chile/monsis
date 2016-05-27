@@ -1162,6 +1162,7 @@ class MantencionController extends Controller
         foreach($mantenciones as $mantencion){
             $mantencion->setEstadoMantencion($estado[0]);
             $mantencion->setIdEstadoMantencion($estado[0]->getId());                
+            $mantencion->setResponsable(null);
             $mantencion->setFechaSalida($fechaTerminado);
             $mantencion->setTocada(new\DateTime('now'));                
 
@@ -1178,6 +1179,7 @@ class MantencionController extends Controller
             $historial->setEstadoMantencion($estado[0]);
             $historial->setIdEstadoMantencion($estado[0]->getId());            
             $historial->setInicio($fechaInicio);                   
+            $historial->setObservacion("Cerrada por PaP");
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($historial);

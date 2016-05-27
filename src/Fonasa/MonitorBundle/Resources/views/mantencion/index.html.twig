@@ -297,11 +297,14 @@
                             }); 
 			});
                         
-                        if($resetFiltros.find(':checked').val()){                                                                    
-                                //$(loader).parent().children(':eq(1)').replaceWith(reset);    
-                                //$resetFiltros.attr('disabled',false);
-                                location.reload();  
+                        if($resetFiltros.find(':checked').val()){                                                                                                    
+                            location.reload();  
                         }       
+                        //Si se modifica el filtro por estado recargar los filtros
+                        if(cambioEstado){                                         
+                            // Show full page Loading Overlay
+                            location.reload();  
+                        }  
             }                    
         });   
         
@@ -363,7 +366,8 @@
         oTable.draw();            
     });
 
-    $estado.change(function() {        
+    $estado.change(function(e) {        
+        $(e.target).parent().children(':eq(0)').append(loader);
         cambioEstado = true;
         updateTitle();
         oTable.draw();            
