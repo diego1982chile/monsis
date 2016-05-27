@@ -38,19 +38,51 @@ class MantencionType extends AbstractType
         
         $filtroComponente = $options['filtroComponente'];                
         
-        $formModifierInicioProgramado = function (FormInterface $form, $inicioProgramado = null) {
+        $formModifierTipoIngreso = function (FormInterface $form, $tipoIngreso = null) {
         
-            if($inicioProgramado == null)
-                return;                         
+            if($tipoIngreso == null)
+                return;        
             
-            if($inicioProgramado){
-                $form 
-                ->add('fechaInicio', DateTimeType::class, array(
-                'date_widget'=> 'single_text',
-                'date_format'=>'d/MM/y',
-                'data'=> new \DateTime()
-                //'disabled' => true
-                )); 
+            switch($tipoIngreso){
+                case 1:
+                    $form 
+                        ->remove('fechaInicio')
+                        ->remove('estadoMantencion');
+                    break;
+                case 2:
+                     $form 
+                        ->add('fechaInicio', DateTimeType::class, array(
+                        'date_widget'=> 'single_text',
+                        'date_format'=>'d/MM/y',
+                        'data'=> new \DateTime(),
+                        'attr' => array('style' => 'margin-bottom:14px'),
+                        //'disabled' => true
+                        ))
+                        ->add('estadoMantencion', EntityType::class, array(
+                            'class' => 'MonitorBundle:EstadoMantencion',
+                            'query_builder' => function (EntityRepository $er) {
+                              return $er->createQueryBuilder('ei')
+                                        ->orderBy('ei.nombre', 'ASC');
+                          },
+                          'choice_label' => 'nombre',                                                            
+                          //'expanded' => true,
+                          //'multiple' => false,
+                          //'position' => 'first',
+                          //'attr' => array('class' => 'form-inline')
+                        )); 
+                    break;
+                case 3:
+                    $form 
+                        ->add('fechaInicio', DateTimeType::class, array(
+                        'date_widget'=> 'single_text',
+                        'date_format'=>'d/MM/y',
+                        'data'=> new \DateTime()
+                        //'disabled' => true
+                        )); 
+                    break;
+            }
+            
+            if($tipoIngreso){               
             }
             else{
                 $form 
@@ -148,6 +180,7 @@ class MantencionType extends AbstractType
                 ))
                 ->add('severidad', EntityType::class, array(
                   'class' => 'MonitorBundle:Severidad',
+                  'placeholder' => 'Seleccione una opción...',                
                   'query_builder' => function (EntityRepository $er) use ($options) {
                                      return $er->createQueryBuilder('s')
                                                ->join('s.incidencias','i')
@@ -305,9 +338,10 @@ class MantencionType extends AbstractType
                   'class' => 'MonitorBundle:Severidad',
                   'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('ei')
-                              ->orderBy('ei.nombre', 'ASC');
+                              ->orderBy('ei.nombre', 'ASC');                    
                 },
                 'choice_label' => 'nombre',
+                'placeholder' => 'Seleccione una opción...',                
                 //'expanded' => true,
                 //'multiple' => false,
                 'position' => 'first',
@@ -337,16 +371,17 @@ class MantencionType extends AbstractType
                 ));                                                                                                         
             
         $choices = array(            
-            'Iniciar Inmediatamente' => false,
-            'Inicio Programado' => true                    
+            'Actual' => 1,
+            'Retroactivo' => 2,                    
+            'Inicio Programado' => 3                    
         );              
         
         $builder                               
-            ->add('inicioProgramado', ChoiceType::class, array(
+            ->add('tipoIngreso', ChoiceType::class, array(
                 'choices' => $choices, 
                 'choices_as_values' => true, 
                 'expanded' => true,
-                'data' => false,
+                'data' => 1,
                 'position' => array('after' => 'hhEstimadas'),
                 'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')
             ))
@@ -410,16 +445,16 @@ class MantencionType extends AbstractType
             ));                
                 
         $builder                                    
-            ->get('inicioProgramado')->addEventListener(
+            ->get('tipoIngreso')->addEventListener(
                 FormEvents::POST_SUBMIT,
-                function (FormEvent $event) use ($formModifierInicioProgramado) {
+                function (FormEvent $event) use ($formModifierTipoIngreso) {
                     // It's important here to fetch $event->getForm()->getData(), as
                     // $event->getData() will get you the client data (that is, the ID)
-                    $inicioProgramado = $event->getForm()->getData();
+                    $tipoIngreso = $event->getForm()->getData();
 
                     // since we've added the listener to the child, we'll have to pass on
                     // the parent to the callback functions!                    
-                    $formModifierInicioProgramado($event->getForm()->getParent(), $inicioProgramado);                    
+                    $formModifierTipoIngreso($event->getForm()->getParent(), $tipoIngreso);                    
                 }
             );                 
     }

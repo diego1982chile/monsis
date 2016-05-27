@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 {% form_theme GlobalFilters 'bootstrap_3_layout.html.twig' %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
 {% block stylesheets %}    
 {% endblock %}
 {% block filtro %}                
@@ -63,9 +64,13 @@
             <a href="{{ path('incidencia_new') }}">Nueva Incidencia</a>
         </li>
     </ul>
-    {% endif %}
-<div id="dialog-form" title="Agregar Observacion" style="padding:1em;display:none">     
-    <input id="observacion" class="form-control" style="padding:1em;margin:1em;width:95%" value="" />                    
+    {% endif %}    
+<div id="dialog-form" title="Cambio Estado Incidencia" style="padding:1em;display:none">         
+    {{ form_start(form) }}        
+        {{ form_errors(form) }}         
+        {{ form_row(form.observacion) }}                         
+    {{ form_end(form) }}    
+    <!--input id="observacion" class="form-control" style="padding:1em;margin:1em;width:95%" value="" /-->                    
 </div>            
 {% endblock %}
 {% block javascripts %}
@@ -76,6 +81,8 @@
     var $componente = $('#form_Componente');        
     var $resetFiltros = $('#form_Reset');
     var cambioEstado = false;
+    
+    var $inicioProgramado = $('#form_inicioProgramado');
     
     var loader = new Image();
     loader.src = '{{ asset('bundles/monitor/images/loader-minitrans.gif') }}';
@@ -135,24 +142,23 @@
     
     var dialog = $( "#dialog-form" ).dialog({
       autoOpen: false,
-      height: 200,
-      width: 500,
+      height: 250,
+      width: 800,
       modal: true,
       buttons: {
         "Aceptar": addObservacion,
         Cancel: function() {
-            $('#observacion').val('');
+            $('#historial_incidencia_observacion').val('');
             dialog.dialog( "close" );          
         }
       },
       close: function() {        
       }
-    });
+    });        
     
     function addObservacion() {
-        var link=$("#dialog-form").data('link');        
-        $(link).attr('href',$(link).attr('href').replace(/null(?![\s\S]*null)/,$('#observacion').val()));  
-        //alert($(link).attr('href'));
+        var link=$("#dialog-form").data('link');                
+        $(link).attr('href',$(link).attr('href').replace(/null(?![\s\S]*null)/,$('#historial_incidencia_observacion').val()));                  
         $(link).click();        
     }                
     
@@ -254,13 +260,14 @@
                                     return false;
                                 //if($(this).text()=='Resuelta MT' || $(this).text()=='En Gestión FONASA' || 
                                    //$(this).text()=='Pendiente MT'){
-                                    if($('#observacion').val().trim()==''){
+                                    if($('#historial_incidencia_observacion').val().trim()==''){
                                         dialog.data('link',$(this));
                                         dialog.dialog( "open" );
                                         return false;                 
                                     }
                                     else{                                        
                                         dialog.dialog( "close" );
+                                        //return false;
                                         window.location=$(this).attr('href');                                                                                        
                                     }
                                     return false;
@@ -362,6 +369,33 @@
         setInterval( function () {
             oTable.draw(false);
         }, 30000 );        
+        
+$inicioProgramado.change(function() {  
+  $inicioProgramado.append(loader);    
+  // ... retrieve the corresponding form.
+  var $form = $(this).closest('form');
+  // Simulate form data, but only include the selected sport value.
+  var data = {};  
+  data[$inicioProgramado.find(':checked').attr('name')] = $inicioProgramado.find(':checked').val();     
+  // Submit data via AJAX to the form's action path.
+  $.ajax({
+    url : $form.attr('action'),
+    type: $form.attr('method'),
+    data : data,
+    success: function(html) {
+        // Replace current position field ...      
+        $('#historial_incidencia_inicio').parent().html('');  
+                
+        $inicioProgramado.after(            
+            // ... with the returned one from the AJAX response.                
+            $(html).find('#historial_incidencia_inicio').parent()                        
+        );
+        $( "#historial_incidencia_inicio_date" ).datepicker();    
+        // Position field now displays the appropriate positions.
+        $(loader).remove();
+      }
+  });
+});
         
 </script>
 {% endblock %}

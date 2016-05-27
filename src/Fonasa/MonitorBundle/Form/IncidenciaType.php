@@ -39,7 +39,48 @@ class IncidenciaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         
-        $filtroComponente = $options['filtroComponente'];                
+        $filtroComponente = $options['filtroComponente'];      
+        
+        $formModifierTipoIngreso = function (FormInterface $form, $tipoIngreso = null) {
+                    
+            
+            if($tipoIngreso == null)                
+                return;   
+            
+            switch($tipoIngreso){                
+                case 1: // Ingreso actual
+                    $form 
+                        ->remove('fechaInicio')
+                        ->remove('estadoIncidencia');
+                    break;
+                case 2: // Ingreso retroactivo
+                    $form 
+                        ->add('fechaInicio', DateTimeType::class, array(
+                        'date_widget'=> 'single_text',
+                        'date_format'=>'d/MM/y',
+                        'data'=> new \DateTime(),
+                        //'disabled' => true
+                        'attr' => array('style' => 'margin-bottom:14px'),
+                        ))
+                        ->add('estadoIncidencia', EntityType::class, array(
+                            'class' => 'MonitorBundle:EstadoIncidencia',
+                            'query_builder' => function (EntityRepository $er) {
+                              return $er->createQueryBuilder('ei')
+                                        ->where('ei.nombre in (?1)')
+                                        ->setParameter(1, ['Pendiente MT', 'En Gestión FONASA', 'Resuelta MT'])  
+                                        ->orderBy('ei.nombre', 'ASC');
+                          },
+                          'choice_label' => 'nombre',
+                          'placeholder' => 'Seleccione una opción...',                
+                          //'expanded' => true,
+                          //'multiple' => false,
+                          //'position' => 'first',
+                          //'attr' => array('class' => 'form-inline')
+                        )); 
+                    
+                    break;
+            }                            
+        };
         
         $builder        
             ->add('id', HiddenType::class);
@@ -177,7 +218,22 @@ class IncidenciaType extends AbstractType
                            'choice_label' => 'nombre',
                            'choices_as_values' => true,                                                                                                                                                                                   
             ));                        
-        }                                                                  
+        }
+        
+        $builder                        
+        ->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($formModifierTipoIngreso, $options) {                    
+                // this would be your entity, i.e. SportMeetup
+                $data = $event->getData();                                        
+                $formModifierTipoIngreso($event->getForm(), $data->getTipoIngreso()); 
+            }
+        );
+        
+        $choices = array(            
+            'Actual' => 1,
+            'Retroactivo' => 2
+        ); 
         
         $builder                                                    
             /*
@@ -199,9 +255,17 @@ class IncidenciaType extends AbstractType
                 'choice_label' => 'nombre',
                 //'expanded' => true,
                 //'multiple' => false,
+                'placeholder' => 'Seleccione una opción...',                
                 'position' => 'first',
                 //'attr' => array('class' => 'form-inline')
-            ))            
+            ))                 
+            ->add('tipoIngreso', ChoiceType::class, array(
+                'choices' => $choices, 
+                'choices_as_values' => true, 
+                'expanded' => true,
+                'data' => 1,                
+                'attr' => array('class' => 'btn-group','data-toggle' => 'buttons')
+            ))
             ->add('comentariosIncidencia', CollectionType::class, array(
                   'entry_type' => ComentarioIncidenciaType::class,
                   'data_class' => null,
@@ -232,9 +296,23 @@ class IncidenciaType extends AbstractType
                 'choice_label' => 'userName',                                          
                 'placeholder' => 'Seleccione una opción...',                
                 //'attr' => array('class' => 'form-inline')
-            ))  
+            ));
+                
+        $builder                                    
+            ->get('tipoIngreso')->addEventListener(
+                FormEvents::POST_SUBMIT,
+                function (FormEvent $event) use ($formModifierTipoIngreso) {
+                    // It's important here to fetch $event->getForm()->getData(), as
+                    // $event->getData() will get you the client data (that is, the ID)
+                    $tipoIngreso = $event->getForm()->getData();
+                    
+                    //echo "inicioProgramado=".$inicioProgramado;
 
-        ;
+                    // since we've added the listener to the child, we'll have to pass on
+                    // the parent to the callback functions!                    
+                    $formModifierTipoIngreso($event->getForm()->getParent(), $tipoIngreso);                    
+                }
+            );                  
         
     }
     

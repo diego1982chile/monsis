@@ -30,6 +30,15 @@
             {{ form_row(edit_form.descripcion) }}
             {{ form_row(edit_form.severidad) }}
             {{ form_row(edit_form.usuario) }}
+            {{ form_label(edit_form.tipoIngreso) }}
+            <div id="form_tipoIngreso">                    
+                {% for child in edit_form.tipoIngreso %}
+                    {{ form_label(child) }} 
+                    <label class="radio-inline">                                       
+                    {{ form_widget(child) }}
+                    </label>                
+                {% endfor %}
+            </div>  
             <label class="control-label required">
                 Comentarios
             </label>               

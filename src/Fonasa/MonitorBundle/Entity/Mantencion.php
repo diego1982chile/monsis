@@ -50,11 +50,11 @@ class Mantencion
     private $fechaIngreso;
     
     /**
-     * @var boolean
+     * @var int
      *
-     * @ORM\Column(name="inicio_programado", type="boolean")
+     * @ORM\Column(name="tipo_ingreso", type="integer")
      */
-    private $inicioProgramado;    
+    private $tipoIngreso;    
 
     /**
      * @var \DateTime
@@ -372,27 +372,27 @@ class Mantencion
     
     
     /**
-     * Set inicioProgramado
+     * Set tipoIngreso
      *
-     * @param boolean $inicioProgramado
+     * @param int $tipoIngreso
      *
      * @return Mantencion
      */
-    public function setInicioProgramado($inicioProgramado)
+    public function setTipoIngreso($tipoIngreso)
     {
-        $this->inicioProgramado = $inicioProgramado;
+        $this->tipoIngreso = $tipoIngreso;
 
         return $this;
     }
 
     /**
-     * Get inicioProgramado
+     * Get tipoIngreso
      *
-     * @return boolean
+     * @return int
      */
-    public function getInicioProgramado()
+    public function getTipoIngreso()
     {
-        return $this->inicioProgramado;
+        return $this->tipoIngreso;
     }
     
 

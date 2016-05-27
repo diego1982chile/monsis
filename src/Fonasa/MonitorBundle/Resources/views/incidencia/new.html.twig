@@ -31,7 +31,16 @@
         </div>                
         {{ form_row(form.descripcion) }}        
         {{ form_row(form.severidad) }}  
-        {{ form_row(form.usuario) }}              
+        {{ form_row(form.usuario) }}    
+        {{ form_label(form.tipoIngreso) }}
+        <div id="form_tipoIngreso">                    
+            {% for child in form.tipoIngreso %}
+                {{ form_label(child) }} 
+                <label class="radio-inline">                                       
+                {{ form_widget(child) }}
+                </label>                
+            {% endfor %}
+        </div>           
         <label class="control-label required">
             Comentarios
         </label>   
@@ -158,6 +167,10 @@ save.className = 'save';
 $validateForm=$('#validate_form');
 $validateForm.append(save);
 
+var $tipoIngreso = $('#indicencia_tipoIngreso');
+
+var $tipoIngreso = $('#form_tipoIngreso');
+
 $(function() {
     $( "#incidencia_fechaReporte_date" ).datepicker();
     
@@ -205,6 +218,36 @@ $(function() {
     ////////////////////////////////////////////////////////////////
 });  
 
+$tipoIngreso.change(function() {  
+  $tipoIngreso.append(loader);    
+  // ... retrieve the corresponding form.
+  var $form = $(this).closest('form');
+  // Simulate form data, but only include the selected sport value.
+  var data = {};  
+  data[$tipoIngreso.find(':checked').attr('name')] = $tipoIngreso.find(':checked').val();  
+  // Submit data via AJAX to the form's action path.
+  $.ajax({
+    url : $form.attr('action'),
+    type: $form.attr('method'),
+    data : data,
+    success: function(html) {
+        // Replace current position field ...      
+        $('#incidencia_fechaInicio').parent().html('');          
+        $('#incidencia_estadoIncidencia').parent().html('');          
+        $tipoIngreso.after(            
+            // ... with the returned one from the AJAX response.                
+            $(html).find('#incidencia_fechaInicio').parent()                        
+        );
+        $( "#incidencia_fechaInicio_date" ).datepicker({ maxDate: "-1H" });    
+        $( "#incidencia_fechaInicio").after(
+            $(html).find('#incidencia_estadoIncidencia').parent()                        
+        );
+        // Position field now displays the appropriate positions.
+        $(loader).remove();
+      }
+  });
+});
+
 // When sport gets selected ...
 $componente.change(function() {
   $('#incidencia_categoriaIncidencia').parent().children(':eq(0)')
@@ -213,7 +256,7 @@ $componente.change(function() {
   var $form = $(this).closest('form');
   // Simulate form data, but only include the selected sport value.
   var data = {};
-  data[$componente.attr('name')] = $componente.val(); 
+  data[$componente.attr('name')] = $componente.val();     
   // Submit data via AJAX to the form's action path.    
   $.ajax({
     url : $form.attr('action'),

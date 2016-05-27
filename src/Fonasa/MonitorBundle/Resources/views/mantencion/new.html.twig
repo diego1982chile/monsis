@@ -47,9 +47,10 @@
         {{ form_row(form.descripcion) }}
         {{ form_row(form.severidad) }}
         {{ form_row(form.usuario) }}                
-        {{ form_row(form.hhEstimadas) }}                
-        <div id="form_inicioProgramado">                    
-            {% for child in form.inicioProgramado %}
+        {{ form_row(form.hhEstimadas) }}  
+        {{ form_label(form.tipoIngreso) }}
+        <div id="form_tipoIngreso">                    
+            {% for child in form.tipoIngreso %}
                 {{ form_label(child) }} 
                 <label class="radio-inline">                                       
                 {{ form_widget(child) }}
@@ -165,7 +166,7 @@ $( window ).load(function() {
    $('#form').show();
 });    
     
-var $inicioProgramado = $('#mantencion_inicioProgramado');
+var $tipoIngreso = $('#mantencion_tipoIngreso');
 
 var $numeroReq = $('#mantencion_numeroRequerimiento');
 
@@ -175,7 +176,7 @@ var $hhEstimadas = $('#mantencion_hhEstimadas');
 
 var $validar= $('#validar');
 // When sport gets selected ...
-var $inicioProgramado = $('#form_inicioProgramado');
+var $tipoIngreso = $('#form_tipoIngreso');
 
 var $tipoMantencion = $('#form_tipoMantencion');
 
@@ -273,13 +274,13 @@ $(function() {
     ////////////////////////////////////////////////////////////////
 }); 
 
-$inicioProgramado.change(function() {  
-  $inicioProgramado.append(loader);    
+$tipoIngreso.change(function() {  
+  $tipoIngreso.append(loader);    
   // ... retrieve the corresponding form.
   var $form = $(this).closest('form');
   // Simulate form data, but only include the selected sport value.
   var data = {};  
-  data[$inicioProgramado.find(':checked').attr('name')] = $inicioProgramado.find(':checked').val();   
+  data[$tipoIngreso.find(':checked').attr('name')] = $tipoIngreso.find(':checked').val();   
   // Submit data via AJAX to the form's action path.
   $.ajax({
     url : $form.attr('action'),
@@ -288,11 +289,20 @@ $inicioProgramado.change(function() {
     success: function(html) {
         // Replace current position field ...      
         $('#mantencion_fechaInicio').parent().html('');
-        $inicioProgramado.after(
-          // ... with the returned one from the AJAX response.                
+        $tipoIngreso.after(                       
           $(html).find('#mantencion_fechaInicio').parent()                        
         );
-        $( "#mantencion_fechaInicio_date" ).datepicker();    
+        $( "#mantencion_fechaInicio").after(
+            $(html).find('#mantencion_estadoMantencion').parent()                        
+        );
+        switch($tipoIngreso.find(':checked').val()){
+            case '2':
+                $( "#mantencion_fechaInicio_date" ).datepicker({ maxDate: "-1H" }); 
+                break;
+            case '3':
+                $( "#mantencion_fechaInicio_date" ).datepicker({ minDate: "+1H" }); 
+                break;
+        }        
         // Position field now displays the appropriate positions.
         $(loader).remove();
       }

@@ -205,8 +205,11 @@
     <div class="col-md-5">
         <fieldset class="scheduler-border">
             <legend class="scheduler-border">Eventos</legend>
-                <div class="control-group" id="eventos">                        
-                </div>
+                {% if mantencion.historialesMantencion|length == 0 %}                                                                
+                    No existen eventos asociados                                        
+                {% endif %}                                    
+                <div class="control-group" id="eventos">
+                </div>                                      
         </fieldset>
     </div>
     <div class="col-md-12">

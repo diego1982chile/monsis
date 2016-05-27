@@ -11,9 +11,17 @@ use Fonasa\MonitorBundle\Entity\EstadoIncidencia;
 use Fonasa\MonitorBundle\Entity\ObservacionIncidencia;
 use Fonasa\MonitorBundle\Entity\DocumentoIncidencia;
 
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;    
+
 use Fonasa\MonitorBundle\Form\IncidenciaType;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -31,9 +39,18 @@ class IncidenciaController extends Controller
      * Lists all Servicio entities.
      *
      */
-    public function indexAction()
-    {                
-        return $this->render('MonitorBundle:incidencia:index.html.twig');         
+    public function indexAction(Request $request)
+    {                                        
+        
+        $historialIncidencia = new HistorialIncidencia();                
+        
+        $form = $this->createForm('Fonasa\MonitorBundle\Form\HistorialIncidenciaType', $historialIncidencia);             
+        $form->handleRequest($request);   
+        
+        return $this->render('MonitorBundle:incidencia:index.html.twig', array(
+            'historialIncidencia' => $historialIncidencia,
+            'form' => $form->createView()
+        ));         
     }
 
     /**
@@ -44,18 +61,7 @@ class IncidenciaController extends Controller
     {
         $incidencia = new Incidencia();
         
-        $session = $request->getSession();
-        
-        //die(json_encode($request->get('incidencia')));
-        
-        // dummy code - this is here just so that the Task has some tags
-        // otherwise, this isn't an interesting example
-        /*
-        $documentoIncidencia1 = new DocumentoIncidencia();
-        $documentoIncidencia1->setNombre('documentoIncidencia1');
-        $incidencia->getDocumentosIncidencia()->add($documentoIncidencia1);                 
-         */
-        // end dummy code
+        $session = $request->getSession();                
         
         $em = $this->getDoctrine()->getManager();        
         
@@ -66,18 +72,20 @@ class IncidenciaController extends Controller
             $numeroTicket=$request->request->get('incidencia')['numeroTicket'];                                                
             
             $fechaIngreso=new\DateTime('now');
-                        
-            // Si es Incidencia, por defecto se crea con estado 'Pendient MT'
-            $estado= $em->getRepository('MonitorBundle:EstadoIncidencia')
-                ->createQueryBuilder('e')                                
-                ->where('e.nombre = ?1')
-                ->setParameter(1, 'Pendiente MT')
-                ->getQuery()
-                ->getResult();                        
-                                    
-            $incidencia->setEstadoIncidencia($estado[0]);
-            $incidencia->setIdEstadoIncidencia($estado[0]->getId());            
-            //$incidencia->setNumeroTicket($numeroTicket);
+        
+            if($incidencia->getTipoIngreso()==1){
+                // Si es Incidencia, por defecto se crea con estado 'Pendient MT'
+                $estado= $em->getRepository('MonitorBundle:EstadoIncidencia')
+                    ->createQueryBuilder('e')                                
+                    ->where('e.nombre = ?1')
+                    ->setParameter(1, 'Pendiente MT')
+                    ->getQuery()
+                    ->getResult();                        
+
+                $incidencia->setEstadoIncidencia($estado[0]);
+                $incidencia->setIdEstadoIncidencia($estado[0]->getId());            
+            }
+            //$incidencia->setNumeroTicket($numeroTicket);   
             $incidencia->setFechaIngreso($fechaIngreso);
             $incidencia->setHhEfectivas(0);
             $incidencia->setTocada($fechaIngreso);
@@ -85,19 +93,23 @@ class IncidenciaController extends Controller
             switch ($incidencia->getEstadoIncidencia()->getNombre()){
                 case 'En Cola': // Si se deja en cola, la fecha de inicio salida se anulan
                     //$incidencia[0]->setFechaInicio(null);
-                    //$incidencia[0]->setFechaSalida(null
+                    //$incidencia[0]->setFechaSalida(null                    
+                    $incidencia->getTipoIngreso()==1?$incidencia->setFechaInicio($fechaIngreso):$incidencia->setFechaInicio($incidencia->getFechaInicio());                        
                     $incidencia->setFechaSalida(null);
                     break;
                 case 'En Gestión FONASA': // Si se deja en gestión FONASA, no se hace nada
                     $incidencia->setFechaSalida(null);
+                    $incidencia->getTipoIngreso()==1?$incidencia->setFechaInicio($fechaIngreso):$incidencia->setFechaInicio($incidencia->getFechaInicio());
                     break;            
                 case 'Pendiente MT': // Si se deja Pendiente MT se actualiza la fecha inicio
                     $incidencia->setFechaInicio(new\DateTime('now'));
                     $incidencia->setFechaSalida(null);                    
                     $incidencia->setFechaUltHH(new\DateTime('now'));
+                    $incidencia->getTipoIngreso()==1?$incidencia->setFechaInicio($fechaIngreso):$incidencia->setFechaInicio($incidencia->getFechaInicio());
                     break;        
                 case 'Resuelta MT':
-                    $incidencia->setFechaSalida(new\DateTime('now'));
+                    $incidencia->getTipoIngreso()==1?$incidencia->setFechaInicio($fechaIngreso):$incidencia->setFechaInicio($incidencia->getFechaInicio());
+                    $incidencia->getTipoIngreso()==1?$incidencia->setFechaSalida($fechaIngreso):$incidencia->setFechaSalida($incidencia->getFechaInicio());                    
                     break;            
             }                        
                                
@@ -139,23 +151,35 @@ class IncidenciaController extends Controller
                 $em->persist($comentarioIncidencia);                                                    
             }   
             
-            $historialIncidencia = new HistorialIncidencia();
+            if($incidencia->getTipoIngreso()==1)
+            {
+                $historialIncidencia = new HistorialIncidencia();
             
-            $historialIncidencia->setInicio($fechaIngreso);
-            $historialIncidencia->setObservacion('Se inicia la incidencia N°Ticket '.$numeroTicket);            
-            $historialIncidencia->setEstadoIncidencia($estado[0]);
-            $historialIncidencia->setIdEstadoIncidencia($estado[0]->getId());            
-            $historialIncidencia->setIncidencia($incidencia);
-            $historialIncidencia->setIdIncidencia($incidencia->getId());
-            $historialIncidencia->setUsuario($incidencia->getUsuario()->getUsername());        
-            
-            $em->persist($historialIncidencia);
+                $historialIncidencia->setInicio($fechaIngreso);
+                $historialIncidencia->setObservacion('Se inicia la incidencia N°Ticket '.$numeroTicket);            
+                $historialIncidencia->setEstadoIncidencia($estado[0]);
+                $historialIncidencia->setIdEstadoIncidencia($estado[0]->getId());            
+                $historialIncidencia->setIncidencia($incidencia);
+                $historialIncidencia->setIdIncidencia($incidencia->getId());
+                $historialIncidencia->setUsuario($incidencia->getUsuario()->getUsername());        
+
+                $em->persist($historialIncidencia);                
+            }            
                                     
             $em->flush();                        
+            
+            switch($incidencia->getTipoIngreso()){
+                case 1:
+                    $msg='La mantención se ha iniciado y ha quedado asignada al área de análisis.';                                                
+                    break;
+                case 2:
+                    $msg='La incidencia se ha ingresado de manera retroactiva en estado '.$incidencia->getEstadoIncidencia()->getNombre().', con fecha '.$incidencia->getfechaInicio()->format('d/m/Y H:i');
+                    break;                
+            }
                         
             $this->addFlash(
                 'notice',
-                'Se ha ingresado una nueva incidencia.| La incidencia está asociada al número de ticket:'.$numeroTicket.'.| La incidencia está en cola, y puede ser asignada en el panel de incidencias'
+                'Se ha ingresado una nueva incidencia.| La incidencia está asociada al número de ticket:'.$numeroTicket.'.|'.$msg
             );               
 
             return $this->redirectToRoute('incidencia_show', array('id' => $incidencia->getId()));
@@ -486,8 +510,7 @@ class IncidenciaController extends Controller
         $em->persist($incidencia[0]);
         $em->flush();
 
-        // Guardar el historial del cambio de estado               
-        $fechaTerminado=new\DateTime('now');            
+        // Guardar el historial del cambio de estado                       
         $historial = new HistorialIncidencia();
 
         $historial->setIncidencia($incidencia[0]);                     
@@ -498,8 +521,8 @@ class IncidenciaController extends Controller
         if(sizeof($usuarios))   
             $historial->setUsuario($usuarios[0]->getUsername());        
         
-        $historial->setInicio($fechaTerminado);                   
-
+        $historial->setInicio(new\DateTime('now'));                           
+        
         $em = $this->getDoctrine()->getManager();
         $em->persist($historial);
         $em->flush();

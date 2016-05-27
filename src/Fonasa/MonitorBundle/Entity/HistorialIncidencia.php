@@ -80,7 +80,7 @@ class HistorialIncidencia
      *      
      * @ORM\Column(name="ID_ESTADO_INCIDENCIA", type="integer", nullable=true)               
      */
-    private $idEstadoIncidencia;      
+    private $idEstadoIncidencia;     
 
     /**
      * Get id
@@ -279,6 +279,7 @@ class HistorialIncidencia
         $this->idEstadoIncidencia = $idEstadoIncidencia;
         
         return $this;
-    }  
+    }
+        
 }
 

@@ -55,8 +55,7 @@ class MantencionController extends Controller
         $form->handleRequest($request);                                                
 
         if ($form->isSubmitted() && $form->isValid()) {                        
-                        
-            $inicioProgramado=$request->request->get('mantencion')['inicioProgramado'];
+                                    
             //$fechaInicio=$request->request->get('mantencion')['fechaInicio']['date'];                                                            
             $fechaIngreso=new\DateTime('now');
 
@@ -79,21 +78,35 @@ class MantencionController extends Controller
             }            
             
             $mantencion->getTipoMantencion()->getNombre()=='Mantención Correctiva'?$suffix='-MC':$suffix='-ME';
-            
-            if($inicioProgramado)
-                $nomEstado='En Cola';                                                        
-            else
-                $nomEstado='En Desarrollo';                
-                                    
-            $estado= $em->getRepository('MonitorBundle:EstadoMantencion')
-                ->createQueryBuilder('e')                                
-                ->where('e.nombre = ?1')
-                ->setParameter(1, $nomEstado)
-                ->getQuery()
-                ->getResult();                        
-                                    
-            $mantencion->setEstadoMantencion($estado[0]);
-            $mantencion->setIdEstadoMantencion($estado[0]->getId());            
+                        
+            switch($mantencion->getTipoIngreso()){
+                case 1:
+                    $nomEstado='En Desarrollo';
+                    $estado= $em->getRepository('MonitorBundle:EstadoMantencion')
+                    ->createQueryBuilder('e')                                
+                    ->where('e.nombre = ?1')
+                    ->setParameter(1, $nomEstado)
+                    ->getQuery()
+                    ->getResult();                 
+                    
+                    $mantencion->setEstadoMantencion($estado[0]);
+                    $mantencion->setIdEstadoMantencion($estado[0]->getId());            
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    $nomEstado='En Cola';                            
+                    $estado= $em->getRepository('MonitorBundle:EstadoMantencion')
+                    ->createQueryBuilder('e')                                
+                    ->where('e.nombre = ?1')
+                    ->setParameter(1, $nomEstado)
+                    ->getQuery()
+                    ->getResult();                 
+                    
+                    $mantencion->setEstadoMantencion($estado[0]);
+                    $mantencion->setIdEstadoMantencion($estado[0]->getId());            
+                    break;
+            }                                                                                                                                                               
             //$incidencia->setNumeroTicket($numeroTicket);
             $mantencion->setFechaIngreso($fechaIngreso);
             $mantencion->setTocada($fechaIngreso);
@@ -103,47 +116,63 @@ class MantencionController extends Controller
                 case 'En Cola': // Si se deja en cola, la fecha de inicio salida se anulan
                     //$incidencia[0]->setFechaInicio(null);
                     //$incidencia[0]->setFechaSalida(null
-                    $mantencion->setFechaSalida(null);
+                    $mantencion->setFechaSalida(null);                 
                     $mantencion->setFechaUltHH(new\DateTime('now'));
+                    switch($mantencion->getTipoIngreso()){
+                        case 1:                        
+                            $mantencion->setFechaInicio($fechaIngreso);                            
+                            break;
+                        case 2:
+                            $mantencion->setFechaInicio($mantencion->getFechaInicio());                            
+                            break;                        
+                    }                    
                     break;
-                case 'En Desarrollo': // Si se deja en gestión FONASA, no se hace nada
-                    $mantencion->setFechaSalida(null);
-                    $mantencion->setFechaInicio(new\DateTime('now'));
+                case 'En Desarrollo': // Si se deja en gestión FONASA, no se hace nada                    
+                case 'En Testing': // Si se deja en gestión FONASA, no se hace nada
+                case 'En Certificación': // Si se deja en gestión FONASA, no se hace nada
+                    $mantencion->setFechaSalida(null);                    
                     $mantencion->setFechaUltHH(new\DateTime('now'));
-                    break;                            
+                    switch($mantencion->getTipoIngreso()){
+                        case 1:                        
+                            $mantencion->setFechaInicio($fechaIngreso);
+                            break;
+                        case 2:
+                            $mantencion->setFechaInicio($mantencion->getFechaInicio());
+                            break;                        
+                    }
+                    break;            
+                case 'Cerrada': // Si se deja en gestión FONASA, no se hace nada                    
+                    $mantencion->setFechaUltHH(new\DateTime('now'));
+                    switch($mantencion->getTipoIngreso()){
+                        case 1:                        
+                            $mantencion->setFechaInicio($fechaIngreso);
+                            $mantencion->setFechaSalida($fechaIngreso);
+                            break;
+                        case 2:
+                            $mantencion->setFechaInicio($mantencion->getFechaInicio());
+                            $mantencion->setFechaSalida($mantencion->getFechaInicio());
+                            break;                        
+                    }
+                    break;            
             }
             
             //$em = $this->getDoctrine()->getManager();
             $em->persist($mantencion);
             //$em->flush();
             
-            //echo '"'.$mantencion->getId().'"';
-            
-            if($inicioProgramado){
-                $msg='La mantención está en cola y tiene un inicio programado para el '.$mantencion->getfechaInicio()->format('d/m/Y H:i').', fecha en la que será automáticamente asignada al área de desarrollo.';
-                //Si es inicio programado crear el scheduledEvent en la BD
-                $connection = $em->getConnection();       
-                $query="CREATE DEFINER=`root`@`localhost` EVENT `scheduler_inicio_mantencion_".$mantencion->getId()."` ON SCHEDULE AT '".$mantencion->getfechaInicio()->format('Y-m-d H:i')."' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE mantencion set ID_ESTADO_MANTENCION=2,FECHA_INICIO_MANTENCION=SYSDATE() WHERE id=".$mantencion->getId()." AND ID_ESTADO_MANTENCION=1;";
-                $connection->exec($query);
-            }
-            else{
-                 //Si no es inicio programado setear la fecha de inicio
-                $mantencion->setFechaInicio($fechaIngreso);
-                $msg='La mantención se ha iniciado y ha quedado asignada al área de desarrollo.';                            
-                
-                // Si se inicia inmediatamente, generar el historial
-                $historialMantencion = new HistorialMantencion();
-            
-                $historialMantencion->setInicio($fechaIngreso);
-                $historialMantencion->setObservacion('Se inicia la mantencion '.$prefix.$suffix.$mantencion->getCodigoInterno());            
-                $historialMantencion->setEstadoMantencion($estado[0]);
-                $historialMantencion->setIdEstadoMantencion($estado[0]->getId());            
-                $historialMantencion->setMantencion($mantencion);
-                $historialMantencion->setIdMantencion($mantencion->getId());
-                $historialMantencion->setUsuario($mantencion->getUsuario()->getUsername());
+            //echo '"'.$mantencion->getId().'"';                        
 
-                $em->persist($historialMantencion);
-            }            
+            switch($mantencion->getTipoIngreso()){
+                case 1:
+                    $msg='La mantención se ha iniciado y ha quedado asignada al área de desarrollo.';                                                
+                    break;
+                case 2:
+                    $msg='La mantención se ha ingresado de manera retroactiva en estado '.$mantencion->getEstadoMantencion()->getNombre().', con fecha '.$mantencion->getfechaInicio()->format('d/m/Y H:i');
+                    break;
+                case 3:
+                    $msg='La mantención está en cola y tiene un inicio programado para el '.$mantencion->getfechaInicio()->format('d/m/Y H:i').', fecha en la que será automáticamente asignada al área de desarrollo.';
+                    break;
+            }
             
             // $file stores the uploaded PDF file
             /** @var Symfony\Component\HttpFoundation\File\UploadedFile $file */            
@@ -189,7 +218,7 @@ class MantencionController extends Controller
             if($idIncidencia == null){
                 $this->addFlash(
                     'notice',
-                    'Se ha ingresado una nueva mantención.| La mantención está asociada al requerimiento:'.$mantencion->getNumeroRequerimiento().'.|'.$msg
+                    'Se ha ingresado una nueva mantención.| La mantención está asociada al requerimiento: '.$mantencion->getNumeroRequerimiento().'.|'.$msg
                 );               
             }
             else{
@@ -228,6 +257,31 @@ class MantencionController extends Controller
                 $em->persist($historialIncidencia);
                 
                 $em->flush();
+                
+                if($mantencion->getTipoIngreso()==3){                
+                    //Si es inicio programado crear el scheduledEvent en la BD
+                    $connection = $em->getConnection();       
+                    $query="CREATE DEFINER=`root`@`localhost` EVENT `scheduler_inicio_mantencion_".$mantencion->getId()."` ON SCHEDULE AT '".$mantencion->getfechaInicio()->format('Y-m-d H:i')."' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE mantencion set ID_ESTADO_MANTENCION=2,FECHA_INICIO_MANTENCION=SYSDATE() WHERE id=".$mantencion->getId()." AND ID_ESTADO_MANTENCION=1;";
+                    $connection->exec($query);
+                }            
+            
+                if($mantencion->getTipoIngreso()==1){
+                    //Si es inicio actual setear la fecha de inicio
+                   $mantencion->setFechaInicio($fechaIngreso);                
+
+                   // Si se inicia inmediatamente, generar el historial
+                   $historialMantencion = new HistorialMantencion();
+
+                   $historialMantencion->setInicio($fechaIngreso);
+                   $historialMantencion->setObservacion('Se inicia la mantencion '.$prefix.$suffix.$mantencion->getCodigoInterno());            
+                   $historialMantencion->setEstadoMantencion($estado[0]);
+                   $historialMantencion->setIdEstadoMantencion($estado[0]->getId());            
+                   $historialMantencion->setMantencion($mantencion);
+                   $historialMantencion->setIdMantencion($mantencion->getId());
+                   $historialMantencion->setUsuario($mantencion->getUsuario()->getUsername());
+
+                   $em->persist($historialMantencion);
+                }   
                 
                 $this->addFlash(
                     'notice',
@@ -323,7 +377,7 @@ class MantencionController extends Controller
             $color='orange';
         if($fillRatio>100)
             $color='red';                                                    
-        if($mantencion->getEstadoMantencion()->getNombre()=='Resuelta MT')
+        if($mantencion->getEstadoMantencion()->getNombre()=='Cerrada')
             $color='green';                            
 
         $html='<div title='.$title.' class="c100 p'.min($fillRatio,100).' center big '.$color.'"><span>'.$fillRatio.'%</span><div class="slice"><div class="bar"></div><div class="fill"></div></div></div>';

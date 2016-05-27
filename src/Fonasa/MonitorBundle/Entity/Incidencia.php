@@ -64,6 +64,13 @@ class Incidencia
     private $fechaSalida;
     
     /**
+     * @var int
+     *
+     * @ORM\Column(name="tipo_ingreso", type="integer")
+     */
+    private $tipoIngreso;   
+    
+    /**
      * @var float
      *
      * @ORM\Column(name="hh_efectivas", type="float", nullable=true)
@@ -321,6 +328,30 @@ class Incidencia
     public function getFechaIngreso()
     {
         return $this->fechaIngreso;
+    }
+    
+    /**
+     * Set tipoIngreso
+     *
+     * @param boolean $tipoIngreso
+     *
+     * @return Incidencia
+     */
+    public function setTipoIngreso($tipoIngreso)
+    {
+        $this->tipoIngreso = $tipoIngreso;
+
+        return $this;
+    }
+
+    /**
+     * Get tipoIngreso
+     *
+     * @return int
+     */
+    public function getTipoIngreso()
+    {
+        return $this->tipoIngreso;
     }
     
     /**
